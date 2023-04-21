@@ -133,18 +133,18 @@ class Loginpage(tk.Frame):
         
         tk.Frame.__init__(self, parent)
         #loginpage bg
-        # raw_image=Image.open("IICP4.png")
-        # background_image=ImageTk.PhotoImage(raw_image)
-        # background_label = tk.Label(self, image=background_image)
-        # background_label.place(x=-560,y=-350)
-        # background_label.image = background_image
+        raw_image=Image.open("images\Slide1.png")
+        background_image=ImageTk.PhotoImage(raw_image)
+        background_label = tk.Label(self, image=background_image)
+        background_label.place(x=-215,y=-155)
+        background_label.image = background_image
 
 
         #direct to register page for new users
         def go_to_register():
             controller.show_frame(RegisterPage)
-        register_link_btn = Button(self, text= "New user? Go to Register Page", cursor= "hand2", font= ('Arial', 18), command=go_to_register)
-        register_link_btn.place(x=393,y=500)
+        register_link_btn = Button(self, text= "New user? Go to Register Page", cursor= "hand2", font= ('Arial', 14), command=go_to_register)
+        register_link_btn.place(x=830,y=500)
         
                 
         def login_response():
@@ -185,12 +185,7 @@ class Loginpage(tk.Frame):
             else:
                 messagebox.showerror('Error', warn)
 
-            
-
-        page_title =  Label(self, text ='Welcome to INTI Study Helpdesk', font = ('Tahoma', 30, 'bold'))
-        page_title.pack()
-        page_title.place(x=290, y=250)
-
+     
         # widgets
         left_frame = Frame(self, bd=2, bg='salmon',   relief=SOLID, padx=10, pady=-1000)
         Label(left_frame, text="Email", bg='salmon',font=f).grid(row=0, column=0, sticky=W, pady=10)
@@ -201,14 +196,14 @@ class Loginpage(tk.Frame):
         def toggle_password():
             if pwd_tf.cget('show') == '':
                 pwd_tf.config(show='*')
-                pwd_btn.config(text='Show')
+                pwd_btn.config(text='Show',cursor= "hand2")
             else:
                 pwd_tf.config(show='')
-                pwd_btn.config(text='Hide')
+                pwd_btn.config(text='Hide',cursor= "hand2")
 
         pwd_tf = Entry(left_frame, font=f, show='*')
-        pwd_btn=Button(self, text='Show', width=4, font=('Arial', 9), command=toggle_password)
-        pwd_btn.place(x=693, y=382)
+        pwd_btn=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2",command=toggle_password)
+        pwd_btn.place(x=1093, y=382)
         
         login_btn = Button(left_frame, width=15, text='Login', font=f, relief=SOLID,cursor='hand2',command=login_response)
 
@@ -216,25 +211,25 @@ class Loginpage(tk.Frame):
         email_tf.grid(row=0, column=1, pady=10, padx=20)
         pwd_tf.grid(row=1, column=1, pady=10, padx=20)
         login_btn.grid(row=2, column=1, pady=10, padx=20)
-        left_frame.place(x=385, y=320)
+        left_frame.place(x=785, y=320)
    
 
 class RegisterPage(tk.Frame):
     def __init__(self,parent, controller):
         tk.Frame.__init__(self, parent)
         # registerpage bg
-        raw_image=Image.open("images\inti_reception.png")
+        raw_image=Image.open("images\Slide2.png")
         background_image=ImageTk.PhotoImage(raw_image)
         background_label = tk.Label(self, image=background_image)
-        background_label.place(x=-560,y=-350)
+        background_label.place(x=-215,y=-155)
         background_label.image = background_image
 
         #direct to register page for new users
         def go_to_login():
             controller.show_frame(Loginpage)
 
-        login_link_btn = Button(self, text= "Go to Login Page", cursor= "hand2", font= ('Arial', 18), command=go_to_login)
-        login_link_btn.place(x=511,y=575)
+        login_link_btn = Button(self, text= "Go to Login Page", cursor= "hand2", font= ('Arial', 14), command=go_to_login)
+        login_link_btn.place(x=900,y=600)
         
         #connect to database
         con = sqlite3.connect('eventsystem.db')
@@ -312,11 +307,7 @@ class RegisterPage(tk.Frame):
             else:
                 messagebox.showerror('Error', warn)
 
-        #page title
-        page_title =  Label(self, text ='Welcome to INTI Study Helpdesk', font = ('Tahoma', 30, 'bold'))
-        page_title.pack()
-        page_title.place(x=303, y=105)
-
+       
         #register frame
         right_frame = Frame(self, bd=2, bg='salmon',relief=SOLID, padx=10, pady=-1000)
         Label(right_frame, text="Name", bg='salmon',font=f).grid(row=0, column=0, sticky=W, pady=10, padx=10)
@@ -336,8 +327,8 @@ class RegisterPage(tk.Frame):
                 pwd_btn2.config(text='Hide')
 
         register_pwd = Entry(right_frame, font=f, show='*')
-        pwd_btn2=Button(self, text='Show', width=4, font=('Arial', 9), command=toggle_password2)
-        pwd_btn2.place(x=778, y=392)
+        pwd_btn2=Button(self, text='Show', width=4, font=('Arial', 9),  cursor= "hand2", command=toggle_password2)
+        pwd_btn2.place(x=1139, y=432)
 
         def toggle_password3():
             if pwd_again.cget('show') == '':
@@ -348,8 +339,8 @@ class RegisterPage(tk.Frame):
                 pwd_btn3.config(text='Hide')
 
         pwd_again = Entry(right_frame, font=f, show='*')
-        pwd_btn3=Button(self, text='Show', width=4, font=('Arial', 9), command=toggle_password3)
-        pwd_btn3.place(x=778, y=440)
+        pwd_btn3=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2", command=toggle_password3)
+        pwd_btn3.place(x=1139, y=480)
 
         
         usertype_frame = LabelFrame(right_frame,bg='#CCCCCC',padx=10, pady=10)
@@ -369,7 +360,7 @@ class RegisterPage(tk.Frame):
         register_pwd.grid(row=4, column=1, pady=10, padx=20)
         pwd_again.grid(row=5, column=1, pady=10, padx=20)
         register_btn.grid(row=6, column=1, pady=10, padx=20)
-        right_frame.place(x=389, y=165)
+        right_frame.place(x=750, y=205)
 
         usertype_frame.grid(row=3, column=1, pady=10, padx=20)
         student_rb.pack(expand=True, side=LEFT)
@@ -527,7 +518,7 @@ class Profile(tk.Frame):
 #window
 ws=App()
 ws.title("INTI Study Helpdesk")
-ws.geometry('1230x770')
+ws.geometry('1230x773')
 ws.resizable(False,False)
 
 ws.mainloop()
