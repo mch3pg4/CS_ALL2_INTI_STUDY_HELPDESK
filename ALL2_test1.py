@@ -7,10 +7,13 @@ from tkinter import messagebox, ttk
 import tkinter as tk
 from time import strftime
 from datetime import date
-import sqlite3
+import mysql.connector
+from mysql.connector import Error
 import io
 
 f=('Arial', 14)
+
+
 
 
 #inti logo
@@ -152,7 +155,10 @@ class Loginpage(tk.Frame):
             try:
                 uname = email_tf.get()
                 upwd = pwd_tf.get()
-                con = sqlite3.connect('eventsystem.db')
+                con = mysql.connector.connect(host="localhost",
+                                    user="Mike",
+                                    password="1234",
+                                    database="userdata") 
                 c = con.cursor()
                 c.execute("Select * from UserDetails where email=? AND password=?",(uname,upwd))
                 
@@ -232,9 +238,14 @@ class RegisterPage(tk.Frame):
         login_link_btn.place(x=900,y=600)
         
         #connect to database
-        con = sqlite3.connect('eventsystem.db')
+        con = mysql.connector.connect(
+                                    user="root",
+                                    password="1234",
+                                    database="userdata")           
+      
         cur=con.cursor()
-        cur.execute('''CREATE TABLE IF NOT EXISTS UserDetails( name text PRIMARY KEY NOT NULL,
+        cur.execute('''CREATE TABLE IF NOT EXISTS UserDetails( id INT AUTO_INCREMENT PRIMARY KEY,
+                                                            name text PRIMARY KEY NOT NULL,
                                                             user_id number NOT NULL, 
                                                             email text NOT NULL, 
                                                             contact number NOT NULL, 
@@ -289,7 +300,10 @@ class RegisterPage(tk.Frame):
 
             if check_counter == 9:
                 try:
-                    con = sqlite3.connect('eventsystem.db')
+                    con = mysql.connector.connect(host="localhost",
+                                    user="Mike",
+                                    password="1234",
+                                    database="userdata")      
                     cur = con.cursor()
                     cur.execute("INSERT INTO UserDetails VALUES (:name, :user_id, :email,  :usertype,  :password)", {
                                 'name': register_name.get(),
