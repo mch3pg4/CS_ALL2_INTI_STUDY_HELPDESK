@@ -88,7 +88,7 @@ class App(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         #create app icon
-        iconpic = PhotoImage(file='inti_icon.png')
+        iconpic = PhotoImage(file='images\inti_icon.png')
         self.iconphoto(False,iconpic)
 
         #create dictionary of frames
@@ -223,7 +223,7 @@ class RegisterPage(tk.Frame):
     def __init__(self,parent, controller):
         tk.Frame.__init__(self, parent)
         # registerpage bg
-        raw_image=Image.open("IICP4.png")
+        raw_image=Image.open("images\inti_reception.png")
         background_image=ImageTk.PhotoImage(raw_image)
         background_label = tk.Label(self, image=background_image)
         background_label.place(x=-560,y=-350)
