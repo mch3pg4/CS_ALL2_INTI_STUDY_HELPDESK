@@ -111,24 +111,24 @@ class App(tk.Tk):
         frame = self.frames[cont]
         frame.tkraise()
 
-    def updateAdmin(self, login_details):
-        frame= self.frames[Adminpage]
-        frame.adminwelcome_lbl.config(text='Welcome Admin, '+login_details[0])
-        frame.tkraise()
+    # def updateAdmin(self, login_details):
+    #     frame= self.frames[Adminpage]
+    #     frame.adminwelcome_lbl.config(text='Welcome Admin, '+login_details[0])
+    #     frame.tkraise()
 
-    def updateHomepage(self, login_details):
-        frame = self.frames[Homepage]
-        frame.lbl_welcome.config(text='Welcome, '+ login_details[0])
-        frame.tkraise() 
+    # def updateHomepage(self, login_details):
+    #     frame = self.frames[Homepage]
+    #     frame.lbl_welcome.config(text='Welcome, '+ login_details[0])
+    #     frame.tkraise() 
 
-    def updateProfile(self, login_details):
-        frame = self.frames[Profile]
-        frame.lbl_welcome.config(text='Welcome, '+ login_details[0])
-        frame.lbl_name.config(text=login_details[0])
-        frame.lbl_email.config(text=login_details[2])
-        frame.lbl_contact.config(text=str(login_details[3]))
-        frame.lbl_gender.config(text=login_details[5])
-        frame.tkraise()
+    # def updateProfile(self, login_details):
+    #     frame = self.frames[Profile]
+    #     frame.lbl_welcome.config(text='Welcome, '+ login_details[0])
+    #     frame.lbl_name.config(text=login_details[0])
+    #     frame.lbl_email.config(text=login_details[2])
+    #     frame.lbl_contact.config(text=str(login_details[3]))
+    #     frame.lbl_gender.config(text=login_details[5])
+    #     frame.tkraise()
 
 
 class Loginpage(tk.Frame):
@@ -177,13 +177,13 @@ class Loginpage(tk.Frame):
             if check_counter == 2:
                 login_details=c.fetchone()
                 if login_details is not None:
-                    messagebox.showinfo('Login Status', 'Logged in Successfully!')
-                    controller.updateProfile( login_details)
-                    controller.updateHomepage(login_details)
-                    controller.updateAdmin(login_details)
-                    if login_details[4]== 'admin':
-                        controller.show_frame(Adminpage)
-                    else:
+                    # messagebox.showinfo('Login Status', 'Logged in Successfully!')
+                    # controller.updateProfile( login_details)
+                    # controller.updateHomepage(login_details)
+                    # controller.updateAdmin(login_details)
+                    # if login_details[4]== 'Lecturer':
+                    #     controller.show_frame(Adminpage)
+                    # else:
                         controller.show_frame(Homepage)
                 
                 else:
@@ -314,7 +314,7 @@ class RegisterPage(tk.Frame):
                     cur.execute(insert_data,data)
 
                     con.commit()
-                    messagebox.showinfo('confirmation', 'Record Saved')
+                    messagebox.showinfo('Register', 'Account Created Successfully!')
                     controller.show_frame(Loginpage)
 
                 except Exception as ep:
