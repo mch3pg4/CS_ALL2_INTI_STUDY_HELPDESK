@@ -1,19 +1,19 @@
 import datetime
 from tkcalendar import Calendar
 from tkinter import *
-from tkinter import filedialog
 from PIL import Image,ImageTk
-from tkinter import messagebox, ttk
+from tkinter import messagebox, ttk, filedialog, Tk, Label, Entry, Button, END
 import tkinter as tk
 from time import strftime
 from datetime import date
 import mysql.connector
 from mysql.connector import Error
-import io
+import random, io, string
+from captcha.image import ImageCaptcha
+
+
 
 f=('Arial', 14)
-
-
 
 
 #inti logo
@@ -56,6 +56,76 @@ def adminclock(self):
     l1=tk.Label(self,font=('calibri', 26, 'bold'),bg='AntiqueWhite1', foreground='black')
     l1.place(x=900, y=5)
     my_time()
+
+#captcha verification
+def captcha_verify():
+
+    top = Toplevel(ws)
+    # top.geometry('1240x450')
+    top.title("Captcha Verification")
+    top.resizable(False,False)
+
+    #generate captcha image
+    def createImage(flag=0): 
+        global random_string, image_label, image_display, entry, verify_label
+
+        #executed when pressed reload captcha button
+        if flag == 1:
+            verify_label.grid_forget()
+
+            # Remove contents of user input
+            entry.delete(0, END)
+
+            # Generate random string for captcha
+            random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+
+            # create captcha image
+            image_captcha = ImageCaptcha(width=250, height=125)
+            image_generated = image_captcha.generate(random_string)
+            image_display = ImageTk.PhotoImage(Image.open(image_generated))
+
+            # Remove previous Image (if present) and display new one
+            image_label.grid_forget()
+            image_label = Label(top, image=image_display)
+            image_label.grid(row=1, column=0, columnspan=2,padx=10)
+
+            # check if user input same as captcha image
+            def check(x, y):
+                global verify_label
+                verify_label.grid_forget()
+
+                if x==y:
+                    verify_label = Label(master=top,text="Verified",font="Arial 15",bg='#ffe75c',fg="#00a806" )
+                    verify_label.grid(row=0, column=0, columnspan=2, pady=10)
+                else:
+                    verify_label = Label(master=top,text="Incorrect!",font="Arial 15",bg='#ffe75c',fg="#fa0800")
+                    verify_label.grid(row=0, column=0, columnspan=2, pady=10)
+                    createImage()
+
+
+            # Initializing the Variables to be defined later
+            verify_label = Label(top)
+            image_label = Label(top)
+
+            # Defining the Input Box and placing it in the window
+            entry = Entry(top, width=10, borderwidth=5,font="Arial 15", justify="center")
+            entry.grid(row=2, column=0)
+
+            # Create captcha image
+            createImage()
+
+            # Defining the path for the reload button image
+            # and using it to add the reload button in the
+            # GUI window
+            path = 'images\reload_img.png'
+            reload_img = ImageTk.PhotoImage(Image.open(path).resize((32, 32), Image.ANTIALIAS))
+            reload_button = Button(image=reload_img, command=lambda: createImage(1))
+            reload_button.grid(row=2, column=1, pady=10)
+
+            # Defining the submit button
+            submit_button = Button(top, text="Submit", font="Arial 10", command=lambda: check(entry.get(), random_string))
+            submit_button.grid(row=3, column=0, columnspan=2, pady=10)
+            top.bind('<Return>', func=lambda Event: check(entry.get(), random_string))
 
 
 #top buttons
@@ -294,12 +364,16 @@ class RegisterPage(tk.Frame):
                 check_counter += 1
 
             if check_counter == 7:
+                captcha_verify()
                 try:
                     con = mysql.connector.connect(host="localhost",
                                     user="root",
                                     password="rootpass",
                                     database="all2")      
                     cur = con.cursor()
+                    
+                    #captcha verification
+
 
                     #get user entries
                     iduserdata= None
