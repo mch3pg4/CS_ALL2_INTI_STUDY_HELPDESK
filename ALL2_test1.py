@@ -156,11 +156,11 @@ class Loginpage(tk.Frame):
                 uname = email_tf.get()
                 upwd = pwd_tf.get()
                 con = mysql.connector.connect(host="localhost",
-                                    user="Mike",
-                                    password="1234",
-                                    database="userdata") 
+                                    user="root",
+                                    password="rootpass",
+                                    database="all2") 
                 c = con.cursor()
-                c.execute("Select * from UserDetails where email=? AND password=?",(uname,upwd))
+                c.execute("SELECT * FROM userdata WHERE email=%s AND password=%s",(uname,upwd))
                 
             except Exception as ep:
                 messagebox.showerror('Error', ep)
@@ -238,26 +238,22 @@ class RegisterPage(tk.Frame):
         login_link_btn.place(x=900,y=600)
         
         #connect to database
-        con = mysql.connector.connect(
+        con = mysql.connector.connect(host="localhost",
                                     user="root",
-                                    password="1234",
-                                    database="userdata")           
+                                    password="rootpass",
+                                    database="all2")           
       
         cur=con.cursor()
-        cur.execute('''CREATE TABLE IF NOT EXISTS UserDetails( id INT AUTO_INCREMENT PRIMARY KEY,
-                                                            name text PRIMARY KEY NOT NULL,
-                                                            user_id number NOT NULL, 
-                                                            email text NOT NULL, 
-                                                            contact number NOT NULL, 
+        cur.execute('''CREATE TABLE IF NOT EXISTS userdata( iduserdata INT AUTO_INCREMENT PRIMARY KEY,
+                                                            name varchar(70) NOT NULL,
+                                                            user_id varchar(45) NOT NULL, 
+                                                            email varchar(45) NOT NULL, 
                                                             usertype text NOT NULL, 
-                                                            gender text NOT NULL, 
-                                                            password text NOT NULL)''')
+                                                            password varchar(45) NOT NULL)''')
         con.commit()
 
         var1=StringVar()
         var1.set(None)
-        var2=StringVar()
-        var2.set(None)
 
         def insert_record():
             check_counter=0
@@ -282,7 +278,6 @@ class RegisterPage(tk.Frame):
             else:
                 check_counter += 1
 
-
             if register_pwd.get() == "":
                 warn = 'Please enter a password.'
             else:
@@ -298,20 +293,26 @@ class RegisterPage(tk.Frame):
             else:
                 check_counter += 1
 
-            if check_counter == 9:
+            if check_counter == 7:
                 try:
                     con = mysql.connector.connect(host="localhost",
-                                    user="Mike",
-                                    password="1234",
-                                    database="userdata")      
+                                    user="root",
+                                    password="rootpass",
+                                    database="all2")      
                     cur = con.cursor()
-                    cur.execute("INSERT INTO UserDetails VALUES (:name, :user_id, :email,  :usertype,  :password)", {
-                                'name': register_name.get(),
-                                'user_id': register_userid.get(),
-                                'email': register_email.get(),
-                                'usertype': var1.get(),
-                                'password': register_pwd.get()              
-                    })
+
+                    #get user entries
+                    iduserdata= None
+                    name= register_name.get()
+                    user_id= register_userid.get()
+                    email= register_email.get()
+                    usertype= var1.get()
+                    password= register_pwd.get() 
+                    
+                    insert_data = ("INSERT INTO userdata(iduserdata, name, user_id, email, usertype, password) VALUES (%s,%s,%s,%s,%s,%s);")
+                    data= (iduserdata, name, user_id, email, usertype, password)
+                    cur.execute(insert_data,data)
+
                     con.commit()
                     messagebox.showinfo('confirmation', 'Record Saved')
                     controller.show_frame(Loginpage)
@@ -361,8 +362,8 @@ class RegisterPage(tk.Frame):
         register_name = Entry(right_frame, font=f)
         register_userid = Entry(right_frame,font=f)
         register_email = Entry(right_frame, font=f)
-        student_rb = Radiobutton(usertype_frame,text='Student',bg='#CCCCCC',variable=var1,value='user',font=('Arial',10))
-        lect_rb = Radiobutton(usertype_frame,text='Lecturer',bg='#CCCCCC',variable=var1,value='admin',font=('Arial',10))
+        student_rb = Radiobutton(usertype_frame,text='Student',bg='#CCCCCC',variable=var1,value='Student',font=('Arial',10))
+        lect_rb = Radiobutton(usertype_frame,text='Lecturer',bg='#CCCCCC',variable=var1,value='Lecturer',font=('Arial',10))
         register_pwd = Entry(right_frame, font=f,show='*')
         pwd_again = Entry(right_frame, font=f,show='*')
         register_btn = Button(right_frame, width=15, text='Register', font=f, relief=SOLID,cursor='hand2',command= insert_record)
