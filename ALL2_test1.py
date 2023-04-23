@@ -257,17 +257,10 @@ class RegisterPage(tk.Frame):
         var1.set(None)
 
 
-        # # Generate random string for captcha
-        # self.random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
-
-        # # create captcha image
-        # image_captcha = ImageCaptcha(width=200, height=55)
-        # image_generated = image_captcha.generate(self.random_string)
-        # image_display = ImageTk.PhotoImage(Image.open(image_generated))
 
         def createImage(flag=0): 
             global image_display, image_label
-            #executed when pressed reload captcha button
+            
             # Generate new random string for captcha
             self.random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
 
@@ -276,15 +269,11 @@ class RegisterPage(tk.Frame):
             image_generated = image_captcha.generate(self.random_string)
             image_display = ImageTk.PhotoImage(Image.open(image_generated))
             
+            #executed when pressed reload captcha button
             if flag == 1:
                 # Remove previous Image (if present) and display new one
                 image_label.config(image=image_display)
 
-
-            
-            
-            
-        
 
         def insert_record():
 
@@ -359,6 +348,7 @@ class RegisterPage(tk.Frame):
             else:
                 messagebox.showerror('Error', warn)
 
+        #captcha function
         createImage()
 
         #register frame
