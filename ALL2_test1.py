@@ -57,76 +57,6 @@ def adminclock(self):
     l1.place(x=900, y=5)
     my_time()
 
-#captcha verification
-def captcha_verify():
-
-    top = Toplevel(ws)
-    # top.geometry('1240x450')
-    top.title("Captcha Verification")
-    top.resizable(False,False)
-
-    #generate captcha image
-    def createImage(flag=0): 
-        global random_string, image_label, image_display, entry, verify_label
-
-        #executed when pressed reload captcha button
-        if flag == 1:
-            verify_label.grid_forget()
-
-            # Remove contents of user input
-            entry.delete(0, END)
-
-            # Generate random string for captcha
-            random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
-
-            # create captcha image
-            image_captcha = ImageCaptcha(width=250, height=125)
-            image_generated = image_captcha.generate(random_string)
-            image_display = ImageTk.PhotoImage(Image.open(image_generated))
-
-            # Remove previous Image (if present) and display new one
-            image_label.grid_forget()
-            image_label = Label(top, image=image_display)
-            image_label.grid(row=1, column=0, columnspan=2,padx=10)
-
-            # check if user input same as captcha image
-            def check(x, y):
-                global verify_label
-                verify_label.grid_forget()
-
-                if x==y:
-                    verify_label = Label(master=top,text="Verified",font="Arial 15",bg='#ffe75c',fg="#00a806" )
-                    verify_label.grid(row=0, column=0, columnspan=2, pady=10)
-                else:
-                    verify_label = Label(master=top,text="Incorrect!",font="Arial 15",bg='#ffe75c',fg="#fa0800")
-                    verify_label.grid(row=0, column=0, columnspan=2, pady=10)
-                    createImage()
-
-
-            # Initializing the Variables to be defined later
-            verify_label = Label(top)
-            image_label = Label(top)
-
-            # Defining the Input Box and placing it in the window
-            entry = Entry(top, width=10, borderwidth=5,font="Arial 15", justify="center")
-            entry.grid(row=2, column=0)
-
-            # Create captcha image
-            createImage()
-
-            # Defining the path for the reload button image
-            # and using it to add the reload button in the
-            # GUI window
-            path = 'images\reload_img.png'
-            reload_img = ImageTk.PhotoImage(Image.open(path).resize((32, 32), Image.ANTIALIAS))
-            reload_button = Button(image=reload_img, command=lambda: createImage(1))
-            reload_button.grid(row=2, column=1, pady=10)
-
-            # Defining the submit button
-            submit_button = Button(top, text="Submit", font="Arial 10", command=lambda: check(entry.get(), random_string))
-            submit_button.grid(row=3, column=0, columnspan=2, pady=10)
-            top.bind('<Return>', func=lambda Event: check(entry.get(), random_string))
-
 
 #top buttons
 def top_buttons(self, controller):
@@ -293,6 +223,7 @@ class Loginpage(tk.Frame):
 class RegisterPage(tk.Frame):
     def __init__(self,parent, controller):
         tk.Frame.__init__(self, parent)
+        global image_display, image_label
         # registerpage bg
         raw_image=Image.open("images\Slide2.png")
         background_image=ImageTk.PhotoImage(raw_image)
@@ -305,7 +236,7 @@ class RegisterPage(tk.Frame):
             controller.show_frame(Loginpage)
 
         login_link_btn = Button(self, text= "Go to Login Page", cursor= "hand2", font= ('Arial', 14), command=go_to_login)
-        login_link_btn.place(x=900,y=600)
+        login_link_btn.place(x=900,y=720)
         
         #connect to database
         con = mysql.connector.connect(host="localhost",
@@ -325,7 +256,38 @@ class RegisterPage(tk.Frame):
         var1=StringVar()
         var1.set(None)
 
+
+        # # Generate random string for captcha
+        # self.random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+
+        # # create captcha image
+        # image_captcha = ImageCaptcha(width=200, height=55)
+        # image_generated = image_captcha.generate(self.random_string)
+        # image_display = ImageTk.PhotoImage(Image.open(image_generated))
+
+        def createImage(flag=0): 
+            global image_display, image_label
+            #executed when pressed reload captcha button
+            # Generate new random string for captcha
+            self.random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+
+            # create captcha image
+            image_captcha = ImageCaptcha(width=200, height=55)
+            image_generated = image_captcha.generate(self.random_string)
+            image_display = ImageTk.PhotoImage(Image.open(image_generated))
+            
+            if flag == 1:
+                # Remove previous Image (if present) and display new one
+                image_label.config(image=image_display)
+
+
+            
+            
+            
+        
+
         def insert_record():
+
             check_counter=0
             warn = " "
             if register_name.get() == "":
@@ -363,8 +325,12 @@ class RegisterPage(tk.Frame):
             else:
                 check_counter += 1
 
-            if check_counter == 7:
-                captcha_verify()
+            if reg_captcha.get() != self.random_string():
+                warn = 'Wrong captcha'
+            else:
+                check_counter += 1
+
+            if check_counter == 8:
                 try:
                     con = mysql.connector.connect(host="localhost",
                                     user="root",
@@ -372,9 +338,6 @@ class RegisterPage(tk.Frame):
                                     database="all2")      
                     cur = con.cursor()
                     
-                    #captcha verification
-
-
                     #get user entries
                     iduserdata= None
                     name= register_name.get()
@@ -396,15 +359,21 @@ class RegisterPage(tk.Frame):
             else:
                 messagebox.showerror('Error', warn)
 
-       
+        createImage()
+
         #register frame
-        right_frame = Frame(self, bd=2, bg='salmon',relief=SOLID, padx=10, pady=-1000)
-        Label(right_frame, text="Name", bg='salmon',font=f).grid(row=0, column=0, sticky=W, pady=10, padx=10)
-        Label(right_frame, text="ID", bg='salmon',font=f).grid(row=1, column=0, sticky=W, pady=10, padx=10)
-        Label(right_frame, text="Email", bg='salmon',font=f).grid(row=2, column=0, sticky=W, pady=10, padx=10)
-        Label(right_frame,text="User Type",bg='salmon',font=f).grid(row=3, column=0, sticky =W, pady=10, padx=10)
-        Label(right_frame, text="Enter Password", bg='salmon',font=f).grid(row=4, column=0, sticky=W, pady=10, padx=10)
-        Label(right_frame, text="Re-Enter Password", bg='salmon',font=f ).grid(row=5, column=0, sticky=W, pady=10)
+        reg_frame = Frame(self, bd=2, bg='salmon',relief=SOLID, padx=10, pady=-1000)
+        Label(reg_frame, text="Name", bg='salmon',font=f).grid(row=0, column=0, sticky=W, pady=10, padx=10)
+        Label(reg_frame, text="ID", bg='salmon',font=f).grid(row=1, column=0, sticky=W, pady=10, padx=10)
+        Label(reg_frame, text="Email", bg='salmon',font=f).grid(row=2, column=0, sticky=W, pady=10, padx=10)
+        Label(reg_frame,text="User Type",bg='salmon',font=f).grid(row=3, column=0, sticky =W, pady=10, padx=10)
+        Label(reg_frame, text="Enter Password", bg='salmon',font=f).grid(row=4, column=0, sticky=W, pady=10, padx=10)
+        Label(reg_frame, text="Re-Enter Password", bg='salmon',font=f ).grid(row=5, column=0, sticky=W, pady=10)
+        Label(reg_frame, text="Enter Captcha", bg='salmon',font=f ).grid(row=6, column=0, sticky=W, pady=10)
+        image_label = Label(reg_frame, image=image_display)
+        image_label.grid(row=6, column=1,padx=10, pady=10)
+        image_label.image=image_display
+        
         
         #show/hide password
         def toggle_password2():
@@ -415,7 +384,7 @@ class RegisterPage(tk.Frame):
                 register_pwd.config(show='')
                 pwd_btn2.config(text='Hide')
 
-        register_pwd = Entry(right_frame, font=f, show='*')
+        register_pwd = Entry(reg_frame, font=f, show='*')
         pwd_btn2=Button(self, text='Show', width=4, font=('Arial', 9),  cursor= "hand2", command=toggle_password2)
         pwd_btn2.place(x=1139, y=432)
 
@@ -427,20 +396,27 @@ class RegisterPage(tk.Frame):
                 pwd_again.config(show='')
                 pwd_btn3.config(text='Hide')
 
-        pwd_again = Entry(right_frame, font=f, show='*')
+        pwd_again = Entry(reg_frame, font=f, show='*')
         pwd_btn3=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2", command=toggle_password3)
         pwd_btn3.place(x=1139, y=480)
 
         
-        usertype_frame = LabelFrame(right_frame,bg='#CCCCCC',padx=10, pady=10)
-        register_name = Entry(right_frame, font=f)
-        register_userid = Entry(right_frame,font=f)
-        register_email = Entry(right_frame, font=f)
+
+        #reload button for captcha
+        reload_button = Button(self, text='Reload',command=lambda: createImage(1))
+        reload_button.place(x=1130, y=606)
+
+        
+        usertype_frame = LabelFrame(reg_frame,bg='#CCCCCC',padx=10, pady=10)
+        register_name = Entry(reg_frame, font=f)
+        register_userid = Entry(reg_frame,font=f)
+        register_email = Entry(reg_frame, font=f)
         student_rb = Radiobutton(usertype_frame,text='Student',bg='#CCCCCC',variable=var1,value='Student',font=('Arial',10))
         lect_rb = Radiobutton(usertype_frame,text='Lecturer',bg='#CCCCCC',variable=var1,value='Lecturer',font=('Arial',10))
-        register_pwd = Entry(right_frame, font=f,show='*')
-        pwd_again = Entry(right_frame, font=f,show='*')
-        register_btn = Button(right_frame, width=15, text='Register', font=f, relief=SOLID,cursor='hand2',command= insert_record)
+        register_pwd = Entry(reg_frame, font=f,show='*')
+        pwd_again = Entry(reg_frame, font=f,show='*')
+        reg_captcha= Entry(reg_frame, font=f)
+        register_btn = Button(reg_frame, width=15, text='Register', font=f, relief=SOLID,cursor='hand2',command= insert_record)
 
         #widgets placement
         register_name.grid(row=0, column=1, pady=10, padx=20)
@@ -448,8 +424,9 @@ class RegisterPage(tk.Frame):
         register_email.grid(row=2, column=1, pady=10, padx=20) 
         register_pwd.grid(row=4, column=1, pady=10, padx=20)
         pwd_again.grid(row=5, column=1, pady=10, padx=20)
-        register_btn.grid(row=6, column=1, pady=10, padx=20)
-        right_frame.place(x=750, y=205)
+        reg_captcha.grid(row=7, column=1, pady=10, padx=20)
+        register_btn.grid(row=8, column=1, pady=10, padx=20)
+        reg_frame.place(x=750, y=205)
 
         usertype_frame.grid(row=3, column=1, pady=10, padx=20)
         student_rb.pack(expand=True, side=LEFT)
