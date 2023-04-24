@@ -314,7 +314,7 @@ class RegisterPage(tk.Frame):
             else:
                 check_counter += 1
 
-            if reg_captcha.get() != self.random_string():
+            if reg_captcha.get() != self.random_string:
                 warn = 'Wrong captcha'
             else:
                 check_counter += 1
@@ -393,7 +393,7 @@ class RegisterPage(tk.Frame):
         
 
         #reload button for captcha
-        reload_button = Button(self, text='Reload',command=lambda: createImage(1))
+        reload_button = Button(self, text='Reload',font=('Arial', 9), cursor='hand2',command=lambda: createImage(1))
         reload_button.place(x=1130, y=606)
 
         
