@@ -17,65 +17,58 @@ f=('Arial', 14)
 
 
 #inti logo
-# def inti_logo(self):
-#     image=Image.open('INTI_Logo.png')
-#     img=image.resize((220,50))
-#     my_img=ImageTk.PhotoImage(img)
-#     intilogo = tk.Label(self, image=my_img)
-#     intilogo.place(x=0, y=10)
-#     intilogo.image = my_img
+def inti_logo(self):
+    image=Image.open('images\INTI_Logo.png')
+    img=image.resize((220,50))
+    my_img=ImageTk.PhotoImage(img)
+    intilogo = tk.Label(self, image=my_img)
+    intilogo.place(x=0, y=10)
+    intilogo.image = my_img
 
-#clock
-def clock(self): 
-        def time():
-            string = strftime('%H:%M:%S %p')
-            lbl.config(text = string)
-            lbl.after(1000, time)
 
-        lbl = Label(self, font = ('calibri', 20, 'bold'),background= 'antique white',foreground = 'black')
-        lbl.pack()
-        lbl.place(x=935, y=80)
-        time()
-
-#Today's date
-def today_date(self):
-        today=date.today()
-        f_today = today.strftime("%A %d/%m/%Y")
-        today_label = Label(self, text=f_today, font= ('Calibri', 20, 'bold'),background= 'antique white',foreground = 'black')
-        today_label.pack()
-        today_label.place(x=40, y=80)
-
-#adminpage clock
-def adminclock(self):
+#clock and date day
+def clockdate(self):
     
     def my_time():
-        time_string = strftime('%H:%M:%S %p \n %A \n %d/%m/%Y') # time format 
+        time_string = strftime('%H:%M:%S %p %a %d/%m/%Y') # time format 
         l1.config(text=time_string)
         l1.after(1000,my_time) # time delay of 1000 milliseconds 
 
-    l1=tk.Label(self,font=('calibri', 26, 'bold'),bg='AntiqueWhite1', foreground='black')
-    l1.place(x=900, y=5)
+    l1=tk.Label(self,font=('Arial', 19, 'bold'),bg='antique white', foreground='black')
+    l1.place(x=750, y=12)
     my_time()
+
+#Welcome user title (to be changed later)
+def welcome_user(self):
+    welcome_text=tk.Label(self,font=('Arial', 19, 'bold'),bg='antique white', text='Welcome, User', foreground='black')
+    welcome_text.place(x=350, y=12)
+
 
 
 #top buttons
 def top_buttons(self, controller):
     button1=tk.Button(self, height=1, width= 12, text="Homepage", font=f,command= lambda:controller.show_frame(Homepage))
-    button1.place(x=230, y=12)
+    button1.place(x=230, y=75)
 
     button2=tk.Button(self, height=1, width=12, text="Announcements", font=f, command= lambda:controller.show_frame(Announcements))
-    button2.place(x=230*1.75, y=12)
+    button2.place(x=230*1.75, y=75)
 
     button3=tk.Button(self, height=1, width=12, text="Events", font=f,command= lambda:controller.show_frame(Events))
-    button3.place(x=230*2.5, y=12)
+    button3.place(x=230*2.5, y=75)
 
     button4=tk.Button(self, height=1, width=12, text="Competitions", font=f,command= lambda:controller.show_frame(Competitions))
-    button4.place(x=230*3.25, y=12)
+    button4.place(x=230*3.25, y=75)
 
     button5=tk.Button(self, height=1, width=12, text="Profile", font=f, command=lambda: controller.show_frame(Profile))
-    button5.place(x=230*4, y=12)
+    button5.place(x=230*4, y=75)
 
-
+#logout button 
+def log_out_btn(self):
+    def logout(controller):
+        controller.show_frame(Loginpage)
+        messagebox.showinfo('Logout Status', 'Logged out successfully!')
+    logout_btn=tk.Button(self, height=1, width=7, font=f, command=logout, text='Logout')
+    logout_btn.place(x=1120 ,y=10)
 
 
 class App(tk.Tk):
@@ -197,7 +190,7 @@ class Loginpage(tk.Frame):
         Label(left_frame, text="Email", bg='salmon',font=f).grid(row=0, column=0, sticky=W, pady=10)
         Label(left_frame, text="Password", bg='salmon',font=f).grid(row=1, column=0, pady=10)
         email_tf = Entry(left_frame, font=f)
-
+        email_tf.insert(0, 'm')   #default value for testing
         #show/hide password
         def toggle_password():
             if pwd_tf.cget('show') == '':
@@ -207,7 +200,8 @@ class Loginpage(tk.Frame):
                 pwd_tf.config(show='')
                 pwd_btn.config(text='Hide',cursor= "hand2")
 
-        pwd_tf = Entry(left_frame, font=f, show='*')
+        pwd_tf = Entry(left_frame, font=f, show='*')    #default value for testing
+        pwd_tf.insert(0, 'm')
         pwd_btn=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2",command=toggle_password)
         pwd_btn.place(x=1093, y=382)
         
@@ -247,7 +241,7 @@ class RegisterPage(tk.Frame):
         cur=con.cursor()
         cur.execute('''CREATE TABLE IF NOT EXISTS userdata( iduserdata INT AUTO_INCREMENT PRIMARY KEY,
                                                             name varchar(70) NOT NULL,
-                                                            user_id varchar(45) NOT NULL, 
+                                                            user_id varchar(45) NOT NULL UNIQUE, 
                                                             email varchar(45) NOT NULL, 
                                                             usertype text NOT NULL, 
                                                             password varchar(45) NOT NULL)''')
@@ -433,7 +427,7 @@ class Adminpage(tk.Frame):
         # inti_logo(self)
 
         #show admin date and clock
-        adminclock(self)
+        # adminclock(self)
 
         #Welcome to Admin page title
         self.adminwelcome_lbl = Label(self, text ='', font = ('Arial', 28) , bg='AntiqueWhite1')
@@ -465,18 +459,21 @@ class Homepage(tk.Frame):
         global login_details
 
         #inti logo
-        # inti_logo(self)
+        inti_logo(self)
         #top buttons
         top_buttons(self,controller)
         #show date and clock
-        clock(self)
-        today_date(self)
+        clockdate(self)
+        #welcome user text
+        welcome_user(self)
+        #logout btn
+        log_out_btn(self)
 
         #Homepage
         #Homepage title
         w = Label(self, text ='Homepage', font = ('Arial', 28) , bg='antique white')
         w.pack()
-        w.place(x=480, y=80)
+        w.place(x=480, y=100)
         
     
 
@@ -486,17 +483,20 @@ class Announcements(tk.Frame):
 
 
         #inti logo
-        # inti_logo(self)
+        inti_logo(self)
         #top buttons
         top_buttons(self,controller)
         #show date and clock
-        clock(self)
-        today_date(self)
+        clockdate(self)
+        #welcome user text
+        welcome_user(self)
+        #logout btn
+        log_out_btn(self)
 
         #Announcements Title
         w = Label(self, text ='Announcements', font = ('Arial', 28), bg='antique white' )
         w.pack()
-        w.place(x=445, y=80)
+        w.place(x=445, y=100)
 
 
 
@@ -505,17 +505,20 @@ class Events(tk.Frame):
         tk.Frame.__init__(self, parent, bg='antique white')
         
         #inti logo
-        # inti_logo(self)
+        inti_logo(self)
         #top buttons
         top_buttons(self,controller)
         #show date and clock
-        clock(self)
-        today_date(self)
+        clockdate(self)
+        #welcome user text
+        welcome_user(self)
+        #logout btn
+        log_out_btn(self)
 
         #Events title
         w = Label(self, text ='Events', font = ('Arial', 28) , bg='antique white')
         w.pack()
-        w.place(x=480, y=80)
+        w.place(x=480, y=100)
 
 
 
@@ -525,17 +528,20 @@ class Competitions(tk.Frame):
 
 
         #inti logo
-        # inti_logo(self)
+        inti_logo(self)
         #top buttons
         top_buttons(self,controller)
         #show date and clock
-        clock(self)
-        today_date(self)
+        clockdate(self)
+        #welcome user text
+        welcome_user(self)
+        #logout btn
+        log_out_btn(self)
 
         #Competitions title
         w = Label(self, text ='Competitions', font = ('Arial', 28) , bg='antique white')
         w.pack()
-        w.place(x=465, y=80)
+        w.place(x=465, y=100)
 
         
 
@@ -545,29 +551,25 @@ class Profile(tk.Frame):
         global login_details
 
         #inti logo
-        # inti_logo(self)
+        inti_logo(self)
         #top buttons
         top_buttons(self,controller)
         #show date and clock
-        clock(self)
-        today_date(self)
+        clockdate(self)
+        #welcome user text
+        welcome_user(self)
+        #logout btn
+        log_out_btn(self)
 
         #Profile Title
         w = Label(self, text ='Profile', font = ('Arial', 28), bg='antique white')
         w.pack()
-        w.place(x=500, y=80)
+        w.place(x=500, y=100)
 
         
         
 
 
-
-        #Logout
-        def log_out():
-            controller.show_frame(Loginpage)
-            messagebox.showinfo('Logout Status', 'Logged out successfully!')
-        logout_btn=tk.Button(self, height=1, width=7, font=f, command=log_out, text='Logout')
-        logout_btn.place(x=980 ,y=130)
 
 
 
