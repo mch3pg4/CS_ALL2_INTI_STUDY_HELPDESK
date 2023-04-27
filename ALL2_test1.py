@@ -22,7 +22,7 @@ def inti_logo(self):
     img=image.resize((220,50))
     my_img=ImageTk.PhotoImage(img)
     intilogo = tk.Label(self, image=my_img)
-    intilogo.place(x=0, y=10)
+    intilogo.place(x=0, y=5)
     intilogo.image = my_img
 
 
@@ -63,8 +63,8 @@ def top_buttons(self, controller):
     button5.place(x=230*4, y=75)
 
 #logout button 
-def log_out_btn(self):
-    def logout(controller):
+def log_out_btn(self, controller):
+    def logout():
         controller.show_frame(Loginpage)
         messagebox.showinfo('Logout Status', 'Logged out successfully!')
     logout_btn=tk.Button(self, height=1, width=7, font=f, command=logout, text='Logout')
@@ -467,7 +467,7 @@ class Homepage(tk.Frame):
         #welcome user text
         welcome_user(self)
         #logout btn
-        log_out_btn(self)
+        log_out_btn(self,controller)
 
         #Homepage
         #Homepage title
@@ -491,7 +491,7 @@ class Announcements(tk.Frame):
         #welcome user text
         welcome_user(self)
         #logout btn
-        log_out_btn(self)
+        log_out_btn(self,controller)
 
         #Announcements Title
         w = Label(self, text ='Announcements', font = ('Arial', 28), bg='antique white' )
@@ -513,7 +513,7 @@ class Events(tk.Frame):
         #welcome user text
         welcome_user(self)
         #logout btn
-        log_out_btn(self)
+        log_out_btn(self,controller)
 
         #Events title
         w = Label(self, text ='Events', font = ('Arial', 28) , bg='antique white')
@@ -536,7 +536,7 @@ class Competitions(tk.Frame):
         #welcome user text
         welcome_user(self)
         #logout btn
-        log_out_btn(self)
+        log_out_btn(self,controller)
 
         #Competitions title
         w = Label(self, text ='Competitions', font = ('Arial', 28) , bg='antique white')
@@ -559,7 +559,7 @@ class Profile(tk.Frame):
         #welcome user text
         welcome_user(self)
         #logout btn
-        log_out_btn(self)
+        log_out_btn(self,controller)
 
         #Profile Title
         w = Label(self, text ='Profile', font = ('Arial', 28), bg='antique white')
@@ -576,7 +576,7 @@ class Profile(tk.Frame):
 #window
 ws=App()
 ws.title("INTI Study Helpdesk")
-ws.geometry('1230x773')
+ws.geometry('1240x773')
 ws.resizable(False,False)
 
 ws.mainloop()
