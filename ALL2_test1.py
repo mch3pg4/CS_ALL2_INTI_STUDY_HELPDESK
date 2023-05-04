@@ -38,11 +38,6 @@ def clockdate(self):
     l1.place(x=750, y=12)
     my_time()
 
-#Welcome user title (to be changed later)
-def welcome_user(self):
-    welcome_text=tk.Label(self,font=('Arial', 19, 'bold'),bg='antique white', text='Welcome, User', foreground='black')
-    welcome_text.place(x=350, y=12)
-
 
 
 #top buttons
@@ -104,15 +99,6 @@ class App(tk.Tk):
         frame = self.frames[cont]
         frame.tkraise()
 
-    # def updateAdmin(self, login_details):
-    #     frame= self.frames[Adminpage]
-    #     frame.adminwelcome_lbl.config(text='Welcome Admin, '+login_details[0])
-    #     frame.tkraise()
-
-    # def updateHomepage(self, login_details):
-    #     frame = self.frames[Homepage]
-    #     frame.lbl_welcome.config(text='Welcome, '+ login_details[0])
-    #     frame.tkraise() 
 
     # def updateProfile(self, login_details):
     #     frame = self.frames[Profile]
@@ -429,11 +415,6 @@ class Adminpage(tk.Frame):
         #show admin date and clock
         # adminclock(self)
 
-        #Welcome to Admin page title
-        self.adminwelcome_lbl = Label(self, text ='', font = ('Arial', 28) , bg='AntiqueWhite1')
-        self.adminwelcome_lbl.pack()
-        self.adminwelcome_lbl.place(x=390, y=20)
-
 
        
 
@@ -464,8 +445,6 @@ class Homepage(tk.Frame):
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
-        #welcome user text
-        welcome_user(self)
         #logout btn
         log_out_btn(self,controller)
 
@@ -488,8 +467,6 @@ class Announcements(tk.Frame):
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
-        #welcome user text
-        welcome_user(self)
         #logout btn
         log_out_btn(self,controller)
 
@@ -510,8 +487,6 @@ class Events(tk.Frame):
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
-        #welcome user text
-        welcome_user(self)
         #logout btn
         log_out_btn(self,controller)
 
@@ -533,8 +508,6 @@ class Competitions(tk.Frame):
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
-        #welcome user text
-        welcome_user(self)
         #logout btn
         log_out_btn(self,controller)
 
@@ -556,8 +529,6 @@ class Profile(tk.Frame):
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
-        #welcome user text
-        welcome_user(self)
         #logout btn
         log_out_btn(self,controller)
 
