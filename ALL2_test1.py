@@ -531,7 +531,7 @@ class Profile(tk.Frame):
 #window
 ws=App()
 ws.title("INTI Study Helpdesk")
-ws.geometry('1240x773')
+ws.geometry('1240x773+150+5')
 ws.resizable(False,False)
 
 ws.mainloop()
