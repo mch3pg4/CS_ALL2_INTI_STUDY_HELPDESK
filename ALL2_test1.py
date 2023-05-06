@@ -129,25 +129,25 @@ class Loginpage(tk.Frame):
         
         tk.Frame.__init__(self, parent)
         #loginpage bg
-        raw_image=Image.open("images\Slide1.png")
-        background_image=ImageTk.PhotoImage(raw_image)
-        background_label = tk.Label(self, image=background_image)
-        background_label.place(x=-215,y=-155)
-        background_label.image = background_image
+        self.raw_image=Image.open("images\Slide1.png")
+        self.background_image=ImageTk.PhotoImage(self.raw_image)
+        self.background_label = tk.Label(self, image=self.background_image)
+        self.background_label.place(x=-215,y=-155)
+        self.background_label.image = self.background_image
 
 
         #direct to register page for new users
         def go_to_register():
             controller.show_frame(RegisterPage)
-        register_link_btn = Button(self, text= "New user? Go to Register Page", cursor= "hand2", font= ('Arial', 14), command=go_to_register)
-        register_link_btn.place(x=830,y=500)
+        self.register_link_btn = Button(self, text= "New user? Go to Register Page", cursor= "hand2", font= ('Arial', 14), command=go_to_register)
+        self.register_link_btn.place(x=830,y=500)
         
                 
         def login_response():
             global login_details
             try:
-                uname = email_tf.get()
-                upwd = pwd_tf.get()
+                uname = self.email_tf.get()
+                upwd = self.pwd_tf.get()
 
                 con = mysql.connector.connect(host="localhost",
                                               user="root",
@@ -187,24 +187,24 @@ class Loginpage(tk.Frame):
 
      
         # widgets
-        left_frame = Frame(self, bd=2, bg='salmon',   relief=SOLID, padx=10, pady=-1000)
-        Label(left_frame, text="Email", bg='salmon',font=f).grid(row=0, column=0, sticky=W, pady=10)
-        Label(left_frame, text="Password", bg='salmon',font=f).grid(row=1, column=0, pady=10)
-        email_tf = Entry(left_frame, font=f)
-        email_tf.insert(0, 'james@gmail.com')   #default value for testing
+        self.left_frame = Frame(self, bd=2, bg='salmon',   relief=SOLID, padx=10, pady=-1000)
+        Label(self.left_frame, text="Email", bg='salmon',font=f).grid(row=0, column=0, sticky=W, pady=10)
+        Label(self.left_frame, text="Password", bg='salmon',font=f).grid(row=1, column=0, pady=10)
+        self.email_tf = Entry(self.left_frame, font=f)
+        self.email_tf.insert(0, 'james@gmail.com')   #default value for testing
 
-        pwd_tf = Entry(left_frame, font=f, show='*')    #default value for testing
-        pwd_tf.insert(0, 'james')
-        pwd_btn=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2",command=lambda:toggle_password(pwd_tf, pwd_btn))
-        pwd_btn.place(x=1093, y=382)
+        self.pwd_tf = Entry(self.left_frame, font=f, show='*')    #default value for testing
+        self.pwd_tf.insert(0, 'james')
+        self.pwd_btn=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2",command=lambda:toggle_password(self.pwd_tf, self.pwd_btn))
+        self.pwd_btn.place(x=1093, y=382)
         
-        login_btn = Button(left_frame, width=15, text='Login', font=f, relief=SOLID,cursor='hand2',command=login_response)
+        self.login_btn = Button(self.left_frame, width=15, text='Login', font=f, relief=SOLID,cursor='hand2',command=login_response)
 
         # widgets placement
-        email_tf.grid(row=0, column=1, pady=10, padx=20)
-        pwd_tf.grid(row=1, column=1, pady=10, padx=20)
-        login_btn.grid(row=2, column=1, pady=10, padx=20)
-        left_frame.place(x=785, y=320)
+        self.email_tf.grid(row=0, column=1, pady=10, padx=20)
+        self.pwd_tf.grid(row=1, column=1, pady=10, padx=20)
+        self.login_btn.grid(row=2, column=1, pady=10, padx=20)
+        self.left_frame.place(x=785, y=320)
    
 
 class RegisterPage(tk.Frame):
@@ -212,18 +212,18 @@ class RegisterPage(tk.Frame):
         tk.Frame.__init__(self, parent)
         global image_display, image_label
         # registerpage bg
-        raw_image=Image.open("images\Slide2.png")
-        background_image=ImageTk.PhotoImage(raw_image)
-        background_label = tk.Label(self, image=background_image)
-        background_label.place(x=-215,y=-155)
-        background_label.image = background_image
+        self.raw_image=Image.open("images\Slide2.png")
+        self.background_image=ImageTk.PhotoImage(self.raw_image)
+        self.background_label = tk.Label(self, image=self.background_image)
+        self.background_label.place(x=-215,y=-155)
+        self.background_label.image = self.background_image
 
         #direct to register page for new users
         def go_to_login():
             controller.show_frame(Loginpage)
 
-        login_link_btn = Button(self, text= "Go to Login Page", cursor= "hand2", font= ('Arial', 14), command=go_to_login)
-        login_link_btn.place(x=900,y=720)
+        self.login_link_btn = Button(self, text= "Go to Login Page", cursor= "hand2", font= ('Arial', 14), command=go_to_login)
+        self.login_link_btn.place(x=900,y=720)
         
         #connect to database
         con = mysql.connector.connect(host="localhost",
@@ -240,8 +240,8 @@ class RegisterPage(tk.Frame):
                                                             password varchar(256) NOT NULL)''')
         con.commit()
 
-        var1=StringVar()
-        var1.set(None)
+        self.user_var=StringVar()
+        self.user_var.set(None)
 
 
 
@@ -252,56 +252,56 @@ class RegisterPage(tk.Frame):
             self.random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
 
             # create captcha image
-            image_captcha = ImageCaptcha(width=200, height=55)
-            image_generated = image_captcha.generate(self.random_string)
-            image_display = ImageTk.PhotoImage(Image.open(image_generated))
+            self.image_captcha = ImageCaptcha(width=200, height=55)
+            self.image_generated = self.image_captcha.generate(self.random_string)
+            self.image_display = ImageTk.PhotoImage(Image.open(self.image_generated))
             
             #executed when pressed reload captcha button
             if flag == 1:
                 # Remove previous Image (if present) and display new one
-                image_label.config(image=image_display)
+                self.image_label.config(image=self.image_display)
 
 
         def insert_record():
 
             check_counter=0
             warn = " "
-            if register_name.get() == "":
+            if self.register_name.get() == "":
                 warn = 'Please enter a name.'
             else:
                 check_counter += 1
             
-            if register_userid.get() == "":
+            if self.register_userid.get() == "":
                 warn='Please enter student ID.'
             else:
                 check_counter += 1
 
-            if register_email.get() == "":
+            if self.register_email.get() == "":
                 warn = 'Please enter a valid email.'
             else:
                 check_counter += 1
 
-            if var1.get() == 'None':
+            if self.user_var.get() == 'None':
                 warn = 'Select User Type'
             else:
                 check_counter += 1
 
-            if register_pwd.get() == "":
+            if self.register_pwd.get() == "":
                 warn = 'Please enter a password.'
             else:
                 check_counter += 1
 
-            if pwd_again.get() == "":
+            if self.pwd_again.get() == "":
                 warn = 'Please re-enter your password.'
             else:
                 check_counter += 1
 
-            if register_pwd.get() != pwd_again.get():
+            if self.register_pwd.get() != self.pwd_again.get():
                 warn = 'Your passwords do not match!'
             else:
                 check_counter += 1
 
-            if reg_captcha.get() != self.random_string:
+            if self.reg_captcha.get() != self.random_string:
                 warn = 'Wrong captcha'
             else:
                 check_counter += 1
@@ -316,11 +316,11 @@ class RegisterPage(tk.Frame):
                     
                     #get user entries
                     iduserdata= None
-                    name= register_name.get()
-                    user_id= register_userid.get()
-                    email= register_email.get()
-                    usertype= var1.get()
-                    password= register_pwd.get()
+                    name= self.register_name.get()
+                    user_id= self.register_userid.get()
+                    email= self.register_email.get()
+                    usertype= self.user_var.get()
+                    password= self.register_pwd.get()
                     hashed_pw= bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
                     
                     insert_data = ("INSERT INTO userdata(iduserdata, name, user_id, email, usertype, password) VALUES (%s,%s,%s,%s,%s,%s);")
@@ -340,56 +340,56 @@ class RegisterPage(tk.Frame):
         createImage()
 
         #register frame
-        reg_frame = Frame(self, bd=2, bg='salmon',relief=SOLID, padx=10, pady=-1000)
-        Label(reg_frame, text="Name", bg='salmon',font=f).grid(row=0, column=0, sticky=W, pady=10, padx=10)
-        Label(reg_frame, text="ID", bg='salmon',font=f).grid(row=1, column=0, sticky=W, pady=10, padx=10)
-        Label(reg_frame, text="Email", bg='salmon',font=f).grid(row=2, column=0, sticky=W, pady=10, padx=10)
-        Label(reg_frame,text="User Type",bg='salmon',font=f).grid(row=3, column=0, sticky =W, pady=10, padx=10)
-        Label(reg_frame, text="Enter Password", bg='salmon',font=f).grid(row=4, column=0, sticky=W, pady=10, padx=10)
-        Label(reg_frame, text="Re-Enter Password", bg='salmon',font=f ).grid(row=5, column=0, sticky=W, pady=10)
-        Label(reg_frame, text="Enter Captcha", bg='salmon',font=f ).grid(row=6, column=0, sticky=W, pady=10)
-        image_label = Label(reg_frame, image=image_display)
-        image_label.grid(row=6, column=1,padx=10, pady=10)
-        image_label.image=image_display
+        self.reg_frame = Frame(self, bd=2, bg='salmon',relief=SOLID, padx=10, pady=-1000)
+        Label(self.reg_frame, text="Name", bg='salmon',font=f).grid(row=0, column=0, sticky=W, pady=10, padx=10)
+        Label(self.reg_frame, text="ID", bg='salmon',font=f).grid(row=1, column=0, sticky=W, pady=10, padx=10)
+        Label(self.reg_frame, text="Email", bg='salmon',font=f).grid(row=2, column=0, sticky=W, pady=10, padx=10)
+        Label(self.reg_frame,text="User Type",bg='salmon',font=f).grid(row=3, column=0, sticky =W, pady=10, padx=10)
+        Label(self.reg_frame, text="Enter Password", bg='salmon',font=f).grid(row=4, column=0, sticky=W, pady=10, padx=10)
+        Label(self.reg_frame, text="Re-Enter Password", bg='salmon',font=f ).grid(row=5, column=0, sticky=W, pady=10)
+        Label(self.reg_frame, text="Enter Captcha", bg='salmon',font=f ).grid(row=6, column=0, sticky=W, pady=10)
+        self.image_label = Label(self.reg_frame, image=self.image_display)
+        self.image_label.grid(row=6, column=1,padx=10, pady=10)
+        self.image_label.image=self.image_display
         
         #password show/hide button
-        register_pwd = Entry(reg_frame, font=f, show='*')
-        pwd_btn2=Button(self, text='Show', width=4, font=('Arial', 9),  cursor= "hand2", command=lambda:toggle_password(register_pwd, pwd_btn2))
-        pwd_btn2.place(x=1139, y=432)
-        
-        pwd_again = Entry(reg_frame, font=f, show='*')
-        pwd_btn3=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2", command=lambda:toggle_password(pwd_again, pwd_btn3))
-        pwd_btn3.place(x=1139, y=480)
+        self.register_pwd = Entry(self.reg_frame, font=f, show='*')
+        self.pwd_btn2=Button(self, text='Show', width=4, font=('Arial', 9),  cursor= "hand2", command=lambda:toggle_password(self.register_pwd, self.pwd_btn2))
+        self.pwd_btn2.place(x=1139, y=432)
+
+        self.pwd_again = Entry(self.reg_frame, font=f, show='*')
+        self.pwd_btn3=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2", command=lambda:toggle_password(self.pwd_again, self.pwd_btn3))
+        self.pwd_btn3.place(x=1139, y=480)
 
         #reload button for captcha
-        reload_button = Button(self, text='Reload',font=('Arial', 9), cursor='hand2',command=lambda: createImage(1))
-        reload_button.place(x=1130, y=606)
+        self.reload_button = Button(self, text='Reload',font=('Arial', 9), cursor='hand2',command=lambda: createImage(1))
+        self.reload_button.place(x=1130, y=606)
 
         #widgets
-        usertype_frame = LabelFrame(reg_frame,bg='#CCCCCC',padx=10, pady=10)
-        register_name = Entry(reg_frame, font=f)
-        register_userid = Entry(reg_frame,font=f)
-        register_email = Entry(reg_frame, font=f)
-        student_rb = Radiobutton(usertype_frame,text='Student',bg='#CCCCCC',variable=var1,value='Student',font=('Arial',10))
-        lect_rb = Radiobutton(usertype_frame,text='Lecturer',bg='#CCCCCC',variable=var1,value='Lecturer',font=('Arial',10))
-        register_pwd = Entry(reg_frame, font=f,show='*')
-        pwd_again = Entry(reg_frame, font=f,show='*')
-        reg_captcha= Entry(reg_frame, font=f)
-        register_btn = Button(reg_frame, width=15, text='Register', font=f, relief=SOLID,cursor='hand2',command= insert_record)
+        self.usertype_frame = LabelFrame(self.reg_frame,bg='#CCCCCC',padx=10, pady=10)
+        self.register_name = Entry(self.reg_frame, font=f)
+        self.register_userid = Entry(self.reg_frame,font=f)
+        self.register_email = Entry(self.reg_frame, font=f)
+        self.student_rb = Radiobutton(self.usertype_frame,text='Student',bg='#CCCCCC',variable=self.user_var,value='Student',font=('Arial',10))
+        self.lect_rb = Radiobutton(self.usertype_frame,text='Lecturer',bg='#CCCCCC',variable=self.user_var,value='Lecturer',font=('Arial',10))
+        self.register_pwd = Entry(self.reg_frame, font=f,show='*')
+        self.pwd_again = Entry(self.reg_frame, font=f,show='*')
+        self.reg_captcha= Entry(self.reg_frame, font=f)
+        self.register_btn = Button(self.reg_frame, width=15, text='Register', font=f, relief=SOLID,cursor='hand2',command= insert_record)
 
         #widgets placement
-        register_name.grid(row=0, column=1, pady=10, padx=20)
-        register_userid.grid(row=1, column=1, pady=10, padx=20)
-        register_email.grid(row=2, column=1, pady=10, padx=20) 
-        register_pwd.grid(row=4, column=1, pady=10, padx=20)
-        pwd_again.grid(row=5, column=1, pady=10, padx=20)
-        reg_captcha.grid(row=7, column=1, pady=10, padx=20)
-        register_btn.grid(row=8, column=1, pady=10, padx=20)
-        reg_frame.place(x=750, y=205)
+        self.register_name.grid(row=0, column=1, pady=10, padx=20)
+        self.register_userid.grid(row=1, column=1, pady=10, padx=20)
+        self.register_email.grid(row=2, column=1, pady=10, padx=20) 
+        self.register_pwd.grid(row=4, column=1, pady=10, padx=20)
+        self.pwd_again.grid(row=5, column=1, pady=10, padx=20)
+        self.reg_captcha.grid(row=7, column=1, pady=10, padx=20)
+        self.register_btn.grid(row=8, column=1, pady=10, padx=20)
+        self.reg_frame.place(x=750, y=205)
 
-        usertype_frame.grid(row=3, column=1, pady=10, padx=20)
-        student_rb.pack(expand=True, side=LEFT)
-        lect_rb.pack(expand=True, side=LEFT)
+        self.usertype_frame.grid(row=3, column=1, pady=10, padx=20)
+        self.student_rb.pack(expand=True, side=LEFT)
+        self.lect_rb.pack(expand=True, side=LEFT)
 
 
         
@@ -410,15 +410,15 @@ class Adminpage(tk.Frame):
         #admin view as normal user
         def view_user():
             controller.show_frame(Homepage)
-        viewuser_btn=tk.Button(self,height=1, width=10, font=f, command=view_user, text='View as User')
-        viewuser_btn.place(x=945, y=135)
+        self.viewuser_btn=tk.Button(self,height=1, width=10, font=f, command=view_user, text='View as User')
+        self.viewuser_btn.place(x=945, y=135)
 
         #Logout
         def log_out():
             controller.show_frame(Loginpage)
             messagebox.showinfo('Logout Status', 'Logged out successfully!')
-        logout_btn=tk.Button(self, height=1, width=9, font=f, command=log_out, text='Logout')
-        logout_btn.place(x=950 ,y=180)
+        self.logout_btn=tk.Button(self, height=1, width=9, font=f, command=log_out, text='Logout')
+        self.logout_btn.place(x=950 ,y=180)
         
 
 
