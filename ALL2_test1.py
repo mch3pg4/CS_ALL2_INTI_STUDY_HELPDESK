@@ -180,7 +180,7 @@ class Loginpage(tk.Frame):
                     #     controller.show_frame(Adminpage)
                     # else:
                 else:
-                        messagebox.showerror('Login Status', 'invalid username or password')
+                    messagebox.showerror('Login Status', 'invalid username or password')
             else:
                 messagebox.showerror('Error', warn)
 
@@ -401,9 +401,6 @@ class Adminpage(tk.Frame):
 
         #show admin date and clock
         # adminclock(self)
-
-
-       
 
         #admin view as normal user
         def view_user():
