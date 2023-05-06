@@ -1,4 +1,4 @@
-import bcrypt
+import bcrypt, re, random, io, string
 import datetime
 from tkcalendar import Calendar
 from tkinter import *
@@ -9,7 +9,6 @@ from time import strftime
 from datetime import date
 import mysql.connector
 from mysql.connector import Error
-import random, io, string
 from captcha.image import ImageCaptcha
 
 
@@ -180,7 +179,7 @@ class Loginpage(tk.Frame):
                     # if login_details[4]== 'Lecturer':
                     #     controller.show_frame(Adminpage)
                     # else:
-                    else:
+                else:
                         messagebox.showerror('Login Status', 'invalid username or password')
             else:
                 messagebox.showerror('Error', warn)
@@ -191,10 +190,10 @@ class Loginpage(tk.Frame):
         Label(self.left_frame, text="Email", bg='salmon',font=f).grid(row=0, column=0, sticky=W, pady=10)
         Label(self.left_frame, text="Password", bg='salmon',font=f).grid(row=1, column=0, pady=10)
         self.email_tf = Entry(self.left_frame, font=f)
-        self.email_tf.insert(0, 'james@gmail.com')   #default value for testing
+        self.email_tf.insert(0, 'brad@gmail.com')   #default value for testing
 
         self.pwd_tf = Entry(self.left_frame, font=f, show='*')    #default value for testing
-        self.pwd_tf.insert(0, 'james')
+        self.pwd_tf.insert(0, 'Brad,123')
         self.pwd_btn=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2",command=lambda:toggle_password(self.pwd_tf, self.pwd_btn))
         self.pwd_btn.place(x=1093, y=382)
         
@@ -227,9 +226,9 @@ class RegisterPage(tk.Frame):
         
         #connect to database
         con = mysql.connector.connect(host="localhost",
-                                    user="root",
-                                    password="rootpass",
-                                    database="all2")           
+                                      user="root",
+                                      password="rootpass",
+                                      database="all2")             
       
         cur=con.cursor()
         cur.execute('''CREATE TABLE IF NOT EXISTS userdata( iduserdata INT AUTO_INCREMENT PRIMARY KEY,
@@ -263,7 +262,6 @@ class RegisterPage(tk.Frame):
 
 
         def insert_record():
-
             check_counter=0
             warn = " "
             if self.register_name.get() == "":
@@ -271,12 +269,12 @@ class RegisterPage(tk.Frame):
             else:
                 check_counter += 1
             
-            if self.register_userid.get() == "":
-                warn='Please enter student ID.'
+            if self.register_userid.get() == "" or not re.match(r'^[Pp]\d{8}$', self.register_userid.get()):
+                warn='Please enter a valid student ID.'
             else:
                 check_counter += 1
 
-            if self.register_email.get() == "":
+            if self.register_email.get() == "" or not re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", self.register_email.get()):
                 warn = 'Please enter a valid email.'
             else:
                 check_counter += 1
@@ -286,8 +284,8 @@ class RegisterPage(tk.Frame):
             else:
                 check_counter += 1
 
-            if self.register_pwd.get() == "":
-                warn = 'Please enter a password.'
+            if self.register_pwd.get() == "" or not re.match(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+}{":;\'?/>.<,])(?=.*[a-zA-Z]).{8,}$', self.register_pwd.get()):
+                warn = 'Please enter a minimum 8-character password.\nPassword must contain at least 1 digit and 1 special character.'
             else:
                 check_counter += 1
 
