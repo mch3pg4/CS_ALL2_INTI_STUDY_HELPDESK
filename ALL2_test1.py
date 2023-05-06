@@ -1,3 +1,4 @@
+import bcrypt
 import datetime
 from tkcalendar import Calendar
 from tkinter import *
@@ -134,12 +135,13 @@ class Loginpage(tk.Frame):
             try:
                 uname = email_tf.get()
                 upwd = pwd_tf.get()
+
                 con = mysql.connector.connect(host="localhost",
-                                    user="root",
-                                    password="rootpass",
-                                    database="all2") 
+                                              user="root",
+                                              password="rootpass",
+                                              database="all2") 
                 c = con.cursor()
-                c.execute("SELECT * FROM userdata WHERE email=%s AND password=%s",(uname,upwd))
+                c.execute("SELECT * FROM userdata WHERE email=%s ",(uname,))
                 
             except Exception as ep:
                 messagebox.showerror('Error', ep)
@@ -156,6 +158,8 @@ class Loginpage(tk.Frame):
             if check_counter == 2:
                 login_details=c.fetchone()
                 if login_details is not None:
+                    if bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')):
+                        controller.show_frame(Homepage)
                     # messagebox.showinfo('Login Status', 'Logged in Successfully!')
                     # controller.updateProfile( login_details)
                     # controller.updateHomepage(login_details)
@@ -163,10 +167,8 @@ class Loginpage(tk.Frame):
                     # if login_details[4]== 'Lecturer':
                     #     controller.show_frame(Adminpage)
                     # else:
-                        controller.show_frame(Homepage)
-                
-                else:
-                    messagebox.showerror('Login Status', 'invalid username or password')
+                    else:
+                        messagebox.showerror('Login Status', 'invalid username or password')
             else:
                 messagebox.showerror('Error', warn)
 
@@ -176,7 +178,7 @@ class Loginpage(tk.Frame):
         Label(left_frame, text="Email", bg='salmon',font=f).grid(row=0, column=0, sticky=W, pady=10)
         Label(left_frame, text="Password", bg='salmon',font=f).grid(row=1, column=0, pady=10)
         email_tf = Entry(left_frame, font=f)
-        email_tf.insert(0, 'm')   #default value for testing
+        email_tf.insert(0, 'james@gmail.com')   #default value for testing
         #show/hide password
         def toggle_password():
             if pwd_tf.cget('show') == '':
@@ -187,7 +189,7 @@ class Loginpage(tk.Frame):
                 pwd_btn.config(text='Hide',cursor= "hand2")
 
         pwd_tf = Entry(left_frame, font=f, show='*')    #default value for testing
-        pwd_tf.insert(0, 'm')
+        pwd_tf.insert(0, 'james')
         pwd_btn=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2",command=toggle_password)
         pwd_btn.place(x=1093, y=382)
         
@@ -230,7 +232,7 @@ class RegisterPage(tk.Frame):
                                                             user_id varchar(45) NOT NULL UNIQUE, 
                                                             email varchar(45) NOT NULL, 
                                                             usertype text NOT NULL, 
-                                                            password varchar(45) NOT NULL)''')
+                                                            password varchar(256) NOT NULL)''')
         con.commit()
 
         var1=StringVar()
@@ -313,10 +315,11 @@ class RegisterPage(tk.Frame):
                     user_id= register_userid.get()
                     email= register_email.get()
                     usertype= var1.get()
-                    password= register_pwd.get() 
+                    password= register_pwd.get()
+                    hashed_pw= bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
                     
                     insert_data = ("INSERT INTO userdata(iduserdata, name, user_id, email, usertype, password) VALUES (%s,%s,%s,%s,%s,%s);")
-                    data= (iduserdata, name, user_id, email, usertype, password)
+                    data= (iduserdata, name, user_id, email, usertype, hashed_pw)
                     cur.execute(insert_data,data)
 
                     con.commit()
