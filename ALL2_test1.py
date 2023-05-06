@@ -59,7 +59,13 @@ def top_buttons(self, controller):
     button5.place(x=230*4, y=75)
 
 #toggle show/hide password function
-
+def toggle_password(pwd_tf, pwd_btn):
+    if pwd_tf.cget('show') == '':
+        pwd_tf.config(show='*')
+        pwd_btn.config(text='Show',cursor= "hand2")
+    else:
+        pwd_tf.config(show='')
+        pwd_btn.config(text='Hide',cursor= "hand2")
 
 
 
@@ -186,18 +192,10 @@ class Loginpage(tk.Frame):
         Label(left_frame, text="Password", bg='salmon',font=f).grid(row=1, column=0, pady=10)
         email_tf = Entry(left_frame, font=f)
         email_tf.insert(0, 'james@gmail.com')   #default value for testing
-        #show/hide password
-        def toggle_password():
-            if pwd_tf.cget('show') == '':
-                pwd_tf.config(show='*')
-                pwd_btn.config(text='Show',cursor= "hand2")
-            else:
-                pwd_tf.config(show='')
-                pwd_btn.config(text='Hide',cursor= "hand2")
 
         pwd_tf = Entry(left_frame, font=f, show='*')    #default value for testing
         pwd_tf.insert(0, 'james')
-        pwd_btn=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2",command=toggle_password)
+        pwd_btn=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2",command=lambda:toggle_password(pwd_tf, pwd_btn))
         pwd_btn.place(x=1093, y=382)
         
         login_btn = Button(left_frame, width=15, text='Login', font=f, relief=SOLID,cursor='hand2',command=login_response)
@@ -354,39 +352,20 @@ class RegisterPage(tk.Frame):
         image_label.grid(row=6, column=1,padx=10, pady=10)
         image_label.image=image_display
         
-        
-        #show/hide password
-        def toggle_password2():
-            if register_pwd.cget('show') == '':
-                register_pwd.config(show='*')
-                pwd_btn2.config(text='Show')
-            else:
-                register_pwd.config(show='')
-                pwd_btn2.config(text='Hide')
-
+        #password show/hide button
         register_pwd = Entry(reg_frame, font=f, show='*')
-        pwd_btn2=Button(self, text='Show', width=4, font=('Arial', 9),  cursor= "hand2", command=toggle_password2)
+        pwd_btn2=Button(self, text='Show', width=4, font=('Arial', 9),  cursor= "hand2", command=lambda:toggle_password(register_pwd, pwd_btn2))
         pwd_btn2.place(x=1139, y=432)
-
-        def toggle_password3():
-            if pwd_again.cget('show') == '':
-                pwd_again.config(show='*')
-                pwd_btn3.config(text='Show')
-            else:
-                pwd_again.config(show='')
-                pwd_btn3.config(text='Hide')
-
-        pwd_again = Entry(reg_frame, font=f, show='*')
-        pwd_btn3=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2", command=toggle_password3)
-        pwd_btn3.place(x=1139, y=480)
-
         
+        pwd_again = Entry(reg_frame, font=f, show='*')
+        pwd_btn3=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2", command=lambda:toggle_password(pwd_again, pwd_btn3))
+        pwd_btn3.place(x=1139, y=480)
 
         #reload button for captcha
         reload_button = Button(self, text='Reload',font=('Arial', 9), cursor='hand2',command=lambda: createImage(1))
         reload_button.place(x=1130, y=606)
 
-        
+        #widgets
         usertype_frame = LabelFrame(reg_frame,bg='#CCCCCC',padx=10, pady=10)
         register_name = Entry(reg_frame, font=f)
         register_userid = Entry(reg_frame,font=f)
