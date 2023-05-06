@@ -58,6 +58,13 @@ def top_buttons(self, controller):
     button5=tk.Button(self, height=1, width=12, text="Profile", font=f, command=lambda: controller.show_frame(Profile))
     button5.place(x=230*4, y=75)
 
+#toggle show/hide password function
+
+
+
+
+
+
 #logout button 
 def log_out_btn(self, controller):
     def logout():
