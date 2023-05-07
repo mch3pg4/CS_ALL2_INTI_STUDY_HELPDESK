@@ -25,7 +25,6 @@ def inti_logo(self):
     intilogo.place(x=0, y=5)
     intilogo.image = my_img
 
-
 #clock and date day
 def clockdate(self):
     
@@ -37,8 +36,6 @@ def clockdate(self):
     l1=tk.Label(self,font=('Arial', 19, 'bold'),bg='antique white', foreground='black')
     l1.place(x=750, y=12)
     my_time()
-
-
 
 #top buttons
 def top_buttons(self, controller):
@@ -65,10 +62,6 @@ def toggle_password(pwd_tf, pwd_btn):
     else:
         pwd_tf.config(show='')
         pwd_btn.config(text='Hide',cursor= "hand2")
-
-
-
-
 
 #logout button 
 def log_out_btn(self, controller):
@@ -98,7 +91,7 @@ class App(tk.Tk):
         #create dictionary of frames
         self.frames={}
 
-        for F in (Loginpage, RegisterPage, Adminpage,Homepage, Announcements, Events, Competitions, Profile):
+        for F in (Loginpage, RegisterPage, RegisterCourses, Adminpage, Homepage, Announcements, Events, Competitions, Profile):
             frame= F(container, self)
             #windows class act as root window for frames
             self.frames[F] = frame
@@ -231,10 +224,10 @@ class RegisterPage(tk.Frame):
                                       database="all2")             
       
         cur=con.cursor()
-        cur.execute('''CREATE TABLE IF NOT EXISTS userdata( iduserdata INT AUTO_INCREMENT PRIMARY KEY,
+        cur.execute('''CREATE TABLE IF NOT EXISTS userdata( iduserdata INT AUTO_INCREMENT UNIQUE,
                                                             name varchar(70) NOT NULL,
-                                                            user_id varchar(45) NOT NULL UNIQUE, 
-                                                            email varchar(45) NOT NULL, 
+                                                            user_id varchar(45) NOT NULL PRIMARY KEY, 
+                                                            email varchar(45) NOT NULL UNIQUE, 
                                                             usertype text NOT NULL, 
                                                             password varchar(256) NOT NULL)''')
         con.commit()
@@ -248,7 +241,8 @@ class RegisterPage(tk.Frame):
             global image_display, image_label
             
             # Generate new random string for captcha
-            self.random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+            # self.random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+            self.random_string = ''.join(random.choices('a', k=6))  #default value for testing, to be changed later
 
             # create captcha image
             self.image_captcha = ImageCaptcha(width=200, height=55)
@@ -307,9 +301,9 @@ class RegisterPage(tk.Frame):
             if check_counter == 8:
                 try:
                     con = mysql.connector.connect(host="localhost",
-                                    user="root",
-                                    password="rootpass",
-                                    database="all2")      
+                                                  user="root",
+                                                  password="rootpass",
+                                                  database="all2")      
                     cur = con.cursor()
                     
                     #get user entries
@@ -327,7 +321,7 @@ class RegisterPage(tk.Frame):
 
                     con.commit()
                     messagebox.showinfo('Register', 'Account Created Successfully!')
-                    controller.show_frame(Loginpage)
+                    controller.show_frame(RegisterCourses)
 
                 except Exception as ep:
                     messagebox.showerror('', ep)
@@ -364,10 +358,10 @@ class RegisterPage(tk.Frame):
         self.reload_button.place(x=1130, y=606)
 
         #widgets
-        self.usertype_frame = LabelFrame(self.reg_frame,bg='#CCCCCC',padx=10, pady=10)
         self.register_name = Entry(self.reg_frame, font=f)
         self.register_userid = Entry(self.reg_frame,font=f)
         self.register_email = Entry(self.reg_frame, font=f)
+        self.usertype_frame = LabelFrame(self.reg_frame,bg='#CCCCCC',padx=10, pady=10)
         self.student_rb = Radiobutton(self.usertype_frame,text='Student',bg='#CCCCCC',variable=self.user_var,value='Student',font=('Arial',10))
         self.lect_rb = Radiobutton(self.usertype_frame,text='Lecturer',bg='#CCCCCC',variable=self.user_var,value='Lecturer',font=('Arial',10))
         self.register_pwd = Entry(self.reg_frame, font=f,show='*')
@@ -389,7 +383,54 @@ class RegisterPage(tk.Frame):
         self.student_rb.pack(expand=True, side=LEFT)
         self.lect_rb.pack(expand=True, side=LEFT)
 
+        #default entry values for testing
+        self.register_name.insert(0, 'Tom')
+        self.register_userid.insert(0, 'P12345678')
+        self.register_email.insert(0, 'tom@gmail.com')
+        self.register_pwd.insert(0, 'Tom,1234')
+        self.pwd_again.insert(0, 'Tom,1234')
+        self.reg_captcha.insert(0, 'aaaaaa')
 
+
+class RegisterCourses(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+
+        #registercourses page bg
+        self.raw_image=Image.open("images\Slide3.png")
+        self.background_image=ImageTk.PhotoImage(self.raw_image)
+        self.background_label = tk.Label(self, image=self.background_image)
+        self.background_label.place(x=-443,y=-155)
+        self.background_label.image = self.background_image
+
+        #register courses frame
+        self.regcourses_frame = Frame(self, bd=2, bg='salmon',relief=SOLID, padx=10, pady=-1000)
+        Label(self.regcourses_frame, text="ID", bg='salmon',font=f).grid(row=0, column=0, sticky=W, pady=10, padx=10)
+        Label(self.regcourses_frame, text="Level", bg='salmon',font=f).grid(row=1, column=0, sticky=W, pady=10, padx=10)
+        Label(self.regcourses_frame, text="Year", bg='salmon',font=f).grid(row=2, column=0, sticky=W, pady=10, padx=10)
+        Label(self.regcourses_frame,text="School",bg='salmon',font=f).grid(row=3, column=0, sticky =W, pady=10, padx=10)
+        Label(self.regcourses_frame, text="Program", bg='salmon',font=f).grid(row=4, column=0, sticky=W, pady=10, padx=10)
+        Label(self.regcourses_frame, text="Semeseter", bg='salmon',font=f ).grid(row=5, column=0, sticky=W, pady=10)
+        Label(self.regcourses_frame, text="Subjects", bg='salmon',font=f ).grid(row=6, column=0, sticky=W, pady=10)
+        
+        #optionmenu values
+        level=['Certificate','Foundation','Diploma','Degree','A-Level','Masters']
+        year=['1','2','3','4']
+        school=['School of Computing','School of Engineering']
+        program=['BCSCUN','BCTCUN']
+        semester=['1','2', '3']
+        subjects=['']
+        #widgets
+        self.userid_entry = Entry(self.regcourses_frame, font=f)
+        self.register_userid = OptionMenu(self.regcourses_frame,font=f)
+        self.register_email = Entry(self.regcourses_frame, font=f)
+        self.usertype_frame = LabelFrame(self.regcourses_frame,bg='#CCCCCC',padx=10, pady=10)
+        self.student_rb = Radiobutton(self.usertype_frame,text='Student',bg='#CCCCCC',variable=self.user_var,value='Student',font=('Arial',10))
+        self.lect_rb = Radiobutton(self.usertype_frame,text='Lecturer',bg='#CCCCCC',variable=self.user_var,value='Lecturer',font=('Arial',10))
+        self.register_pwd = Entry(self.regcourses_frame, font=f,show='*')
+        self.pwd_again = Entry(self.regcourses_frame, font=f,show='*')
+        self.reg_captcha= Entry(self.regcourses_frame, font=f)
+        self.register_btn = Button(self.regcourses_frame, width=15, text='Register', font=f, relief=SOLID,cursor='hand2' )
         
 class Adminpage(tk.Frame):
     def __init__(self,parent, controller):
