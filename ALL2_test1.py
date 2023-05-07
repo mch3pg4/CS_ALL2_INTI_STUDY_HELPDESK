@@ -14,6 +14,7 @@ from captcha.image import ImageCaptcha
 
 
 f=('Arial', 14)
+f2=('Arial', 12)
 
 
 #inti logo
@@ -216,6 +217,13 @@ class RegisterPage(tk.Frame):
 
         self.login_link_btn = Button(self, text= "Go to Login Page", cursor= "hand2", font= ('Arial', 14), command=go_to_login)
         self.login_link_btn.place(x=900,y=720)
+
+        #for testing
+        #direct to registercourses page for users
+        def go_to_registercourses():
+            controller.show_frame(RegisterCourses)
+        self.registercourses_link_btn = Button(self, text= "Go to Register Courses Page", cursor= "hand2", font= ('Arial', 14), command=go_to_registercourses)
+        self.registercourses_link_btn.place(x=400,y=720)    
         
         #connect to database
         con = mysql.connector.connect(host="localhost",
@@ -232,8 +240,8 @@ class RegisterPage(tk.Frame):
                                                             password varchar(256) NOT NULL)''')
         con.commit()
 
-        self.user_var=StringVar()
-        self.user_var.set(None)
+        self.user_var=StringVar().set(None)
+        # self.user_var.set(None)
 
 
 
@@ -403,6 +411,19 @@ class RegisterCourses(tk.Frame):
         self.background_label.place(x=-443,y=-155)
         self.background_label.image = self.background_image
 
+        #for testing
+        #direct to register page for users
+        def go_to_registerpage():
+            controller.show_frame(RegisterPage)
+        self.registerpage_link_btn = Button(self, text= "Go to Register Page", cursor= "hand2", font= ('Arial', 14), command=go_to_registerpage)
+        self.registerpage_link_btn.place(x=185,y=660)
+
+        #insert record into database
+
+        #connect to database
+
+
+
         #register courses frame
         self.regcourses_frame = Frame(self, bd=2, bg='salmon',relief=SOLID, padx=10, pady=-1000)
         Label(self.regcourses_frame, text="ID", bg='salmon',font=f).grid(row=0, column=0, sticky=W, pady=10, padx=10)
@@ -414,24 +435,58 @@ class RegisterCourses(tk.Frame):
         Label(self.regcourses_frame, text="Subjects", bg='salmon',font=f ).grid(row=6, column=0, sticky=W, pady=10)
         
         #optionmenu values
-        level=['Certificate','Foundation','Diploma','Degree','A-Level','Masters']
-        year=['1','2','3','4']
-        school=['School of Computing','School of Engineering']
-        program=['BCSCUN','BCTCUN']
-        semester=['1','2', '3']
-        subjects=['']
+        level=['Select','Certificate','Foundation','Diploma','Degree','A-Level','Masters']
+        year=['Select','1','2','3','4']
+        school=['Select','School of Computing','School of Engineering']
+        program=['Select','BCSCUN','BCTCUN']
+        semester=['Select','1','2','3']
+        subjects=['Select', 'Computer Architecture & Networks', 'Objected Oriented Programming', 'Mathematics for Computer Science']
+        
+        #default values for optionmenus
+        self.level_var=StringVar()
+        self.level_var.set(level[0])
+        self.year_var=StringVar()
+        self.year_var.set(year[0])
+        self.school_var=StringVar()
+        self.school_var.set(school[0])
+        self.program_var=StringVar()
+        self.program_var.set(program[0])
+        self.semester_var=StringVar()
+        self.semester_var.set(semester[0])
+        self.subjects_var=StringVar()
+        self.subjects_var.set(subjects[0])
+
         #widgets
         self.userid_entry = Entry(self.regcourses_frame, font=f)
-        self.register_userid = OptionMenu(self.regcourses_frame,font=f)
-        self.register_email = Entry(self.regcourses_frame, font=f)
-        self.usertype_frame = LabelFrame(self.regcourses_frame,bg='#CCCCCC',padx=10, pady=10)
-        self.student_rb = Radiobutton(self.usertype_frame,text='Student',bg='#CCCCCC',variable=self.user_var,value='Student',font=('Arial',10))
-        self.lect_rb = Radiobutton(self.usertype_frame,text='Lecturer',bg='#CCCCCC',variable=self.user_var,value='Lecturer',font=('Arial',10))
-        self.register_pwd = Entry(self.regcourses_frame, font=f,show='*')
-        self.pwd_again = Entry(self.regcourses_frame, font=f,show='*')
-        self.reg_captcha= Entry(self.regcourses_frame, font=f)
+        self.studylevel = ttk.Combobox(self.regcourses_frame, textvariable = self.level_var, values=level, state='readonly',  width=20, font=f)
+        self.studyyear = ttk.Combobox(self.regcourses_frame,textvariable = self.year_var, values=year, state='readonly', width=20, font=f)
+        self.studysch = ttk.Combobox(self.regcourses_frame, textvariable = self.school_var, values=school, state='readonly', width=20, font=f)
+        self.studyprog = ttk.Combobox(self.regcourses_frame,textvariable = self.program_var, values=program, state='readonly', width=20, font=f)
+        self.studysem = ttk.Combobox(self.regcourses_frame, textvariable = self.semester_var, values=semester, state='readonly', width=20, font=f)
+        self.studysubj = ttk.Combobox(self.regcourses_frame,textvariable = self.subjects_var, values=subjects, state='readonly', width=20, font=f)
         self.register_btn = Button(self.regcourses_frame, width=15, text='Register', font=f, relief=SOLID,cursor='hand2' )
         
+        #change subjects combobox to checkbuttons
+        
+        #remove blue highlight after selection in combobox
+        self.studylevel.bind("<<ComboboxSelected>>",lambda e: self.regcourses_frame.focus())
+        self.studyyear.bind("<<ComboboxSelected>>",lambda e: self.regcourses_frame.focus())
+        self.studysch.bind("<<ComboboxSelected>>",lambda e: self.regcourses_frame.focus())
+        self.studyprog.bind("<<ComboboxSelected>>",lambda e: self.regcourses_frame.focus())
+        self.studysem.bind("<<ComboboxSelected>>",lambda e: self.regcourses_frame.focus())
+        self.studysubj.bind("<<ComboboxSelected>>",lambda e: self.regcourses_frame.focus())
+
+        #widgets placement
+        self.userid_entry.grid(row=0, column=1, pady=10, padx=20)
+        self.studylevel.grid(row=1, column=1, pady=10, padx=20)
+        self.studyyear.grid(row=2, column=1, pady=10, padx=20)
+        self.studysch.grid(row=3, column=1, pady=10, padx=20)
+        self.studyprog.grid(row=4, column=1, pady=10, padx=20)
+        self.studysem.grid(row=5, column=1, pady=10, padx=20)
+        self.studysubj.grid(row=6, column=1, pady=10, padx=20)
+        self.register_btn.grid(row=7, column=1, pady=10, padx=20)
+        self.regcourses_frame.place(x=95, y=225)
+
 class Adminpage(tk.Frame):
     def __init__(self,parent, controller):
         global login_details
