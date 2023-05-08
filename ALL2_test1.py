@@ -520,11 +520,6 @@ class RegisterCourses(tk.Frame):
             else:
                 messagebox.showerror('Error', warn)
 
-            
-        
-
-
-
         #register courses frame
         self.regcourses_frame = Frame(self, bd=2, bg='salmon',relief=SOLID, padx=10, pady=-1000)
         Label(self.regcourses_frame, text="ID", bg='salmon',font=f).grid(row=0, column=0, sticky=W, pady=10, padx=10)
@@ -732,17 +727,10 @@ class Profile(tk.Frame):
         w.pack()
         w.place(x=500, y=100)
 
-        
-        
-
-
-
-
 
 #window
 ws=App()
 ws.title("INTI Study Helpdesk")
 ws.geometry('1240x773+150+5')
 ws.resizable(False,False)
-
 ws.mainloop()
