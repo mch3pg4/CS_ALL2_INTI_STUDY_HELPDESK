@@ -240,8 +240,8 @@ class RegisterPage(tk.Frame):
                                                             password varchar(256) NOT NULL)''')
         con.commit()
 
-        self.user_var=StringVar().set(None)
-        # self.user_var.set(None)
+        self.user_var=StringVar()
+        self.user_var.set(None)
 
 
 
@@ -369,9 +369,9 @@ class RegisterPage(tk.Frame):
         self.register_name = Entry(self.reg_frame, font=f)
         self.register_userid = Entry(self.reg_frame,font=f)
         self.register_email = Entry(self.reg_frame, font=f)
-        self.usertype_frame = LabelFrame(self.reg_frame,bg='#CCCCCC',padx=10, pady=10)
-        self.student_rb = Radiobutton(self.usertype_frame,text='Student',bg='#CCCCCC',variable=self.user_var,value='Student',font=('Arial',10))
-        self.lect_rb = Radiobutton(self.usertype_frame,text='Lecturer',bg='#CCCCCC',variable=self.user_var,value='Lecturer',font=('Arial',10))
+        self.usertype_frame = LabelFrame(self.reg_frame,bg='#EEEEEE',padx=10, pady=10)
+        self.student_rb = Radiobutton(self.usertype_frame,text='Student',bg='#EEEEEE',variable=self.user_var,value='Student',font=('Arial',10))
+        self.lect_rb = Radiobutton(self.usertype_frame,text='Lecturer',bg='#EEEEEE',variable=self.user_var,value='Lecturer',font=('Arial',10))
         self.register_pwd = Entry(self.reg_frame, font=f,show='*')
         self.pwd_again = Entry(self.reg_frame, font=f,show='*')
         self.reg_captcha= Entry(self.reg_frame, font=f)
@@ -416,11 +416,112 @@ class RegisterCourses(tk.Frame):
         def go_to_registerpage():
             controller.show_frame(RegisterPage)
         self.registerpage_link_btn = Button(self, text= "Go to Register Page", cursor= "hand2", font= ('Arial', 14), command=go_to_registerpage)
-        self.registerpage_link_btn.place(x=185,y=660)
+        self.registerpage_link_btn.place(x=700,y=660)
 
-        #insert record into database
 
         #connect to database
+        con = mysql.connector.connect(host="localhost",
+                                      user="root",
+                                      password="rootpass",
+                                      database="all2")
+        cur=con.cursor()
+        cur.execute('''CREATE TABLE IF NOT EXISTS usersubjects(user_id varchar(45) ,
+                                                               level varchar(45) NOT NULL, 
+                                                               year varchar(45) NOT NULL , 
+                                                               school text NOT NULL, 
+                                                               program varchar(256) NOT NULL,
+                                                               semester varchar(256) NOT NULL,
+                                                               subject1 varchar(256) NOT NULL,
+                                                               subject2 varchar(256) NOT NULL,
+                                                               subject3 varchar(256) NOT NULL,
+                                                               subject4 varchar(256) NOT NULL,
+                                                               FOREIGN KEY (user_id) REFERENCES userdata(user_id))''')
+        con.commit()
+
+        #insert record into database
+        def insert_subjrecord():
+            check_counter=0
+            warn = " "
+            if self.userid_entry.get() == "":
+                warn = 'Please enter a valid ID.'
+            else:
+                check_counter += 1
+
+            if self.studylevel.get() == "Select":
+                warn = 'Select study level.'
+            else:
+                check_counter += 1
+
+            if self.studyyear.get() == "Select":
+                warn = 'Select study year.'
+            else:
+                check_counter += 1
+
+            if self.studysch.get() == "Select":
+                warn = 'Select school.'
+            else:
+                check_counter += 1
+
+            if self.studyprog.get() == "Select":
+                warn = 'Select program.'
+            else:
+                check_counter += 1
+
+            if self.studysem.get() == "Select":
+                warn = 'Select semester.'
+            else:
+                check_counter += 1
+            
+            selected_subjects= [self.studysubj1.get(), self.studysubj2.get(), self.studysubj3.get(), self.studysubj4.get()]
+
+            if self.studysubj1.get() == "Select" and self.studysubj2.get() == "Select" and self.studysubj3.get() == "Select" and self.studysubj4.get() == "Select":
+                warn = 'Select at least one subject.'
+            else:
+                check_counter += 1
+
+            unique_subjects = set(selected_subjects)
+            unique_subjects.discard("Select")
+
+            if len(unique_subjects) < len(selected_subjects) - selected_subjects.count("Select"):
+                warn = 'You have selected the same subject.'
+            else:
+                check_counter += 1
+
+            if check_counter ==8:
+                try:
+                    con = mysql.connector.connect(host="localhost",
+                                                  user="root",
+                                                  password="rootpass",
+                                                  database="all2")      
+                    cur = con.cursor()
+
+                    #get user entries
+                    user_id= self.userid_entry.get()
+                    level= self.studylevel.get()
+                    year= self.studyyear.get()
+                    school= self.studysch.get()
+                    program= self.studyprog.get()
+                    semester= self.studysem.get()
+                    subject1= self.studysubj1.get()
+                    subject2= self.studysubj2.get()
+                    subject3= self.studysubj3.get()
+                    subject4= self.studysubj4.get()
+
+                    insert_subjectrecord = ("INSERT INTO usersubjects(user_id, level, year, school, program, semester, subject1, subject2, subject3, subject4) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);")
+                    data= (user_id, level, year, school, program, semester, subject1, subject2, subject3, subject4)
+                    cur.execute(insert_subjectrecord,data)
+
+                    con.commit()
+                    messagebox.showinfo('Register', 'Subjects Registered Successfully!')
+                    controller.show_frame(Homepage)
+
+                except Exception as ep:
+                    messagebox.showerror('', ep)
+            else:
+                messagebox.showerror('Error', warn)
+
+            
+        
 
 
 
@@ -431,16 +532,16 @@ class RegisterCourses(tk.Frame):
         Label(self.regcourses_frame, text="Year", bg='salmon',font=f).grid(row=2, column=0, sticky=W, pady=10, padx=10)
         Label(self.regcourses_frame,text="School",bg='salmon',font=f).grid(row=3, column=0, sticky =W, pady=10, padx=10)
         Label(self.regcourses_frame, text="Program", bg='salmon',font=f).grid(row=4, column=0, sticky=W, pady=10, padx=10)
-        Label(self.regcourses_frame, text="Semeseter", bg='salmon',font=f ).grid(row=5, column=0, sticky=W, pady=10)
+        Label(self.regcourses_frame, text="Semester", bg='salmon',font=f ).grid(row=5, column=0, sticky=W, pady=10)
         Label(self.regcourses_frame, text="Subjects", bg='salmon',font=f ).grid(row=6, column=0, sticky=W, pady=10)
         
         #optionmenu values
-        level=['Select','Certificate','Foundation','Diploma','Degree','A-Level','Masters']
+        level=['Select','Degree']
         year=['Select','1','2','3','4']
-        school=['Select','School of Computing','School of Engineering']
+        school=['Select','School of Computing']
         program=['Select','BCSCUN','BCTCUN']
         semester=['Select','1','2','3']
-        subjects=['Select', 'Computer Architecture & Networks', 'Objected Oriented Programming', 'Mathematics for Computer Science']
+        subjects=['Computer Architecture & Networks', 'Objected Oriented Programming', 'Mathematics for Computer Science', 'Database Systems', 'Programming & Algorithms']
         
         #default values for optionmenus
         self.level_var=StringVar()
@@ -453,8 +554,14 @@ class RegisterCourses(tk.Frame):
         self.program_var.set(program[0])
         self.semester_var=StringVar()
         self.semester_var.set(semester[0])
-        self.subjects_var=StringVar()
-        self.subjects_var.set(subjects[0])
+        self.subject1_var=StringVar()
+        self.subject1_var.set('Select')
+        self.subject2_var=StringVar()
+        self.subject2_var.set('Select')
+        self.subject3_var=StringVar()
+        self.subject3_var.set('Select')
+        self.subject4_var=StringVar()
+        self.subject4_var.set('Select')
 
         #widgets
         self.userid_entry = Entry(self.regcourses_frame, font=f)
@@ -463,10 +570,12 @@ class RegisterCourses(tk.Frame):
         self.studysch = ttk.Combobox(self.regcourses_frame, textvariable = self.school_var, values=school, state='readonly', width=20, font=f)
         self.studyprog = ttk.Combobox(self.regcourses_frame,textvariable = self.program_var, values=program, state='readonly', width=20, font=f)
         self.studysem = ttk.Combobox(self.regcourses_frame, textvariable = self.semester_var, values=semester, state='readonly', width=20, font=f)
-        self.studysubj = ttk.Combobox(self.regcourses_frame,textvariable = self.subjects_var, values=subjects, state='readonly', width=20, font=f)
-        self.register_btn = Button(self.regcourses_frame, width=15, text='Register', font=f, relief=SOLID,cursor='hand2' )
+        self.studysubj1 = ttk.Combobox(self.regcourses_frame,textvariable = self.subject1_var, values=subjects, state='readonly', width=20, font=f)
+        self.studysubj2 = ttk.Combobox(self.regcourses_frame,textvariable = self.subject2_var, values=subjects, state='readonly', width=20, font=f)
+        self.studysubj3 = ttk.Combobox(self.regcourses_frame,textvariable = self.subject3_var, values=subjects, state='readonly', width=20, font=f)
+        self.studysubj4 = ttk.Combobox(self.regcourses_frame,textvariable = self.subject4_var, values=subjects, state='readonly', width=20, font=f)
+        self.register_btn = Button(self.regcourses_frame, width=15, text='Register', font=f, relief=SOLID,cursor='hand2', command=insert_subjrecord )
         
-        #change subjects combobox to checkbuttons
         
         #remove blue highlight after selection in combobox
         self.studylevel.bind("<<ComboboxSelected>>",lambda e: self.regcourses_frame.focus())
@@ -474,7 +583,10 @@ class RegisterCourses(tk.Frame):
         self.studysch.bind("<<ComboboxSelected>>",lambda e: self.regcourses_frame.focus())
         self.studyprog.bind("<<ComboboxSelected>>",lambda e: self.regcourses_frame.focus())
         self.studysem.bind("<<ComboboxSelected>>",lambda e: self.regcourses_frame.focus())
-        self.studysubj.bind("<<ComboboxSelected>>",lambda e: self.regcourses_frame.focus())
+        self.studysubj1.bind("<<ComboboxSelected>>",lambda e: self.regcourses_frame.focus())
+        self.studysubj2.bind("<<ComboboxSelected>>",lambda e: self.regcourses_frame.focus())
+        self.studysubj3.bind("<<ComboboxSelected>>",lambda e: self.regcourses_frame.focus())
+        self.studysubj4.bind("<<ComboboxSelected>>",lambda e: self.regcourses_frame.focus())
 
         #widgets placement
         self.userid_entry.grid(row=0, column=1, pady=10, padx=20)
@@ -483,9 +595,12 @@ class RegisterCourses(tk.Frame):
         self.studysch.grid(row=3, column=1, pady=10, padx=20)
         self.studyprog.grid(row=4, column=1, pady=10, padx=20)
         self.studysem.grid(row=5, column=1, pady=10, padx=20)
-        self.studysubj.grid(row=6, column=1, pady=10, padx=20)
-        self.register_btn.grid(row=7, column=1, pady=10, padx=20)
-        self.regcourses_frame.place(x=95, y=225)
+        self.studysubj1.grid(row=6, column=1, pady=10, padx=20)
+        self.studysubj2.grid(row=7, column=1, pady=10, padx=20)
+        self.studysubj3.grid(row=8, column=1, pady=10, padx=20)
+        self.studysubj4.grid(row=9, column=1, pady=10, padx=20)
+        self.register_btn.grid(row=10, column=1, pady=10, padx=20)
+        self.regcourses_frame.place(x=75, y=210)
 
 class Adminpage(tk.Frame):
     def __init__(self,parent, controller):
