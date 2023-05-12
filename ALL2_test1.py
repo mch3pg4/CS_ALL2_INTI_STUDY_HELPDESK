@@ -536,7 +536,7 @@ class RegisterCourses(tk.Frame):
         school=['Select','School of Computing']
         program=['Select','BCSCUN','BCTCUN']
         semester=['Select','1','2','3']
-        subjects=['Computer Architecture & Networks', 'Objected Oriented Programming', 'Mathematics for Computer Science', 'Database Systems', 'Programming & Algorithms']
+        subjects=['Select','Computer Architecture & Networks', 'Objected Oriented Programming', 'Mathematics for Computer Science', 'Database Systems', 'Programming & Algorithms']
         
         #default values for optionmenus
         self.level_var=StringVar()
