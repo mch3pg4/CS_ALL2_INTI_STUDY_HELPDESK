@@ -663,7 +663,7 @@ class Announcements(tk.Frame):
         #Announcements Title
         w = Label(self, text ='Announcements', font = ('Arial', 28), bg='antique white' )
         w.pack()
-        w.place(x=445, y=100)
+        w.place(x=445, y=120)
 
 
 
