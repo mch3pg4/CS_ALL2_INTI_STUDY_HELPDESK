@@ -5,26 +5,26 @@ from tkinter import *
 from PIL import Image,ImageTk
 from tkinter import messagebox, ttk, filedialog, Tk, Label, Entry, Button, END
 import tkinter as tk
+import tkinter.ttk as ttk
 from time import strftime
 from datetime import date
 import mysql.connector
 from mysql.connector import Error
 from captcha.image import ImageCaptcha
-
-
+from tktooltip import ToolTip
 
 f=('Arial', 14)
 f2=('Arial', 12)
+bgc='#F9D3B9'
 
-
-#inti logo
-def inti_logo(self):
-    image=Image.open('images\INTI_Logo.png')
-    img=image.resize((220,50))
-    my_img=ImageTk.PhotoImage(img)
-    intilogo = tk.Label(self, image=my_img)
-    intilogo.place(x=0, y=5)
-    intilogo.image = my_img
+#ui background with inti logo
+def ui_bg(self):
+    self.raw_image=Image.open("images\Slide4.png")
+    self.img=self.raw_image.resize((1240,773),Image.LANCZOS)
+    self.background_image=ImageTk.PhotoImage(self.raw_image)
+    self.background_label = tk.Label(self, image=self.background_image)
+    self.background_label.place(x=-5,y=-5)
+    self.background_label.image = self.background_image
 
 #clock and date day
 def clockdate(self):
@@ -34,26 +34,72 @@ def clockdate(self):
         l1.config(text=time_string)
         l1.after(1000,my_time) # time delay of 1000 milliseconds 
 
-    l1=tk.Label(self,font=('Arial', 19, 'bold'),bg='antique white', foreground='black')
+    
+    l1=tk.Label(self,font=('Arial', 19, 'bold'),bg=bgc, foreground='black')
     l1.place(x=750, y=12)
     my_time()
 
 #top buttons
 def top_buttons(self, controller):
-    button1=tk.Button(self, height=1, width= 12, text="Homepage", font=f,command= lambda:controller.show_frame(Homepage))
-    button1.place(x=230, y=75)
+    image2=Image.open('images\home.png')
+    img2=image2.resize((65,65))
+    my_img2=ImageTk.PhotoImage(img2)
+    homepage_icon=Label(image=my_img2)
+    homepage_icon.image=my_img2
 
-    button2=tk.Button(self, height=1, width=12, text="Announcements", font=f, command= lambda:controller.show_frame(Announcements))
-    button2.place(x=230*1.75, y=75)
+    image3=Image.open('images\\readbooks.png')
+    img3=image3.resize((65,65))
+    my_img3=ImageTk.PhotoImage(img3)
+    books_icon=Label(image=my_img3)
+    books_icon.image=my_img3
 
-    button3=tk.Button(self, height=1, width=12, text="Events", font=f,command= lambda:controller.show_frame(Events))
-    button3.place(x=230*2.5, y=75)
+    image4=Image.open('images\\quiz.png')
+    img4=image4.resize((65,65))
+    my_img4=ImageTk.PhotoImage(img4)
+    quiz_icon=Label(image=my_img4)
+    quiz_icon.image=my_img4
 
-    button4=tk.Button(self, height=1, width=12, text="Competitions", font=f,command= lambda:controller.show_frame(Competitions))
-    button4.place(x=230*3.25, y=75)
+    image5=Image.open('images\\calculator.png')
+    img5=image5.resize((65,65))
+    my_img5=ImageTk.PhotoImage(img5)
+    calc_icon=Label(image=my_img5)
+    calc_icon.image=my_img5
 
-    button5=tk.Button(self, height=1, width=12, text="Profile", font=f, command=lambda: controller.show_frame(Profile))
-    button5.place(x=230*4, y=75)
+    image6=Image.open('images\\qa.png')
+    img6=image6.resize((65,65))
+    my_img6=ImageTk.PhotoImage(img6)
+    chat_icon=Label(image=my_img6)
+    chat_icon.image=my_img6
+
+    image7=Image.open('images\\user.png')
+    img7=image7.resize((50,50))
+    my_img7=ImageTk.PhotoImage(img7)
+    profile_icon=Label(image=my_img7)
+    profile_icon.image=my_img7
+
+    button1=tk.Button(self, image=my_img2,command= lambda:controller.show_frame(Homepage))
+    button1.place(x=3, y=100)
+    ToolTip(button1, msg='Homepage')
+
+    button2=tk.Button(self, image=my_img3, command= lambda:controller.show_frame(Books))
+    button2.place(x=3, y=242)
+    ToolTip(button2, msg='Books')
+
+    button3=tk.Button(self, image=my_img4, command= lambda:controller.show_frame(Quiz))
+    button3.place(x=3, y=384)
+    ToolTip(button3, msg='Quiz')
+
+    button4=tk.Button(self, image=my_img5,command= lambda:controller.show_frame(Calculator))
+    button4.place(x=3, y=384+142)
+    ToolTip(button4, msg='Calculator')
+
+    button4=tk.Button(self, image=my_img6,command= lambda:controller.show_frame(Chat))
+    button4.place(x=3, y=384+284)
+    ToolTip(button4, msg='Discussions')
+
+    button5=tk.Button(self, image=my_img7, command=lambda: controller.show_frame(Profile))
+    button5.place(x=1225, y=5)
+    ToolTip(button5, msg='Profile')
 
 #toggle show/hide password function
 def toggle_password(pwd_tf, pwd_btn):
@@ -69,8 +115,16 @@ def log_out_btn(self, controller):
     def logout():
         controller.show_frame(Loginpage)
         messagebox.showinfo('Logout Status', 'Logged out successfully!')
-    logout_btn=tk.Button(self, height=1, width=7, font=f, command=logout, text='Logout')
-    logout_btn.place(x=1120 ,y=10)
+
+    image8=Image.open('images\\logout.png')
+    img8=image8.resize((50,50))
+    my_img8=ImageTk.PhotoImage(img8)
+    logout_icon=Label(image=my_img8)
+    logout_icon.image=my_img8
+
+    logout_btn=tk.Button(self, image=my_img8, command=logout)
+    logout_btn.place(x=1300,y=5)
+    ToolTip(logout_btn, msg='Logout')
 
 
 class App(tk.Tk):
@@ -92,7 +146,7 @@ class App(tk.Tk):
         #create dictionary of frames
         self.frames={}
 
-        for F in (Loginpage, RegisterPage, RegisterCourses, Adminpage, Homepage, Announcements, Events, Competitions, Profile):
+        for F in (Loginpage, RegisterPage, RegisterCourses, Adminpage, Homepage, Books, Quiz, Calculator, Chat, Profile):
             frame= F(container, self)
             #windows class act as root window for frames
             self.frames[F] = frame
@@ -133,7 +187,7 @@ class Loginpage(tk.Frame):
         def go_to_register():
             controller.show_frame(RegisterPage)
         self.register_link_btn = Button(self, text= "New user? Go to Register Page", cursor= "hand2", font= ('Arial', 14), command=go_to_register)
-        self.register_link_btn.place(x=830,y=500)
+        self.register_link_btn.place(x=860,y=500)
         
                 
         def login_response():
@@ -189,7 +243,7 @@ class Loginpage(tk.Frame):
         self.pwd_tf = Entry(self.left_frame, font=f, show='*')    #default value for testing
         self.pwd_tf.insert(0, 'Brad,123')
         self.pwd_btn=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2",command=lambda:toggle_password(self.pwd_tf, self.pwd_btn))
-        self.pwd_btn.place(x=1093, y=382)
+        self.pwd_btn.place(x=1123, y=382)
         
         self.login_btn = Button(self.left_frame, width=15, text='Login', font=f, relief=SOLID,cursor='hand2',command=login_response)
 
@@ -197,7 +251,7 @@ class Loginpage(tk.Frame):
         self.email_tf.grid(row=0, column=1, pady=10, padx=20)
         self.pwd_tf.grid(row=1, column=1, pady=10, padx=20)
         self.login_btn.grid(row=2, column=1, pady=10, padx=20)
-        self.left_frame.place(x=785, y=320)
+        self.left_frame.place(x=815, y=320)
    
 
 class RegisterPage(tk.Frame):
@@ -216,7 +270,7 @@ class RegisterPage(tk.Frame):
             controller.show_frame(Loginpage)
 
         self.login_link_btn = Button(self, text= "Go to Login Page", cursor= "hand2", font= ('Arial', 14), command=go_to_login)
-        self.login_link_btn.place(x=900,y=720)
+        self.login_link_btn.place(x=930,y=720)
 
         #for testing
         #direct to registercourses page for users
@@ -355,15 +409,15 @@ class RegisterPage(tk.Frame):
         #password show/hide button
         self.register_pwd = Entry(self.reg_frame, font=f, show='*')
         self.pwd_btn2=Button(self, text='Show', width=4, font=('Arial', 9),  cursor= "hand2", command=lambda:toggle_password(self.register_pwd, self.pwd_btn2))
-        self.pwd_btn2.place(x=1139, y=432)
+        self.pwd_btn2.place(x=1169, y=432)
 
         self.pwd_again = Entry(self.reg_frame, font=f, show='*')
         self.pwd_btn3=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2", command=lambda:toggle_password(self.pwd_again, self.pwd_btn3))
-        self.pwd_btn3.place(x=1139, y=480)
+        self.pwd_btn3.place(x=1169, y=480)
 
         #reload button for captcha
         self.reload_button = Button(self, text='Reload',font=('Arial', 9), cursor='hand2',command=lambda: createImage(1))
-        self.reload_button.place(x=1130, y=606)
+        self.reload_button.place(x=1160, y=606)
 
         #widgets
         self.register_name = Entry(self.reg_frame, font=f)
@@ -385,7 +439,7 @@ class RegisterPage(tk.Frame):
         self.pwd_again.grid(row=5, column=1, pady=10, padx=20)
         self.reg_captcha.grid(row=7, column=1, pady=10, padx=20)
         self.register_btn.grid(row=8, column=1, pady=10, padx=20)
-        self.reg_frame.place(x=750, y=205)
+        self.reg_frame.place(x=780, y=205)
 
         self.usertype_frame.grid(row=3, column=1, pady=10, padx=20)
         self.student_rb.pack(expand=True, side=LEFT)
@@ -597,6 +651,7 @@ class RegisterCourses(tk.Frame):
         self.register_btn.grid(row=10, column=1, pady=10, padx=20)
         self.regcourses_frame.place(x=75, y=210)
 
+
 class Adminpage(tk.Frame):
     def __init__(self,parent, controller):
         global login_details
@@ -621,16 +676,14 @@ class Adminpage(tk.Frame):
         self.logout_btn=tk.Button(self, height=1, width=9, font=f, command=log_out, text='Logout')
         self.logout_btn.place(x=950 ,y=180)
         
-
-
 class Homepage(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg='antique white')
+        tk.Frame.__init__(self, parent)
         self.controller=controller 
         global login_details
 
-        #inti logo
-        inti_logo(self)
+        # ui_bg
+        ui_bg(self)
         #top buttons
         top_buttons(self,controller)
         #show date and clock
@@ -638,21 +691,110 @@ class Homepage(tk.Frame):
         #logout btn
         log_out_btn(self,controller)
 
-        #Homepage
-        #Homepage title
-        w = Label(self, text ='Homepage', font = ('Arial', 28) , bg='antique white')
-        w.pack()
-        w.place(x=480, y=100)
+        #Recent Courses Title
+        self.courses_lbl = Label(self, text ='Recent Courses', font = ('Arial', 28), bg=bgc)
+        self.courses_lbl.pack()
+        self.courses_lbl.place(x=380, y=100)
+
+        #courses frame
+        self.courses_frame = Frame(self, bg=bgc,relief=SOLID)
+        self.courses_frame.place(x=99, y=155)
+
+
+        #Courses button with images
+        image9=Image.open('images\comp_arch.png')
+        img9=image9.resize((170,150))
+        my_img9=ImageTk.PhotoImage(img9)
+        comp_arch_img=Label(image=my_img9)
+        comp_arch_img.image=my_img9
+
+        self.course1_btn = Button(self.courses_frame, image=my_img9, cursor='hand2' )
+        self.course1_btn.grid(row=0, column=0, padx=10, pady=10)
+
+        self.course1_lbl = Label(self.courses_frame, text ='Computer Architecture & Networks', wraplength=200,font = f, bg=bgc)
+        self.course1_lbl.grid(row=1, column=0, padx=10)
+
+        image10=Image.open('images\programming.png')
+        img10=image10.resize((170,150))
+        my_img10=ImageTk.PhotoImage(img10)
+        oop_img=Label(image=my_img10)
+        oop_img.image=my_img10
+
+        self.course2_btn = Button(self.courses_frame, image=my_img10, cursor='hand2', state='disabled' )
+        self.course2_btn.grid(row=0, column=1, padx=10, pady=10)
+
+        self.course2_lbl = Label(self.courses_frame, text ='Programming & Algorithms', wraplength=200, font =f, bg=bgc)
+        self.course2_lbl.grid(row=1, column=1, padx=10)
+
+        image11=Image.open('images\maths_for_cs.png')
+        img11=image11.resize((170,150))
+        my_img11=ImageTk.PhotoImage(img11)
+        maths_img=Label(image=my_img11)
+        maths_img.image=my_img11
+
+        self.course3_btn = Button(self.courses_frame, image=my_img11, cursor='hand2', state='disabled' )
+        self.course3_btn.grid(row=0, column=2, padx=10, pady=10)
+
+        self.course3_lbl = Label(self.courses_frame, text ='Mathematics for Computer Science',  wraplength=200, font =f, bg=bgc)
+        self.course3_lbl.grid(row=1, column=2, padx=10)
+
+        image12=Image.open('images\database.png')
+        img12=image12.resize((170,150))
+        my_img12=ImageTk.PhotoImage(img12)
+        db_img=Label(image=my_img12)
+        db_img.image=my_img12
+
+        self.course4_btn = Button(self.courses_frame, image=my_img12, cursor='hand2', state='disabled' )
+        self.course4_btn.grid(row=0, column=3, padx=10, pady=10)
+
+        self.course4_lbl = Label(self.courses_frame, text ='Database Systems',  wraplength=200, font =f, bg=bgc)
+        self.course4_lbl.grid(row=1, column=3, padx=10)
+
+
+        #Recent Books Title
+        self.books_lbl = Label(self, text ='Recent Books', font = ('Arial', 28), bg=bgc)
+        self.books_lbl.pack()
+        self.books_lbl.place(x=385, y=420)
+
+        #books frame
+        self.books_frame = Frame(self, bd=2, bg=bgc,relief=SOLID)
+        self.books_frame.place(x=99, y=475)
+
+        #Books button 
+        self.book1_btn = Button(self.books_frame, text='Book 1', wraplength=200,font=f, cursor='hand2')
+        self.book1_btn.grid(row=0, column=0, padx=10, pady=10)
+
+        self.book2_btn = Button(self.books_frame, text='Book 2', font=f,wraplength=200, cursor='hand2')
+        self.book2_btn.grid(row=0, column=1, padx=10, pady=10)
+
+        self.book3_btn = Button(self.books_frame, text='Book 3',wraplength=200, font=f, cursor='hand2')
+        self.book3_btn.grid(row=0, column=2, padx=10, pady=10)
+
+        self.book4_btn = Button(self.books_frame, text='Book 4',wraplength=200, font=f, cursor='hand2')
+        self.book4_btn.grid(row=0, column=3, padx=10, pady=10)
+
+        #take books from database
+
+
+        #calendar for appointment
+
+
+        #post a question
+
+
+
+
+        
         
     
 
-class Announcements(tk.Frame):
+class Books(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg='antique white')
+        tk.Frame.__init__(self, parent)
 
-
-        #inti logo
-        inti_logo(self)
+        # ui_bg
+        ui_bg(self)
+       
         #top buttons
         top_buttons(self,controller)
         #show date and clock
@@ -660,19 +802,24 @@ class Announcements(tk.Frame):
         #logout btn
         log_out_btn(self,controller)
 
-        #Announcements Title
-        w = Label(self, text ='Announcements', font = ('Arial', 28), bg='antique white' )
+        #Books Title
+        w = Label(self, text ='Books', font = ('Arial', 28), bg='antique white' )
         w.pack()
         w.place(x=445, y=120)
 
+        #view books
+        #list down all books
+        #recent books
+        #search books
 
 
-class Events(tk.Frame):
+
+class Quiz(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg='antique white')
-        
-        #inti logo
-        inti_logo(self)
+        tk.Frame.__init__(self, parent)
+
+        # ui_bg
+        ui_bg(self)
         #top buttons
         top_buttons(self,controller)
         #show date and clock
@@ -680,20 +827,21 @@ class Events(tk.Frame):
         #logout btn
         log_out_btn(self,controller)
 
-        #Events title
-        w = Label(self, text ='Events', font = ('Arial', 28) , bg='antique white')
+        #Quiz title
+        w = Label(self, text ='Quiz', font = ('Arial', 28) , bg='antique white')
         w.pack()
         w.place(x=480, y=100)
 
+        #view quiz
+        #list down all quiz
 
 
-class Competitions(tk.Frame):
+class Calculator(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg='antique white')
+        tk.Frame.__init__(self, parent)
 
-
-        #inti logo
-        inti_logo(self)
+        # ui_bg
+        ui_bg(self)
         #top buttons
         top_buttons(self,controller)
         #show date and clock
@@ -701,20 +849,44 @@ class Competitions(tk.Frame):
         #logout btn
         log_out_btn(self,controller)
 
-        #Competitions title
-        w = Label(self, text ='Competitions', font = ('Arial', 28) , bg='antique white')
+        #Calculator title
+        w = Label(self, text ='Calculator', font = ('Arial', 28) , bg='antique white')
         w.pack()
         w.place(x=465, y=100)
 
-        
+        #calculator webview
+
+
+
+class Chat(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+
+        # ui_bg
+        ui_bg(self)
+        #top buttons
+        top_buttons(self,controller)
+        #show date and clock
+        clockdate(self)
+        #logout btn
+        log_out_btn(self,controller)
+
+        #Calculator title
+        w = Label(self, text ='Chat', font = ('Arial', 28) , bg='antique white')
+        w.pack()
+        w.place(x=465, y=100)
+
+        #websockets chat server
+
+
 
 class Profile(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent, bg='antique white')
         global login_details
 
-        #inti logo
-        inti_logo(self)
+        # ui_bg
+        ui_bg(self)
         #top buttons
         top_buttons(self,controller)
         #show date and clock
@@ -727,10 +899,16 @@ class Profile(tk.Frame):
         w.pack()
         w.place(x=500, y=100)
 
+        #edit profile details
+        #view profile details
+        #change password????
+
+        
+
 
 #window
 ws=App()
 ws.title("INTI Study Helpdesk")
-ws.geometry('1240x773+150+5')
+ws.geometry('1380x773+80+5')
 ws.resizable(False,False)
 ws.mainloop()
