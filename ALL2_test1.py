@@ -383,7 +383,7 @@ class RegisterPage(tk.Frame):
 
                     con.commit()
                     messagebox.showinfo('Register', 'Account Created Successfully!')
-                    if login_details[4]== 'Lecturer':
+                    if self.user_var.get()== 'Lecturer':
                         controller.show_frame(AdminPage)
                     else:
                         controller.show_frame(RegisterCourses)
