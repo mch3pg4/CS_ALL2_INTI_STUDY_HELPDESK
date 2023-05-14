@@ -12,6 +12,7 @@ import mysql.connector
 from mysql.connector import Error
 from captcha.image import ImageCaptcha
 from tktooltip import ToolTip
+from admin import AdminPage
 
 f=('Arial', 14)
 f2=('Arial', 12)
@@ -77,27 +78,27 @@ def top_buttons(self, controller):
     profile_icon=Label(image=my_img7)
     profile_icon.image=my_img7
 
-    button1=tk.Button(self, image=my_img2,command= lambda:controller.show_frame(Homepage))
+    button1=tk.Button(self, image=my_img2,cursor='hand2',command= lambda:controller.show_frame(Homepage))
     button1.place(x=3, y=100)
     ToolTip(button1, msg='Homepage')
 
-    button2=tk.Button(self, image=my_img3, command= lambda:controller.show_frame(Books))
+    button2=tk.Button(self, image=my_img3, cursor='hand2',command= lambda:controller.show_frame(Books))
     button2.place(x=3, y=242)
     ToolTip(button2, msg='Books')
 
-    button3=tk.Button(self, image=my_img4, command= lambda:controller.show_frame(Quiz))
+    button3=tk.Button(self, image=my_img4,cursor='hand2', command= lambda:controller.show_frame(Quiz))
     button3.place(x=3, y=384)
     ToolTip(button3, msg='Quiz')
 
-    button4=tk.Button(self, image=my_img5,command= lambda:controller.show_frame(Calculator))
+    button4=tk.Button(self, image=my_img5,cursor='hand2',command= lambda:controller.show_frame(Calculator))
     button4.place(x=3, y=384+142)
     ToolTip(button4, msg='Calculator')
 
-    button4=tk.Button(self, image=my_img6,command= lambda:controller.show_frame(Chat))
+    button4=tk.Button(self, image=my_img6,cursor='hand2',command= lambda:controller.show_frame(Chat))
     button4.place(x=3, y=384+284)
     ToolTip(button4, msg='Discussions')
 
-    button5=tk.Button(self, image=my_img7, command=lambda: controller.show_frame(Profile))
+    button5=tk.Button(self, image=my_img7, cursor='hand2',command=lambda: controller.show_frame(Profile))
     button5.place(x=1225, y=5)
     ToolTip(button5, msg='Profile')
 
@@ -122,7 +123,7 @@ def log_out_btn(self, controller):
     logout_icon=Label(image=my_img8)
     logout_icon.image=my_img8
 
-    logout_btn=tk.Button(self, image=my_img8, command=logout)
+    logout_btn=tk.Button(self, image=my_img8,cursor='hand2', command=logout)
     logout_btn.place(x=1300,y=5)
     ToolTip(logout_btn, msg='Logout')
 
@@ -146,7 +147,7 @@ class App(tk.Tk):
         #create dictionary of frames
         self.frames={}
 
-        for F in (Loginpage, RegisterPage, RegisterCourses, Adminpage, Homepage, Books, Quiz, Calculator, Chat, Profile):
+        for F in (Loginpage, RegisterPage, RegisterCourses, AdminPage, Homepage, Subject1, Books, Quiz, Calculator, Chat, Profile):
             frame= F(container, self)
             #windows class act as root window for frames
             self.frames[F] = frame
@@ -218,17 +219,16 @@ class Loginpage(tk.Frame):
             if check_counter == 2:
                 login_details=c.fetchone()
                 if login_details is not None:
-                    if bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')):
+                    if bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Student'):
                         controller.show_frame(Homepage)
                     # messagebox.showinfo('Login Status', 'Logged in Successfully!')
                     # controller.updateProfile( login_details)
                     # controller.updateHomepage(login_details)
                     # controller.updateAdmin(login_details)
-                    # if login_details[4]== 'Lecturer':
-                    #     controller.show_frame(Adminpage)
-                    # else:
-                else:
-                    messagebox.showerror('Login Status', 'invalid username or password')
+                    elif bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Lecturer'):
+                        controller.show_frame(AdminPage)
+                    else:
+                        messagebox.showerror('Login Status', 'invalid username or password')
             else:
                 messagebox.showerror('Error', warn)
 
@@ -383,7 +383,10 @@ class RegisterPage(tk.Frame):
 
                     con.commit()
                     messagebox.showinfo('Register', 'Account Created Successfully!')
-                    controller.show_frame(RegisterCourses)
+                    if login_details[4]== 'Lecturer':
+                        controller.show_frame(AdminPage)
+                    else:
+                        controller.show_frame(RegisterCourses)
 
                 except Exception as ep:
                     messagebox.showerror('', ep)
@@ -652,29 +655,29 @@ class RegisterCourses(tk.Frame):
         self.regcourses_frame.place(x=75, y=210)
 
 
-class Adminpage(tk.Frame):
-    def __init__(self,parent, controller):
-        global login_details
-        tk.Frame.__init__(self,parent,bg='AntiqueWhite1')
+# class Adminpage(tk.Frame):
+#     def __init__(self,parent, controller):
+#         global login_details
+#         tk.Frame.__init__(self,parent,bg='AntiqueWhite1')
     
-        #inti logo
-        # inti_logo(self)
+#         #inti logo
+#         # inti_logo(self)
 
-        #show admin date and clock
-        # adminclock(self)
+#         #show admin date and clock
+#         # adminclock(self)
 
-        #admin view as normal user
-        def view_user():
-            controller.show_frame(Homepage)
-        self.viewuser_btn=tk.Button(self,height=1, width=10, font=f, command=view_user, text='View as User')
-        self.viewuser_btn.place(x=945, y=135)
+#         #admin view as normal user
+#         def view_user():
+#             controller.show_frame(Homepage)
+#         self.viewuser_btn=tk.Button(self,height=1, width=10, font=f, command=view_user, text='View as User')
+#         self.viewuser_btn.place(x=945, y=135)
 
-        #Logout
-        def log_out():
-            controller.show_frame(Loginpage)
-            messagebox.showinfo('Logout Status', 'Logged out successfully!')
-        self.logout_btn=tk.Button(self, height=1, width=9, font=f, command=log_out, text='Logout')
-        self.logout_btn.place(x=950 ,y=180)
+#         #Logout
+#         def log_out():
+#             controller.show_frame(Loginpage)
+#             messagebox.showinfo('Logout Status', 'Logged out successfully!')
+#         self.logout_btn=tk.Button(self, height=1, width=9, font=f, command=log_out, text='Logout')
+#         self.logout_btn.place(x=950 ,y=180)
         
 class Homepage(tk.Frame):
     def __init__(self, parent, controller):
@@ -708,7 +711,7 @@ class Homepage(tk.Frame):
         comp_arch_img=Label(image=my_img9)
         comp_arch_img.image=my_img9
 
-        self.course1_btn = Button(self.courses_frame, image=my_img9, cursor='hand2' )
+        self.course1_btn = Button(self.courses_frame, image=my_img9, cursor='hand2', command=lambda: controller.show_frame(Subject1))
         self.course1_btn.grid(row=0, column=0, padx=10, pady=10)
 
         self.course1_lbl = Label(self.courses_frame, text ='Computer Architecture & Networks', wraplength=200,font = f, bg=bgc)
@@ -757,31 +760,116 @@ class Homepage(tk.Frame):
         self.books_lbl.place(x=385, y=420)
 
         #books frame
-        self.books_frame = Frame(self, bd=2, bg=bgc,relief=SOLID)
+        self.books_frame = Frame(self, bg=bgc,relief=SOLID)
         self.books_frame.place(x=99, y=475)
 
-        #Books button 
-        self.book1_btn = Button(self.books_frame, text='Book 1', wraplength=200,font=f, cursor='hand2')
+        #Books button with images (books need to be taken from db)
+        image13=Image.open('books\computer-organization-and-architecture.png')
+        img13=image13.resize((150,180))
+        my_img13=ImageTk.PhotoImage(img13)
+        book1_img=Label(image=my_img13)
+        book1_img.image=my_img13
+
+        self.book1_btn = Button(self.books_frame,image= my_img13, cursor='hand2')
         self.book1_btn.grid(row=0, column=0, padx=10, pady=10)
 
-        self.book2_btn = Button(self.books_frame, text='Book 2', font=f,wraplength=200, cursor='hand2')
+        self.book1_lbl=Label(self.books_frame, text='Computer Organization & Architecture', wraplength=195, font=f, bg=bgc)
+        self.book1_lbl.grid(row=1, column=0, padx=10)
+
+        image14=Image.open('books\ObjectOrientedProgramminginC4thEdition.png')
+        img14=image14.resize((150,180))
+        my_img14=ImageTk.PhotoImage(img14)
+        book2_img=Label(image=my_img14)
+        book2_img.image=my_img14
+
+        self.book2_btn = Button(self.books_frame, image=my_img14, cursor='hand2')
         self.book2_btn.grid(row=0, column=1, padx=10, pady=10)
 
-        self.book3_btn = Button(self.books_frame, text='Book 3',wraplength=200, font=f, cursor='hand2')
+        self.book2_lbl = Label(self.books_frame, text ='Objected Oriented Programming', wraplength=195, font =f, bg=bgc)
+        self.book2_lbl.grid(row=1, column=1, padx=10)
+
+        image15=Image.open('books\\rosen_discrete_mathematics_and_its_applications_7th_edition.png')
+        img15=image15.resize((150,180))
+        my_img15=ImageTk.PhotoImage(img15)
+        book3_img=Label(image=my_img15)
+        book3_img.image=my_img15
+
+        self.book3_btn = Button(self.books_frame, image=my_img15, cursor='hand2')
         self.book3_btn.grid(row=0, column=2, padx=10, pady=10)
 
-        self.book4_btn = Button(self.books_frame, text='Book 4',wraplength=200, font=f, cursor='hand2')
+        self.book3_lbl = Label(self.books_frame, text ='Discrete Mathematics and its Applications', wraplength=195, font =f, bg=bgc)
+        self.book3_lbl.grid(row=1, column=2, padx=10)
+
+        image16=Image.open('books\Computer Architecture, Sixth Edition_ A_Quantitative_Approach.png')
+        img16=image16.resize((150,180))
+        my_img16=ImageTk.PhotoImage(img16)
+        book4_img=Label(image=my_img16)
+        book4_img.image=my_img16
+
+        self.book4_btn = Button(self.books_frame,image=my_img16, cursor='hand2')
         self.book4_btn.grid(row=0, column=3, padx=10, pady=10)
 
+        self.book4_lbl = Label(self.books_frame, text ='Computer Architecture', wraplength=195, font =f, bg=bgc)
+        self.book4_lbl.grid(row=1, column=3, padx=10)
+
         #take books from database
+        
 
 
         #calendar for appointment
+        
+        #calendar title
+        self.calendar_lbl = Label(self, text ='Calendar', font = ('Arial', 28), bg=bgc)
+        self.calendar_lbl.pack()
+        self.calendar_lbl.place(x=1015, y=100)
+
+        #calendar frame
+        self.calendar_frame = Frame(self, bg=bgc,relief=SOLID)
+        self.calendar_frame.place(x=965, y=155)
+
+        today = datetime.date.today()
+        #calendar widget
+        self.cal = Calendar(self.calendar_frame, selectmode="day", year=today.year, month=today.month, day=today.day, date_pattern='dd/mm/yyyy', font=('Arial', 10))
+        self.cal.pack(pady=20, padx=20)
 
 
-        #post a question
+        #post a question label
+        self.post_lbl = Label(self, text ='Post a Question', font = ('Arial', 28), bg=bgc)
+        self.post_lbl.pack()
+        self.post_lbl.place(x=985, y=425)
+
+        #post a question frame
+        self.post_frame = Frame(self, bg=bgc,relief=SOLID)
+        self.post_frame.place(x=934, y=465)
+
+        #question textbox
+        self.question_txt = Text(self.post_frame, width=35, height=10, wrap='word',font=f)
+        self.question_txt.insert(INSERT, 'Type your question here...')
+        self.question_txt.grid(row=0, column=0,columnspan=3, padx=10, pady=10)
+
+        #post question btn
+        self.post_btn = Button(self.post_frame, width=15, text='Post', font=f, relief=SOLID,cursor='hand2')
+        self.post_btn.grid(row=1, column=1, padx=10, pady=10)
 
 
+class Subject1(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+
+        # ui_bg
+        ui_bg(self)
+       
+        #top buttons
+        top_buttons(self,controller)
+        #show date and clock
+        clockdate(self)
+        #logout btn
+        log_out_btn(self,controller)
+
+        #Subject title
+        self.subj1_title = Label(self, text ='Computer Architecture & Networks', font = ('Arial', 28), bg=bgc )
+        self.subj1_title.pack()
+        self.subj1_title.place(x=350, y=100)
 
 
         
@@ -808,9 +896,10 @@ class Books(tk.Frame):
         w.place(x=445, y=120)
 
         #view books
-        #list down all books
+        #list down available books
         #recent books
-        #search books
+        #search books 
+        #by category
 
 
 
@@ -903,7 +992,7 @@ class Profile(tk.Frame):
         #view profile details
         #change password????
 
-        
+
 
 
 #window
