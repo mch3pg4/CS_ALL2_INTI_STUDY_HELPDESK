@@ -11,11 +11,18 @@ import mysql.connector
 from mysql.connector import Error
 from captcha.image import ImageCaptcha
 
-class Adminpage(tk.Frame):
-    def __init__(self,parent, controller):
+class AdminPage(tk.Frame):
+    def __init__(self,parent=None, controller=None, name=None):
         global login_details
         tk.Frame.__init__(self,parent,bg='AntiqueWhite1')
-    
+        self.controller=controller
+        self.name=name
+        self.parent=parent
+
+        #admin page title
+        self.admin_title=tk.Label(self, text='Admin Page', font=('Helvetica', 18, 'bold'), bg='AntiqueWhite1')
+        self.admin_title.place(x=450, y=10)
+
         #inti logo
         # inti_logo(self)
 
@@ -34,3 +41,4 @@ class Adminpage(tk.Frame):
         #     messagebox.showinfo('Logout Status', 'Logged out successfully!')
         # self.logout_btn=tk.Button(self, height=1, width=9, font=f, command=log_out, text='Logout')
         # self.logout_btn.place(x=950 ,y=180)
+
