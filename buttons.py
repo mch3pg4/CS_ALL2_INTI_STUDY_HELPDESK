@@ -12,6 +12,7 @@ from tktooltip import ToolTip
 
 f=('Arial', 14)
 f2=('Arial', 12)
+f3=('Arial', 16)
 bgc='#F9D3B9'
 
 #clock and date
@@ -45,6 +46,42 @@ def toggle_password(pwd_tf, pwd_btn):
         pwd_tf.config(show='')
         pwd_btn.config(text='Hide',cursor= "hand2")
 
+#admin buttons
+def admin_btns(self, frame1, frame2, controller):
+    #admin page title
+    self.admin_title=tk.Label(self, text='Admin Page', font=('Helvetica', 18, 'bold'), bg=bgc)
+    self.admin_title.place(x=450, y=10)
+
+    #show list of students from db
+    #show list of students btn
+    self.showstudents_btn=tk.Button(self, text='Students', font=f3, width=14,  cursor='hand2', command=lambda:controller.show_frame(frame1)) 
+    self.showstudents_btn.place(x=47, y=100)
+
+    #add/delete/view books
+    #books button
+    self.books_btn=tk.Button(self, text='Books', font=f3, width=14,  cursor='hand2', command=lambda:controller.show_frame(frame2))
+    self.books_btn.place(x=47*5.5, y=100)
+
+
+    #add/edit/delete quiz
+    #quiz button
+    self.quiz_btn=tk.Button(self, text='Quiz', font=f3,width=14,   cursor='hand2')
+    self.quiz_btn.place(x=47*10, y=100)
+
+    #chat discussions
+    #chat button
+    self.chat_btn=tk.Button(self, text='Chat', font=f3, width=14,  cursor='hand2')
+    self.chat_btn.place(x=47*14.5, y=100)
+
+    #add/delete/view course materials
+    #course materials button
+    self.coursematerials_btn=tk.Button(self, text='Course Materials', font=f3,width=14,   cursor='hand2')
+    self.coursematerials_btn.place(x=47*19.15, y=100)
+
+    #view appointments
+    #appointments button
+    self.appointments_btn=tk.Button(self, text='Appointments', font=f3,width=14,   cursor='hand2')
+    self.appointments_btn.place(x=47*23.75, y=100)
 
 #logout button 
 def log_out_btn(self, frame, controller):
