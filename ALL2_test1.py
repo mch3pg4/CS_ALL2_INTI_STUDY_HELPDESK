@@ -12,13 +12,14 @@ import mysql.connector
 from mysql.connector import Error
 from captcha.image import ImageCaptcha
 from tktooltip import ToolTip
-from admin import AdminPage
-from buttons import clockdate, ui_bg, log_out_btn, toggle_password
+from buttons import clockdate, ui_bg, log_out_btn, toggle_password, admin_btns
+from admin import StudentsView, BooksView
 
 
 
 f=('Arial', 14)
 f2=('Arial', 12)
+f3=('Arial', 16)
 bgc='#F9D3B9'
 img_file='images\Slide4.png'
 
@@ -89,21 +90,6 @@ def top_buttons(self, controller):
 
 
 
-# #logout button 
-# def log_out_btn(self, controller):
-#     def logout():
-#         controller.show_frame(Loginpage)
-#         messagebox.showinfo('Logout Status', 'Logged out successfully!')
-
-#     image8=Image.open('images\\logout.png')
-#     img8=image8.resize((50,50))
-#     my_img8=ImageTk.PhotoImage(img8)
-#     logout_icon=Label(image=my_img8)
-#     logout_icon.image=my_img8
-
-#     logout_btn=tk.Button(self, image=my_img8,cursor='hand2', command=logout)
-#     logout_btn.place(x=1300,y=5)
-#     ToolTip(logout_btn, msg='Logout')
 
 
 
@@ -127,7 +113,7 @@ class App(tk.Tk):
         #create dictionary of frames
         self.frames={}
 
-        for F in (Loginpage, RegisterPage, RegisterCourses, AdminPage,Homepage, Subject1, Books, Quiz, Calculator, Chat, Profile):
+        for F in (Loginpage, RegisterPage, RegisterCourses, AdminPage,Homepage, Subject1, Books, Quiz, Calculator, Chat, Profile, StudentsView, BooksView):
             frame= F(container, self)
             #windows class act as root window for frames
             self.frames[F] = frame
@@ -218,10 +204,10 @@ class Loginpage(tk.Frame):
         Label(self.left_frame, text="Email", bg='salmon',font=f).grid(row=0, column=0, sticky=W, pady=10)
         Label(self.left_frame, text="Password", bg='salmon',font=f).grid(row=1, column=0, pady=10)
         self.email_tf = Entry(self.left_frame, font=f)
-        self.email_tf.insert(0, 'brad@gmail.com')   #default value for testing
+        self.email_tf.insert(0, 'lect1@gmail.com')   #default value for testing
 
         self.pwd_tf = Entry(self.left_frame, font=f, show='*')    #default value for testing
-        self.pwd_tf.insert(0, 'Brad,123')
+        self.pwd_tf.insert(0, 'Lect,1234')
         self.pwd_btn=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2",command=lambda:toggle_password(self.pwd_tf, self.pwd_btn))
         self.pwd_btn.place(x=1123, y=382)
         
@@ -634,6 +620,33 @@ class RegisterCourses(tk.Frame):
         self.register_btn.grid(row=10, column=1, pady=10, padx=20)
         self.regcourses_frame.place(x=75, y=210)
 
+class AdminPage(tk.Frame):
+    def __init__(self,parent=None, controller=None, name=None):
+        global login_details
+        tk.Frame.__init__(self,parent)
+        self.controller=controller
+        self.name=name
+        self.parent=parent
+
+        ui_bg(self, 'images/Slide5.png')
+        admin_btns(self, StudentsView, BooksView, controller)
+        StudentsView(self, controller)
+        
+
+        #show admin date and clock
+        clockdate(self)
+
+        #show student view first
+
+        #admin view as normal user
+        # def view_user():
+        #     controller.show_frame(Homepage)
+        # self.viewuser_btn=tk.Button(self,height=1, width=10, font=f, command=view_user, text='View as User')
+        # self.viewuser_btn.place(x=945, y=135)
+
+        #Logout
+        log_out_btn(self, Loginpage, controller)
+        
 
         
 class Homepage(tk.Frame):
