@@ -13,32 +13,17 @@ from mysql.connector import Error
 from captcha.image import ImageCaptcha
 from tktooltip import ToolTip
 from admin import AdminPage
+from buttons import clockdate, ui_bg, log_out_btn, toggle_password
+
+
 
 f=('Arial', 14)
 f2=('Arial', 12)
 bgc='#F9D3B9'
+img_file='images\Slide4.png'
 
-#ui background with inti logo
-def ui_bg(self):
-    self.raw_image=Image.open("images\Slide4.png")
-    self.img=self.raw_image.resize((1240,773),Image.LANCZOS)
-    self.background_image=ImageTk.PhotoImage(self.raw_image)
-    self.background_label = tk.Label(self, image=self.background_image)
-    self.background_label.place(x=-5,y=-5)
-    self.background_label.image = self.background_image
 
-#clock and date day
-def clockdate(self):
-    
-    def my_time():
-        time_string = strftime('%H:%M:%S %p %a %d/%m/%Y') # time format 
-        l1.config(text=time_string)
-        l1.after(1000,my_time) # time delay of 1000 milliseconds 
 
-    
-    l1=tk.Label(self,font=('Arial', 19, 'bold'),bg=bgc, foreground='black')
-    l1.place(x=750, y=12)
-    my_time()
 
 #top buttons
 def top_buttons(self, controller):
@@ -102,30 +87,25 @@ def top_buttons(self, controller):
     button5.place(x=1225, y=5)
     ToolTip(button5, msg='Profile')
 
-#toggle show/hide password function
-def toggle_password(pwd_tf, pwd_btn):
-    if pwd_tf.cget('show') == '':
-        pwd_tf.config(show='*')
-        pwd_btn.config(text='Show',cursor= "hand2")
-    else:
-        pwd_tf.config(show='')
-        pwd_btn.config(text='Hide',cursor= "hand2")
 
-#logout button 
-def log_out_btn(self, controller):
-    def logout():
-        controller.show_frame(Loginpage)
-        messagebox.showinfo('Logout Status', 'Logged out successfully!')
 
-    image8=Image.open('images\\logout.png')
-    img8=image8.resize((50,50))
-    my_img8=ImageTk.PhotoImage(img8)
-    logout_icon=Label(image=my_img8)
-    logout_icon.image=my_img8
+# #logout button 
+# def log_out_btn(self, controller):
+#     def logout():
+#         controller.show_frame(Loginpage)
+#         messagebox.showinfo('Logout Status', 'Logged out successfully!')
 
-    logout_btn=tk.Button(self, image=my_img8,cursor='hand2', command=logout)
-    logout_btn.place(x=1300,y=5)
-    ToolTip(logout_btn, msg='Logout')
+#     image8=Image.open('images\\logout.png')
+#     img8=image8.resize((50,50))
+#     my_img8=ImageTk.PhotoImage(img8)
+#     logout_icon=Label(image=my_img8)
+#     logout_icon.image=my_img8
+
+#     logout_btn=tk.Button(self, image=my_img8,cursor='hand2', command=logout)
+#     logout_btn.place(x=1300,y=5)
+#     ToolTip(logout_btn, msg='Logout')
+
+
 
 
 class App(tk.Tk):
@@ -141,13 +121,13 @@ class App(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         #create app icon
-        iconpic = PhotoImage(file='images\inti_icon.png')
+        iconpic = ImageTk.PhotoImage(file='images\inti_icon.png')
         self.iconphoto(False,iconpic)
 
         #create dictionary of frames
         self.frames={}
 
-        for F in (Loginpage, RegisterPage, RegisterCourses, AdminPage, Homepage, Subject1, Books, Quiz, Calculator, Chat, Profile):
+        for F in (Loginpage, RegisterPage, RegisterCourses, AdminPage,Homepage, Subject1, Books, Quiz, Calculator, Chat, Profile):
             frame= F(container, self)
             #windows class act as root window for frames
             self.frames[F] = frame
@@ -655,29 +635,6 @@ class RegisterCourses(tk.Frame):
         self.regcourses_frame.place(x=75, y=210)
 
 
-# class Adminpage(tk.Frame):
-#     def __init__(self,parent, controller):
-#         global login_details
-#         tk.Frame.__init__(self,parent,bg='AntiqueWhite1')
-    
-#         #inti logo
-#         # inti_logo(self)
-
-#         #show admin date and clock
-#         # adminclock(self)
-
-#         #admin view as normal user
-#         def view_user():
-#             controller.show_frame(Homepage)
-#         self.viewuser_btn=tk.Button(self,height=1, width=10, font=f, command=view_user, text='View as User')
-#         self.viewuser_btn.place(x=945, y=135)
-
-#         #Logout
-#         def log_out():
-#             controller.show_frame(Loginpage)
-#             messagebox.showinfo('Logout Status', 'Logged out successfully!')
-#         self.logout_btn=tk.Button(self, height=1, width=9, font=f, command=log_out, text='Logout')
-#         self.logout_btn.place(x=950 ,y=180)
         
 class Homepage(tk.Frame):
     def __init__(self, parent, controller):
@@ -686,13 +643,13 @@ class Homepage(tk.Frame):
         global login_details
 
         # ui_bg
-        ui_bg(self)
+        ui_bg(self, img_file)
         #top buttons
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
         #logout btn
-        log_out_btn(self,controller)
+        log_out_btn(self, Loginpage, controller)
 
         #Recent Courses Title
         self.courses_lbl = Label(self, text ='Recent Courses', font = ('Arial', 28), bg=bgc)
@@ -857,14 +814,14 @@ class Subject1(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         # ui_bg
-        ui_bg(self)
+        ui_bg(self, img_file)
        
         #top buttons
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
         #logout btn
-        log_out_btn(self,controller)
+        log_out_btn(self,Loginpage, controller)
 
         #Subject title
         self.subj1_title = Label(self, text ='Computer Architecture & Networks', font = ('Arial', 28), bg=bgc )
@@ -881,14 +838,14 @@ class Books(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         # ui_bg
-        ui_bg(self)
+        ui_bg(self, img_file)
        
         #top buttons
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
         #logout btn
-        log_out_btn(self,controller)
+        log_out_btn(self, Loginpage, controller)
 
         #Books Title
         w = Label(self, text ='Books', font = ('Arial', 28), bg='antique white' )
@@ -908,13 +865,13 @@ class Quiz(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         # ui_bg
-        ui_bg(self)
+        ui_bg(self, img_file)
         #top buttons
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
         #logout btn
-        log_out_btn(self,controller)
+        log_out_btn(self, Loginpage, controller)
 
         #Quiz title
         w = Label(self, text ='Quiz', font = ('Arial', 28) , bg='antique white')
@@ -930,13 +887,13 @@ class Calculator(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         # ui_bg
-        ui_bg(self)
+        ui_bg(self, img_file)
         #top buttons
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
         #logout btn
-        log_out_btn(self,controller)
+        log_out_btn(self, Loginpage, controller)
 
         #Calculator title
         w = Label(self, text ='Calculator', font = ('Arial', 28) , bg='antique white')
@@ -952,13 +909,13 @@ class Chat(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         # ui_bg
-        ui_bg(self)
+        ui_bg(self, img_file)
         #top buttons
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
         #logout btn
-        log_out_btn(self,controller)
+        log_out_btn(self, Loginpage, controller)
 
         #Calculator title
         w = Label(self, text ='Chat', font = ('Arial', 28) , bg='antique white')
@@ -975,13 +932,13 @@ class Profile(tk.Frame):
         global login_details
 
         # ui_bg
-        ui_bg(self)
+        ui_bg(self, img_file)
         #top buttons
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
         #logout btn
-        log_out_btn(self,controller)
+        log_out_btn(self, Loginpage, controller)
 
         #Profile Title
         w = Label(self, text ='Profile', font = ('Arial', 28), bg='antique white')
