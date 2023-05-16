@@ -22,7 +22,13 @@ f3=('Arial', 16)
 bgc='#F9D3B9'
 img_file='images\Slide4.png'
 
-
+#optionmenu values
+level=['Select','Degree']
+year=['Select','1','2','3','4']
+school=['Select','School of Computing']
+program=['Select','BCSCUN','BCTCUN']
+semester=['Select','1','2','3']
+subjects=['Select','Computer Architecture & Networks', 'Objected Oriented Programming', 'Mathematics for Computer Science', 'Database Systems', 'Programming & Algorithms']
 
 
 #top buttons
@@ -548,13 +554,7 @@ class RegisterCourses(tk.Frame):
         Label(self.regcourses_frame, text="Semester", bg='salmon',font=f ).grid(row=5, column=0, sticky=W, pady=10)
         Label(self.regcourses_frame, text="Subjects", bg='salmon',font=f ).grid(row=6, column=0, sticky=W, pady=10)
         
-        #optionmenu values
-        level=['Select','Degree']
-        year=['Select','1','2','3','4']
-        school=['Select','School of Computing']
-        program=['Select','BCSCUN','BCTCUN']
-        semester=['Select','1','2','3']
-        subjects=['Select','Computer Architecture & Networks', 'Objected Oriented Programming', 'Mathematics for Computer Science', 'Database Systems', 'Programming & Algorithms']
+        
         
         #default values for optionmenus
         self.level_var=StringVar()
@@ -618,7 +618,6 @@ class RegisterCourses(tk.Frame):
 
 class StudentsView(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
-        global show_students_frame, show_books_frame
         tk.Frame.__init__(self,parent)
         self.controller=controller
         self.name=name
@@ -631,11 +630,11 @@ class StudentsView(tk.Frame):
         log_out_btn(self, Loginpage, controller)
         admin_btns(self, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments,controller)
 
-        show_students_frame=Frame(self, bd=2, relief=SOLID, bg=bgc)
-        show_students_frame.place(x=40, y=155)
+        self.show_students_frame=Frame(self, bd=2, relief=SOLID, bg=bgc)
+        self.show_students_frame.place(x=40, y=155)
 
         #student view label
-        student_view_label=Label(show_students_frame, text='Student View', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
+        student_view_label=Label(self.show_students_frame, text='Student View', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
         student_view_label.pack(pady=10)
 
         #show students treeview
@@ -644,13 +643,13 @@ class StudentsView(tk.Frame):
         style.configure('Treeview.Heading', font=f)
         style.configure('Treeview', font=f2)
 
-        tree_frame=Frame(show_students_frame, columnspan=6)
-        tree_frame.pack(pady=10)
+        self.tree_frame=Frame(self.show_students_frame)
+        self.tree_frame.pack(pady=10)
 
-        tree_scroll=Scrollbar(tree_frame)
+        tree_scroll=Scrollbar(self.tree_frame)
         tree_scroll.pack(side=RIGHT, fill=Y)
 
-        my_tree=ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, selectmode='extended')
+        my_tree=ttk.Treeview(self.tree_frame, yscrollcommand=tree_scroll.set, selectmode='extended')
         my_tree.pack()
 
         tree_scroll.config(command=my_tree.yview)
@@ -689,65 +688,67 @@ class StudentsView(tk.Frame):
         for row in r_set:
             my_tree.insert("", tk.END, values=row)
 
-        #edit student record
+        #edit student record frame
+        self.edit_frame=Frame(self, bd=2, relief=SOLID, bg=bgc)
+        self.edit_frame.place(x=125, y=500)
         #entry boxes
-        self.name_lbl= Label(show_students_frame, text='Name', font=f, bg=bgc)
-        self.name_lbl.place(x=40, y=500)
-        self.name_entry= Entry(show_students_frame, font=f2, width=20)
-        self.name_entry.place(x=40, y=530)
+        self.name_lbl= Label(self.edit_frame, text='Name', font=f3, bg=bgc)
+        self.name_lbl.grid(row=0, column=0, sticky=W, pady=10, padx=10)
+        self.name_entry= Entry(self.edit_frame, font=f3, width=20)
+        self.name_entry.grid(row=0, column=1, pady=10, padx=10)
 
-        self.id_lbl= Label(show_students_frame, text='Student ID', font=f, bg=bgc)
-        self.id_lbl.place(x=40, y=560)
-        self.id_entry= Entry(show_students_frame, font=f2, width=20)
-        self.id_entry.place(x=40, y=590)
+        self.id_lbl= Label(self.edit_frame, text='Student ID', font=f3, bg=bgc)
+        self.id_lbl.grid(row=1, column=0, sticky=W, pady=10, padx=5)
+        self.id_entry= Entry(self.edit_frame, font=f, width=20)
+        self.id_entry.grid(row=1, column=1, pady=10, padx=10)
 
-        self.email_lbl= Label(show_students_frame, text='Email', font=f, bg=bgc)
-        self.email_lbl.place(x=40, y=620)
-        self.email_entry= Entry(show_students_frame, font=f2, width=20)
-        self.email_entry.place(x=40, y=650)
+        self.email_lbl= Label(self.edit_frame, text='Email', font=f3, bg=bgc)
+        self.email_lbl.grid(row=2, column=0, sticky=W, pady=10, padx=10)
+        self.email_entry= Entry(self.edit_frame, font=f3, width=20)
+        self.email_entry.grid(row=2, column=1, pady=10, padx=10)
 
-        self.subj1_lbl= Label(show_students_frame, text='Subject 1', font=f, bg=bgc)
-        self.subj1_lbl.place(x=40, y=680)
-        self.subj1_entry= Entry(show_students_frame, font=f2, width=20)
-        self.subj1_entry.place(x=40, y=710)
+        self.subj1_lbl= Label(self.edit_frame, text='Subject 1', font=f3, bg=bgc)
+        self.subj1_lbl.grid(row=0, column=4, sticky=W, pady=10, padx=10)
+        self.subj1_entry= ttk.Combobox(self.edit_frame, values=subjects,  width=20, font=f3)
+        self.subj1_entry.grid(row=0, column=5, pady=10, padx=10)
 
-        self.subj2_lbl= Label(show_students_frame, text='Subject 2', font=f, bg=bgc)
-        self.subj2_lbl.place(x=40, y=740)
-        self.subj2_entry= Entry(show_students_frame, font=f2, width=20)
-        self.subj2_entry.place(x=40, y=770)
+        self.subj2_lbl= Label(self.edit_frame, text='Subject 2', font=f3, bg=bgc)
+        self.subj2_lbl.grid(row=1, column=4, sticky=W, pady=10, padx=10)
+        self.subj2_entry= ttk.Combobox(self.edit_frame, values=subjects,  width=20, font=f3)
+        self.subj2_entry.grid(row=1, column=5, pady=10, padx=10)
 
-        self.subj3_lbl= Label(show_students_frame, text='Subject 3', font=f, bg=bgc)
-        self.subj3_lbl.place(x=40, y=800)
-        self.subj3_entry= Entry(show_students_frame, font=f2, width=20)
-        self.subj3_entry.place(x=40, y=830)
+        self.subj3_lbl= Label(self.edit_frame, text='Subject 3', font=f3, bg=bgc)
+        self.subj3_lbl.grid(row=2, column=4, sticky=W, pady=10, padx=10)
+        self.subj3_entry= ttk.Combobox(self.edit_frame, values=subjects,  width=20, font=f3)
+        self.subj3_entry.grid(row=2, column=5, pady=10, padx=10)
 
-        self.subj4_lbl= Label(show_students_frame, text='Subject 4', font=f, bg=bgc)
-        self.subj4_lbl.place(x=40, y=860)
-        self.subj4_entry= Entry(show_students_frame, font=f2, width=20)
-        self.subj4_entry.place(x=40, y=890)
+        self.subj4_lbl= Label(self.edit_frame, text='Subject 4', font=f3, bg=bgc)
+        self.subj4_lbl.grid(row=0, column=6, sticky=W, pady=10, padx=10)
+        self.subj4_entry= ttk.Combobox(self.edit_frame, values=subjects,  width=20, font=f3)
+        self.subj4_entry.grid(row=0, column=7, pady=10, padx=10)
 
-        # def show_stud_record(e):
-        #     #clear entries
-        #     self.name_entry.delete(0, END)
-        #     self.id_entry.delete(0, END)
-        #     self.email_entry.delete(0, END)
-        #     self.subj1_entry.delete(0, END)
-        #     self.subj2_entry.delete(0, END)
-        #     self.subj3_entry.delete(0, END)
-        #     self.subj4_entry.delete(0, END)
+        def show_stud_record(e):
+            #clear entries
+            self.name_entry.delete(0, END)
+            self.id_entry.delete(0, END)
+            self.email_entry.delete(0, END)
+            self.subj1_entry.set('')
+            self.subj2_entry.set('')
+            self.subj3_entry.set('')
+            self.subj4_entry.set('')
 
-        #     #grab record number and values
-        #     selected=my_tree.focus()
-        #     values=my_tree.item(selected, 'values')
+            #grab record number and values
+            selected=my_tree.focus()
+            values=my_tree.item(selected, 'values')
 
-        #     #output to entry boxes
-        #     self.name_entry.insert(0, values[0])
-        #     self.id_entry.insert(0, values[1])
-        #     self.email_entry.insert(0, values[2])
-        #     self.subj1_entry.insert(0, values[3])
-        #     self.subj2_entry.insert(0, values[4])
-        #     self.subj3_entry.insert(0, values[5])
-        #     self.subj4_entry.insert(0, values[6])
+            #output to entry boxes
+            self.name_entry.insert(0, values[0])
+            self.id_entry.insert(0, values[1])
+            self.email_entry.insert(0, values[2])
+            self.subj1_entry.insert(0, values[3])
+            self.subj2_entry.insert(0, values[4])
+            self.subj3_entry.insert(0, values[5])
+            self.subj4_entry.insert(0, values[6])
         
         # #update student records
         # def update_stud_record():
@@ -771,11 +772,11 @@ class StudentsView(tk.Frame):
         #     self.subj3_entry.delete(0, END)
         #     self.subj4_entry.delete(0, END)
         
-        # #Update student record btn
-        # update_btn=Button(show_students_frame, text='Update Record', font=f, width=15, relief=SOLID, cursor='hand2', command=update_stud_record)
-        # update_btn.place(x=40, y=920)
+        #Update student record btn
+        self.update_btn=Button(self.edit_frame, text='Update Record', font=f, width=15, relief=SOLID, cursor='hand2')
+        self.update_btn.grid(row=2, column=6, pady=10, padx=10, columnspan=2)
 
-        # my_tree.bind('<ButtonRelease-1>', show_stud_record)
+        my_tree.bind('<ButtonRelease-1>', show_stud_record)
 
             
 
