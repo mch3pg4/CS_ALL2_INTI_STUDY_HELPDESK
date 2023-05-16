@@ -88,11 +88,6 @@ def top_buttons(self, controller):
     ToolTip(button5, msg='Profile')
 
 
-
-
-
-
-
 class App(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -113,7 +108,7 @@ class App(tk.Tk):
         #create dictionary of frames
         self.frames={}
 
-        for F in (Loginpage, RegisterPage, RegisterCourses,Homepage, Subject1, Books, Quiz, Calculator, Chat, Profile, StudentsView, BooksView):
+        for F in (Loginpage, RegisterPage, RegisterCourses,Homepage, Subject1, Books, Quiz, Calculator, Chat, Profile, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments):
             frame= F(container, self)
             #windows class act as root window for frames
             self.frames[F] = frame
@@ -620,6 +615,7 @@ class RegisterCourses(tk.Frame):
         self.register_btn.grid(row=10, column=1, pady=10, padx=20)
         self.regcourses_frame.place(x=75, y=210)
 
+
 class StudentsView(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
         global show_students_frame, show_books_frame
@@ -633,8 +629,8 @@ class StudentsView(tk.Frame):
         clockdate(self)
         view_user(self,Homepage, controller)
         log_out_btn(self, Loginpage, controller)
+        admin_btns(self, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments,controller)
 
-        admin_btns(self, StudentsView, BooksView, controller)
         show_students_frame=Frame(self, bd=2, relief=SOLID, bg=bgc)
         show_students_frame.place(x=40, y=155)
 
@@ -648,7 +644,7 @@ class StudentsView(tk.Frame):
         style.configure('Treeview.Heading', font=f)
         style.configure('Treeview', font=f2)
 
-        tree_frame=Frame(show_students_frame)
+        tree_frame=Frame(show_students_frame, columnspan=6)
         tree_frame.pack(pady=10)
 
         tree_scroll=Scrollbar(tree_frame)
@@ -693,7 +689,98 @@ class StudentsView(tk.Frame):
         for row in r_set:
             my_tree.insert("", tk.END, values=row)
 
-        show_students_frame.forget()
+        #edit student record
+        #entry boxes
+        self.name_lbl= Label(show_students_frame, text='Name', font=f, bg=bgc)
+        self.name_lbl.place(x=40, y=500)
+        self.name_entry= Entry(show_students_frame, font=f2, width=20)
+        self.name_entry.place(x=40, y=530)
+
+        self.id_lbl= Label(show_students_frame, text='Student ID', font=f, bg=bgc)
+        self.id_lbl.place(x=40, y=560)
+        self.id_entry= Entry(show_students_frame, font=f2, width=20)
+        self.id_entry.place(x=40, y=590)
+
+        self.email_lbl= Label(show_students_frame, text='Email', font=f, bg=bgc)
+        self.email_lbl.place(x=40, y=620)
+        self.email_entry= Entry(show_students_frame, font=f2, width=20)
+        self.email_entry.place(x=40, y=650)
+
+        self.subj1_lbl= Label(show_students_frame, text='Subject 1', font=f, bg=bgc)
+        self.subj1_lbl.place(x=40, y=680)
+        self.subj1_entry= Entry(show_students_frame, font=f2, width=20)
+        self.subj1_entry.place(x=40, y=710)
+
+        self.subj2_lbl= Label(show_students_frame, text='Subject 2', font=f, bg=bgc)
+        self.subj2_lbl.place(x=40, y=740)
+        self.subj2_entry= Entry(show_students_frame, font=f2, width=20)
+        self.subj2_entry.place(x=40, y=770)
+
+        self.subj3_lbl= Label(show_students_frame, text='Subject 3', font=f, bg=bgc)
+        self.subj3_lbl.place(x=40, y=800)
+        self.subj3_entry= Entry(show_students_frame, font=f2, width=20)
+        self.subj3_entry.place(x=40, y=830)
+
+        self.subj4_lbl= Label(show_students_frame, text='Subject 4', font=f, bg=bgc)
+        self.subj4_lbl.place(x=40, y=860)
+        self.subj4_entry= Entry(show_students_frame, font=f2, width=20)
+        self.subj4_entry.place(x=40, y=890)
+
+        # def show_stud_record(e):
+        #     #clear entries
+        #     self.name_entry.delete(0, END)
+        #     self.id_entry.delete(0, END)
+        #     self.email_entry.delete(0, END)
+        #     self.subj1_entry.delete(0, END)
+        #     self.subj2_entry.delete(0, END)
+        #     self.subj3_entry.delete(0, END)
+        #     self.subj4_entry.delete(0, END)
+
+        #     #grab record number and values
+        #     selected=my_tree.focus()
+        #     values=my_tree.item(selected, 'values')
+
+        #     #output to entry boxes
+        #     self.name_entry.insert(0, values[0])
+        #     self.id_entry.insert(0, values[1])
+        #     self.email_entry.insert(0, values[2])
+        #     self.subj1_entry.insert(0, values[3])
+        #     self.subj2_entry.insert(0, values[4])
+        #     self.subj3_entry.insert(0, values[5])
+        #     self.subj4_entry.insert(0, values[6])
+        
+        # #update student records
+        # def update_stud_record():
+        #     selected=my_tree.focus()
+        #     my_tree.item(selected, text='', values=(self.name_entry.get(), self.id_entry.get(), self.email_entry.get(), self.subj1_entry.get(), self.subj2_entry.get(), self.subj3_entry.get(), self.subj4_entry.get()))
+        #     con = mysql.connector.connect(host="localhost",
+        #                                   user="root",
+        #                                   password="rootpass",
+        #                                   database="all2")      
+        #     cur = con.cursor()
+        #     cur.execute("UPDATE userdata, usersubjects SET userdata.name=%s, usersubjects.user_id=%s, userdata.email=%s, usersubjects.subj1=%s, usersubjects.subj2=%s, usersubjects.subj3=%s, usersubjects.subj4=&s WHERE usersubjects.user_id= userdata.user_id AND userdata.user_id =%s", (self.name_entry.get(), self.id_entry.get(), self.email_entry.get(), self.subj1_entry.get(), self.subj2_entry.get(), self.subj3_entry.get(), self.subj4_entry.get()))
+        #     con.commit()
+        #     con.close()
+
+        #     #clear entries
+        #     self.name_entry.delete(0, END)
+        #     self.id_entry.delete(0, END)
+        #     self.email_entry.delete(0, END)
+        #     self.subj1_entry.delete(0, END)
+        #     self.subj2_entry.delete(0, END)
+        #     self.subj3_entry.delete(0, END)
+        #     self.subj4_entry.delete(0, END)
+        
+        # #Update student record btn
+        # update_btn=Button(show_students_frame, text='Update Record', font=f, width=15, relief=SOLID, cursor='hand2', command=update_stud_record)
+        # update_btn.place(x=40, y=920)
+
+        # my_tree.bind('<ButtonRelease-1>', show_stud_record)
+
+            
+
+
+
 
 #add/delete /view books
 class BooksView(tk.Frame):
@@ -707,10 +794,9 @@ class BooksView(tk.Frame):
         #ui_bg and clock and logout btn
         ui_bg(self, 'images/Slide5.png')
         clockdate(self)
-        log_out_btn(self, Loginpage, controller )
-
-
-        admin_btns(self, StudentsView, BooksView, controller)
+        view_user(self,Homepage, controller)
+        log_out_btn(self, Loginpage, controller)
+        admin_btns(self, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments,controller)
 
 
         show_books_frame=Frame(self, bd=2, relief=SOLID, bg=bgc)
@@ -768,9 +854,86 @@ class BooksView(tk.Frame):
             book_img = book_img.resize((100, 100), Image.LANCZOS)
             book_img = ImageTk.PhotoImage(book_img)
             my_tree.insert("", tk.END, values=(row[0], book_img, row[2], row[3]))
-        
 
-        
+
+class QuizAdmin(tk.Frame):
+    def __init__(self,parent=None, controller=None, name=None):
+        global show_students_frame, show_books_frame
+        tk.Frame.__init__(self,parent)
+        self.controller=controller
+        self.name=name
+        self.parent=parent
+
+        #ui_bg and clock and logout btn
+        ui_bg(self, 'images/Slide5.png')
+        clockdate(self)
+        view_user(self,Homepage, controller)
+        log_out_btn(self, Loginpage, controller)
+        admin_btns(self, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments,controller)
+
+        #quiz admin label
+        quiz_admin_label=Label(self, text='Quiz Admin', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
+        quiz_admin_label.place(x=40, y=155)
+  
+
+class ChatAdmin(tk.Frame):
+    def __init__(self,parent=None, controller=None, name=None):
+        global show_students_frame, show_books_frame
+        tk.Frame.__init__(self,parent)
+        self.controller=controller
+        self.name=name
+        self.parent=parent
+
+        #ui_bg and clock and logout btn
+        ui_bg(self, 'images/Slide5.png')
+        clockdate(self)
+        view_user(self,Homepage, controller)
+        log_out_btn(self, Loginpage, controller)
+        admin_btns(self, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments,controller)
+
+        #chat admin label
+        chat_admin_label=Label(self, text='Chat Admin', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
+        chat_admin_label.place(x=40, y=155)
+
+class CourseMaterials(tk.Frame):
+    def __init__(self,parent=None, controller=None, name=None):
+        global show_students_frame, show_books_frame
+        tk.Frame.__init__(self,parent)
+        self.controller=controller
+        self.name=name
+        self.parent=parent
+
+        #ui_bg and clock and logout btn
+        ui_bg(self, 'images/Slide5.png')
+        clockdate(self)
+        view_user(self,Homepage, controller)
+        log_out_btn(self, Loginpage, controller)
+        admin_btns(self, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments,controller)
+
+        #course materials label
+        course_materials_label=Label(self, text='Course Materials', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
+        course_materials_label.place(x=40, y=155)
+
+
+class AdminAppointments(tk.Frame):
+    def __init__(self,parent=None, controller=None, name=None):
+        global show_students_frame, show_books_frame
+        tk.Frame.__init__(self,parent)
+        self.controller=controller
+        self.name=name
+        self.parent=parent
+
+        #ui_bg and clock and logout btn
+        ui_bg(self, 'images/Slide5.png')
+        clockdate(self)
+        view_user(self,Homepage, controller)
+        log_out_btn(self, Loginpage, controller)
+        admin_btns(self, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments,controller)
+
+        #course materials label
+        course_materials_label=Label(self, text='Appointments', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
+        course_materials_label.place(x=40, y=155)
+
 class Homepage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -962,11 +1125,7 @@ class Subject1(tk.Frame):
         self.subj1_title = Label(self, text ='Computer Architecture & Networks', font = ('Arial', 28), bg=bgc )
         self.subj1_title.pack()
         self.subj1_title.place(x=350, y=100)
-
-
-        
-        
-    
+ 
 
 class Books(tk.Frame):
     def __init__(self, parent, controller):
