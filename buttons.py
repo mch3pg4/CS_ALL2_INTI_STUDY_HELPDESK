@@ -83,6 +83,19 @@ def admin_btns(self, frame1, frame2, controller):
     self.appointments_btn=tk.Button(self, text='Appointments', font=f3,width=14,   cursor='hand2')
     self.appointments_btn.place(x=47*23.75, y=100)
 
+
+#view as student button
+def view_user(self, frame, controller):
+    image=Image.open('images\\student.png')
+    img=image.resize((50,50))
+    my_img=ImageTk.PhotoImage(img)
+    student_icon=Label(image=my_img)
+    student_icon.image=my_img
+
+    viewuser_btn=tk.Button(self,image=my_img, cursor='hand2', command=lambda:controller.show_frame(frame))
+    viewuser_btn.place(x=1225, y=5)
+    ToolTip(viewuser_btn, msg='View as Student')
+
 #logout button 
 def log_out_btn(self, frame, controller):
     def logout():
