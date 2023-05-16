@@ -1,4 +1,4 @@
-import bcrypt, re, random, io, string
+import bcrypt, re, random, io, string, os
 import datetime
 from tkcalendar import Calendar
 from tkinter import *
@@ -780,9 +780,6 @@ class StudentsView(tk.Frame):
 
             
 
-
-
-
 #add/delete /view books
 class BooksView(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
@@ -824,14 +821,15 @@ class BooksView(tk.Frame):
 
         tree_scroll.config(command=my_tree.yview)
 
-        my_tree['columns']= ('ID', 'Book Cover','Book Name', 'Category')
+        my_tree['columns']= ('ID', 'Book Cover','Book Name', 'Category', 'File')
 
         #format columns
         my_tree.column('#0', width=0, stretch=NO)
-        my_tree.column('ID', width=150, anchor=CENTER, stretch=NO)
+        my_tree.column('ID', width=80, anchor=CENTER, stretch=NO)
         my_tree.column('Book Cover', width=150, anchor=CENTER, stretch=NO)
-        my_tree.column('Book Name', width=180, anchor=CENTER, stretch=NO)
-        my_tree.column('Category', width=200, anchor=CENTER, stretch=NO)
+        my_tree.column('Book Name', width=210, anchor=CENTER, stretch=NO)
+        my_tree.column('Category', width=165, anchor=CENTER, stretch=NO)
+        my_tree.column('File', width=140, anchor=CENTER, stretch=NO)
 
 
         #column headings
@@ -840,6 +838,7 @@ class BooksView(tk.Frame):
         my_tree.heading('Book Cover', text='Book Cover', anchor=CENTER)
         my_tree.heading('Book Name', text='Book Name', anchor=CENTER)
         my_tree.heading('Category', text='Category', anchor=CENTER)
+        my_tree.heading('File', text='File', anchor=CENTER)
 
 
         #get data from database
@@ -848,13 +847,70 @@ class BooksView(tk.Frame):
                                     password="rootpass",
                                     database="all2")
         cur = con.cursor()
-        r_set=cur.execute("SELECT idbooks, bookcover, bookname, bookcategory from books;")
+        r_set=cur.execute("SELECT idbooks, bookcover, bookname, bookcategory, bookfile from books;")
         r_set=cur.fetchall()
         for row in r_set:
             book_img = Image.open(row[1])
             book_img = book_img.resize((100, 100), Image.LANCZOS)
             book_img = ImageTk.PhotoImage(book_img)
-            my_tree.insert("", tk.END, values=(row[0], book_img, row[2], row[3]))
+            my_tree.insert("", tk.END, values=(row[0], book_img, row[2], row[3], row[4]))
+
+        #add edit delete books frame
+        self.booksrec_frame=Frame(self, bd=2, relief=SOLID, bg=bgc)  
+        self.booksrec_frame.place(x=85, y=500)
+
+        bookcat=['Maths', 'Computer Science', 'Design']
+
+        #entry boxes
+        self.bookid_lbl= Label(self.booksrec_frame, text='Book ID', font=f3, bg=bgc)
+        self.bookid_lbl.grid(row=0, column=0, sticky=W, pady=10, padx=10)
+        self.bookid_entry= Entry(self.booksrec_frame, font=f3, width=18)
+        self.bookid_entry.grid(row=0, column=1, pady=10, padx=10)
+
+        self.bookname_lbl= Label(self.booksrec_frame, text='Book Name', font=f3, bg=bgc)
+        self.bookname_lbl.grid(row=1, column=0, sticky=W, pady=10, padx=10)
+        self.bookname_entry= Entry(self.booksrec_frame, font=f3, width=18)
+        self.bookname_entry.grid(row=1, column=1, pady=10, padx=10)
+
+        self.bookcat_lbl= Label(self.booksrec_frame, text='Book Category', font=f3, bg=bgc)
+        self.bookcat_lbl.grid(row=2, column=0, sticky=W, pady=10, padx=10)
+        self.bookcat_entry= ttk.Combobox(self.booksrec_frame, font=f3, values=bookcat, width=18)
+        self.bookcat_entry.grid(row=2, column=1, pady=10, padx=10)
+
+        #upload book pdf file path
+        def upload_bookfile():
+            global bookfile_path
+            bookfile_path=filedialog.askopenfilename(title='Select Book File', filetypes=(('PDF Files', '*.pdf'), ('All Files', '*.*')))
+
+
+        #upload book cover image
+        def upload_bookcover():
+            global bookcover_path
+            bookcover_path=filedialog.askopenfilename( title='Select Book Cover', filetypes=(('PNG Files', '*.png'), ('All Files', '*.*')))
+
+
+        self.bookfile_lbl= Label(self.booksrec_frame, text='Book File', font=f3, bg=bgc)
+        self.bookfile_lbl.grid(row=0, column=2, sticky=W, pady=10, padx=10)
+        self.bookfile_entry= Button(self.booksrec_frame, text='Upload File',font=f, width=12, cursor='hand2', command=upload_bookfile)
+        self.bookfile_entry.grid(row=0, column=3, pady=10, padx=10)
+
+        self.bookcover_lbl= Label(self.booksrec_frame, text='Book Cover', font=f3, bg=bgc)
+        self.bookcover_lbl.grid(row=1, column=2, sticky=W, pady=10, padx=10)
+        self.bookcover_entry= Button(self.booksrec_frame,text='Upload Cover', font=f, width=12, cursor='hand2', command=upload_bookcover)
+        self.bookcover_entry.grid(row=1, column=3, pady=10, padx=10)
+
+        self.addbook_btn= Button(self.booksrec_frame, text='Add Book', font=f3)
+        self.addbook_btn.grid(row=4, column=0, sticky=W, pady=10, padx=10)
+
+        self.editbook_btn= Button(self.booksrec_frame, text='Edit Book', font=f3)
+        self.editbook_btn.grid(row=4, column=1, sticky=W, pady=10, padx=65)
+
+        self.deletebook_btn= Button(self.booksrec_frame, text='Delete Book', font=f3)
+        self.deletebook_btn.grid(row=4, column=2, sticky=W, pady=10, padx=10)
+
+        
+
+
 
 
 class QuizAdmin(tk.Frame):
@@ -915,7 +971,6 @@ class CourseMaterials(tk.Frame):
         course_materials_label=Label(self, text='Course Materials', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
         course_materials_label.place(x=40, y=155)
 
-
 class AdminAppointments(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
         global show_students_frame, show_books_frame
@@ -934,6 +989,9 @@ class AdminAppointments(tk.Frame):
         #course materials label
         course_materials_label=Label(self, text='Appointments', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
         course_materials_label.place(x=40, y=155)
+
+
+
 
 class Homepage(tk.Frame):
     def __init__(self, parent, controller):
