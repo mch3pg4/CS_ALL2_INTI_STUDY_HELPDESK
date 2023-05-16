@@ -47,7 +47,7 @@ def toggle_password(pwd_tf, pwd_btn):
         pwd_btn.config(text='Hide',cursor= "hand2")
 
 #admin buttons
-def admin_btns(self, frame1, frame2, controller):
+def admin_btns(self, frame1, frame2, frame3, frame4, frame5, frame6, controller):
     #admin page title
     self.admin_title=tk.Label(self, text='Admin Page', font=('Helvetica', 18, 'bold'), bg=bgc)
     self.admin_title.place(x=450, y=10)
@@ -65,22 +65,22 @@ def admin_btns(self, frame1, frame2, controller):
 
     #add/edit/delete quiz
     #quiz button
-    self.quiz_btn=tk.Button(self, text='Quiz', font=f3,width=14,   cursor='hand2')
+    self.quiz_btn=tk.Button(self, text='Quiz', font=f3,width=14,   cursor='hand2', command=lambda:controller.show_frame(frame3))
     self.quiz_btn.place(x=47*10, y=100)
 
     #chat discussions
     #chat button
-    self.chat_btn=tk.Button(self, text='Chat', font=f3, width=14,  cursor='hand2')
+    self.chat_btn=tk.Button(self, text='Chat', font=f3, width=14,  cursor='hand2', command=lambda:controller.show_frame(frame4))
     self.chat_btn.place(x=47*14.5, y=100)
 
     #add/delete/view course materials
     #course materials button
-    self.coursematerials_btn=tk.Button(self, text='Course Materials', font=f3,width=14,   cursor='hand2')
+    self.coursematerials_btn=tk.Button(self, text='Course Materials', font=f3,width=14,   cursor='hand2', command=lambda:controller.show_frame(frame5))
     self.coursematerials_btn.place(x=47*19.15, y=100)
 
     #view appointments
     #appointments button
-    self.appointments_btn=tk.Button(self, text='Appointments', font=f3,width=14,   cursor='hand2')
+    self.appointments_btn=tk.Button(self, text='Appointments', font=f3,width=14,   cursor='hand2', command=lambda:controller.show_frame(frame6))
     self.appointments_btn.place(x=47*23.75, y=100)
 
 
