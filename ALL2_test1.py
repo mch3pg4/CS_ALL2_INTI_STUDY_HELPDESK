@@ -12,8 +12,7 @@ import mysql.connector
 from mysql.connector import Error
 from captcha.image import ImageCaptcha
 from tktooltip import ToolTip
-from buttons import clockdate, ui_bg, log_out_btn, toggle_password, admin_btns
-from admin import StudentsView, BooksView
+from buttons import clockdate, ui_bg, log_out_btn, toggle_password, admin_btns, view_user
 
 
 
@@ -629,9 +628,11 @@ class StudentsView(tk.Frame):
         self.name=name
         self.parent=parent
 
-        #ui_bg and clock 
+        #ui_bg and clock and logout btn
         ui_bg(self, 'images/Slide5.png')
         clockdate(self)
+        view_user(self,Homepage, controller)
+        log_out_btn(self, Loginpage, controller)
 
         admin_btns(self, StudentsView, BooksView, controller)
         show_students_frame=Frame(self, bd=2, relief=SOLID, bg=bgc)
@@ -703,9 +704,10 @@ class BooksView(tk.Frame):
         self.name=name
         self.parent=parent
 
-        #ui_bg and clock
+        #ui_bg and clock and logout btn
         ui_bg(self, 'images/Slide5.png')
         clockdate(self)
+        log_out_btn(self, Loginpage, controller )
 
 
         admin_btns(self, StudentsView, BooksView, controller)
