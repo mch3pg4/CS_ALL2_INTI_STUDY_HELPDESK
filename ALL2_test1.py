@@ -97,6 +97,7 @@ def top_buttons(self, controller):
 class App(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
+        global show_frame
 
         #create frame and assign it to container
         container = tk.Frame(self)
@@ -113,7 +114,7 @@ class App(tk.Tk):
         #create dictionary of frames
         self.frames={}
 
-        for F in (Loginpage, RegisterPage, RegisterCourses, AdminPage,Homepage, Subject1, Books, Quiz, Calculator, Chat, Profile, StudentsView, BooksView):
+        for F in (Loginpage, RegisterPage, RegisterCourses,Homepage, Subject1, Books, Quiz, Calculator, Chat, Profile, StudentsView, BooksView):
             frame= F(container, self)
             #windows class act as root window for frames
             self.frames[F] = frame
@@ -192,7 +193,7 @@ class Loginpage(tk.Frame):
                     # controller.updateHomepage(login_details)
                     # controller.updateAdmin(login_details)
                     elif bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Lecturer'):
-                        controller.show_frame(AdminPage)
+                        controller.show_frame(StudentsView)
                     else:
                         messagebox.showerror('Login Status', 'invalid username or password')
             else:
@@ -350,7 +351,7 @@ class RegisterPage(tk.Frame):
                     con.commit()
                     messagebox.showinfo('Register', 'Account Created Successfully!')
                     if self.user_var.get()== 'Lecturer':
-                        controller.show_frame(AdminPage)
+                        controller.show_frame(StudentsView)
                     else:
                         controller.show_frame(RegisterCourses)
 
@@ -620,32 +621,32 @@ class RegisterCourses(tk.Frame):
         self.register_btn.grid(row=10, column=1, pady=10, padx=20)
         self.regcourses_frame.place(x=75, y=210)
 
-class AdminPage(tk.Frame):
-    def __init__(self,parent=None, controller=None, name=None):
-        global login_details
-        tk.Frame.__init__(self,parent)
-        self.controller=controller
-        self.name=name
-        self.parent=parent
+# class AdminPage(tk.Frame):
+#     def __init__(self,parent=None, controller=None, name=None):
+#         global login_details, show_frame
+#         tk.Frame.__init__(self,parent)
+#         self.controller=controller
+#         self.name=name
+#         self.parent=parent
 
-        ui_bg(self, 'images/Slide5.png')
-        admin_btns(self, StudentsView, BooksView, controller)
-        StudentsView(self, controller)
+#         ui_bg(self, 'images/Slide5.png')
+#         admin_btns(self, StudentsView, BooksView, controller)
         
 
-        #show admin date and clock
-        clockdate(self)
+#         #show admin date and clock
+#         clockdate(self)
 
-        #show student view first
+#         #show student view first
+#         controller.show_frame(StudentsView)
 
-        #admin view as normal user
-        # def view_user():
-        #     controller.show_frame(Homepage)
-        # self.viewuser_btn=tk.Button(self,height=1, width=10, font=f, command=view_user, text='View as User')
-        # self.viewuser_btn.place(x=945, y=135)
+#         #admin view as normal user
+#         # def view_user():
+#         #     controller.show_frame(Homepage)
+#         # self.viewuser_btn=tk.Button(self,height=1, width=10, font=f, command=view_user, text='View as User')
+#         # self.viewuser_btn.place(x=945, y=135)
 
-        #Logout
-        log_out_btn(self, Loginpage, controller)
+#         #Logout
+#         log_out_btn(self, Loginpage, controller)
         
 
         
