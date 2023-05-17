@@ -649,7 +649,7 @@ class StudentsView(tk.Frame):
         tree_scroll=Scrollbar(self.tree_frame)
         tree_scroll.pack(side=RIGHT, fill=Y)
 
-        my_tree=ttk.Treeview(self.tree_frame, yscrollcommand=tree_scroll.set, selectmode='extended')
+        my_tree=ttk.Treeview(self.tree_frame, yscrollcommand=tree_scroll.set, selectmode='extended', height=5)
         my_tree.pack()
 
         tree_scroll.config(command=my_tree.yview)
@@ -809,6 +809,7 @@ class BooksView(tk.Frame):
         style.theme_use('clam')
         style.configure('Treeview.Heading', font=f)
         style.configure('Treeview', font=f2)
+        style.configure('Treeview',rowheight=35)
 
         tree_frame=Frame(show_books_frame)
         tree_frame.pack(pady=10)
@@ -850,43 +851,110 @@ class BooksView(tk.Frame):
         r_set=cur.execute("SELECT idbooks, bookcover, bookname, bookcategory, bookfile from books;")
         r_set=cur.fetchall()
         for row in r_set:
+            print(row[1])
             book_img = Image.open(row[1])
-            book_img = book_img.resize((100, 100), Image.LANCZOS)
-            book_img = ImageTk.PhotoImage(book_img)
-            my_tree.insert("", tk.END, values=(row[0], book_img, row[2], row[3], row[4]))
+            book_i = book_img.resize((100, 100))
+            book_img = ImageTk.PhotoImage(book_i)
+            book_coverimg = Label(image=book_img)
+            book_coverimg.image = book_img
+            my_tree.insert("", tk.END, values=(row[0],'', row[2], row[3], row[4]), image=book_img)
+        # book_images = {}
+        # for row in r_set:
+        #     book_img = Image.open(row[1])
+        #     book_i = book_img.resize((100, 100))
+        #     book_images[row[0]] = ImageTk.PhotoImage(book_i)
+        #     my_tree.insert("", tk.END, image=book_images[row[0]], values=(row[0], '', row[2], row[3], row[4]))
 
-        #add edit delete books frame
-        self.booksrec_frame=Frame(self, bd=2, relief=SOLID, bg=bgc)  
-        self.booksrec_frame.place(x=85, y=500)
 
-        bookcat=['Maths', 'Computer Science', 'Design']
 
-        #entry boxes
-        self.bookid_lbl= Label(self.booksrec_frame, text='Book ID', font=f3, bg=bgc)
-        self.bookid_lbl.grid(row=0, column=0, sticky=W, pady=10, padx=10)
-        self.bookid_entry= Entry(self.booksrec_frame, font=f3, width=18)
-        self.bookid_entry.grid(row=0, column=1, pady=10, padx=10)
-
-        self.bookname_lbl= Label(self.booksrec_frame, text='Book Name', font=f3, bg=bgc)
-        self.bookname_lbl.grid(row=1, column=0, sticky=W, pady=10, padx=10)
-        self.bookname_entry= Entry(self.booksrec_frame, font=f3, width=18)
-        self.bookname_entry.grid(row=1, column=1, pady=10, padx=10)
-
-        self.bookcat_lbl= Label(self.booksrec_frame, text='Book Category', font=f3, bg=bgc)
-        self.bookcat_lbl.grid(row=2, column=0, sticky=W, pady=10, padx=10)
-        self.bookcat_entry= ttk.Combobox(self.booksrec_frame, font=f3, values=bookcat, width=18)
-        self.bookcat_entry.grid(row=2, column=1, pady=10, padx=10)
 
         #upload book pdf file path
         def upload_bookfile():
             global bookfile_path
             bookfile_path=filedialog.askopenfilename(title='Select Book File', filetypes=(('PDF Files', '*.pdf'), ('All Files', '*.*')))
-
+            #change btn name to uploaded
+            if bookfile_path != "":
+                self.bookfile_entry.config(text='Uploaded')
 
         #upload book cover image
         def upload_bookcover():
             global bookcover_path
             bookcover_path=filedialog.askopenfilename( title='Select Book Cover', filetypes=(('PNG Files', '*.png'), ('All Files', '*.*')))
+            #change btn name to uploaded
+            if bookcover_path != "":
+                self.bookcover_entry.config(text='Uploaded')
+
+        #connect to db and insert record
+        con = mysql.connector.connect(host="localhost",
+                                    user="root",
+                                    password="rootpass",
+                                    database="all2")
+        cur = con.cursor()
+        cur.execute('''CREATE TABLE IF NOT EXISTS books( idbooks INT AUTO_INCREMENT PRIMARY KEY, 
+                                                         bookname varchar(200) NOT NULL,
+                                                         bookcategory varchar(45) NOT NULL, 
+                                                         bookfile longtext NOT NULL, 
+                                                         bookcover longtext NOT NULL) ''')
+        con.commit()
+
+        def insert_books():
+            global bookfile_path, bookcover_path
+            check_counter=0
+            warn=" "
+            #check if entries are empty
+            if self.bookname_entry.get() == "":
+                warn = 'Please enter Book Name.'
+            else:
+                check_counter += 1
+
+            if self.bookcat_entry.get() == "":
+                warn = 'Please enter Book Category.'
+            else:
+                check_counter += 1
+
+            if check_counter == 2:
+                try:
+                    #get user entries
+                    book_id= None
+                    book_name= self.bookname_entry.get()
+                    book_cat= self.bookcat_entry.get()
+                    book_file= bookfile_path
+                    book_cover= bookcover_path
+
+                    insert_bookrecord = ("INSERT INTO books(idbooks, bookname, bookcategory, bookfile, bookcover) VALUES (%s,%s,%s,%s,%s);")
+                    data= (book_id, book_name, book_cat, book_file, book_cover)
+                    cur.execute(insert_bookrecord,data)
+
+                    con.commit()
+                    messagebox.showinfo('Register', 'Book Added Successfully!')
+
+                except Exception as ep:
+                    messagebox.showerror('', ep)
+            else:
+                messagebox.showerror('Error', warn)
+
+
+
+
+
+
+        #add edit delete books frame
+        self.booksrec_frame=Frame(self, bd=2, relief=SOLID, bg=bgc)  
+        self.booksrec_frame.place(x=55, y=500)
+
+        bookcat=['Maths', 'Computer Science', 'Design']
+
+        #entry boxes
+
+        self.bookname_lbl= Label(self.booksrec_frame, text='Book Name', font=f3, bg=bgc)
+        self.bookname_lbl.grid(row=0, column=0, sticky=W, pady=10, padx=10)
+        self.bookname_entry= Entry(self.booksrec_frame, font=f3, width=18)
+        self.bookname_entry.grid(row=0, column=1, pady=10, padx=10)
+
+        self.bookcat_lbl= Label(self.booksrec_frame, text='Book Category', font=f3, bg=bgc)
+        self.bookcat_lbl.grid(row=1, column=0, sticky=W, pady=10, padx=10)
+        self.bookcat_entry= ttk.Combobox(self.booksrec_frame, font=f3, values=bookcat, width=18)
+        self.bookcat_entry.grid(row=1, column=1, pady=10, padx=10)
 
 
         self.bookfile_lbl= Label(self.booksrec_frame, text='Book File', font=f3, bg=bgc)
@@ -899,11 +967,11 @@ class BooksView(tk.Frame):
         self.bookcover_entry= Button(self.booksrec_frame,text='Upload Cover', font=f, width=12, cursor='hand2', command=upload_bookcover)
         self.bookcover_entry.grid(row=1, column=3, pady=10, padx=10)
 
-        self.addbook_btn= Button(self.booksrec_frame, text='Add Book', font=f3)
-        self.addbook_btn.grid(row=4, column=0, sticky=W, pady=10, padx=10)
+        self.addbook_btn= Button(self.booksrec_frame, text='Add Book', font=f3, command=insert_books)
+        self.addbook_btn.grid(row=4, column=1, sticky=W, pady=10, padx=65)
 
-        self.editbook_btn= Button(self.booksrec_frame, text='Edit Book', font=f3)
-        self.editbook_btn.grid(row=4, column=1, sticky=W, pady=10, padx=65)
+        # self.editbook_btn= Button(self.booksrec_frame, text='Edit Book', font=f3)
+        # self.editbook_btn.grid(row=4, column=1, sticky=W, pady=10, padx=65)
 
         self.deletebook_btn= Button(self.booksrec_frame, text='Delete Book', font=f3)
         self.deletebook_btn.grid(row=4, column=2, sticky=W, pady=10, padx=10)
