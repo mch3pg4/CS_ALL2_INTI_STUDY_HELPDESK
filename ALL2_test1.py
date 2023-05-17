@@ -817,7 +817,7 @@ class BooksView(tk.Frame):
         tree_scroll=Scrollbar(tree_frame)
         tree_scroll.pack(side=RIGHT, fill=Y)
 
-        my_tree=ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, selectmode='extended')
+        my_tree=ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, selectmode='extended', height=6)
         my_tree.pack()
 
         tree_scroll.config(command=my_tree.yview)
@@ -852,20 +852,17 @@ class BooksView(tk.Frame):
         r_set=cur.fetchall()
         for row in r_set:
             print(row[1])
-            book_img = Image.open(row[1])
-            book_i = book_img.resize((100, 100))
-            book_img = ImageTk.PhotoImage(book_i)
-            book_coverimg = Label(image=book_img)
-            book_coverimg.image = book_img
-            my_tree.insert("", tk.END, values=(row[0],'', row[2], row[3], row[4]), image=book_img)
-        # book_images = {}
-        # for row in r_set:
-        #     book_img = Image.open(row[1])
-        #     book_i = book_img.resize((100, 100))
-        #     book_images[row[0]] = ImageTk.PhotoImage(book_i)
-        #     my_tree.insert("", tk.END, image=book_images[row[0]], values=(row[0], '', row[2], row[3], row[4]))
+            self.book_img = Image.open(row[1])
+            self.book_img = self.book_img.resize((80,100), Image.LANCZOS)
+            self.book_img = ImageTk.PhotoImage(self.book_img)
+            # self.book_coverimg = Label(my_tree, image=self.book_img)
+            # self.book_coverimg.place(x=0, y=0)
+            # self.book_coverimg.image = self.book_img
 
 
+            my_tree.insert("", tk.END, values=(row[0],'', row[2], row[3], row[4]), image=self.book_img)
+            # my_tree.item(my_tree.selection(),image=self.book_img)\
+            # tk.Label.image = self.book_img
 
 
         #upload book pdf file path
@@ -976,7 +973,14 @@ class BooksView(tk.Frame):
         self.deletebook_btn= Button(self.booksrec_frame, text='Delete Book', font=f3)
         self.deletebook_btn.grid(row=4, column=2, sticky=W, pady=10, padx=10)
 
-        
+        #pdf viewer for books
+        self.pdf_frame=Frame(self, bd=2, relief=SOLID, bg=bgc)
+        self.pdf_frame.place(x=1000, y=155)
+
+        #pdf viewer label
+        pdf_viewer_label=Label(self.pdf_frame, text='PDF Viewer', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
+        pdf_viewer_label.pack(pady=10)
+
 
 
 
