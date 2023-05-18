@@ -798,7 +798,7 @@ class BooksView(tk.Frame):
         admin_btns(self, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments,controller)
 
 
-        show_books_frame=Frame(self, bd=2, relief=SOLID, bg=bgc)
+        show_books_frame=Frame(self, bg=bgc)
         show_books_frame.place(x=40, y=155)
 
         
@@ -825,7 +825,7 @@ class BooksView(tk.Frame):
         #book image frame
         self.book_img_frame=Frame(show_books_frame, bg=bgc)
         self.book_img_frame.grid(row=1, column=0)
-        self.book_img_frame.config(width=135, height=85)
+        self.book_img_frame.config(width=115, height=165)
 
         #show students treeview
         style=ttk.Style()
@@ -863,9 +863,27 @@ class BooksView(tk.Frame):
         my_tree.heading('Category', text='Category', anchor=CENTER)
         my_tree.heading('File', text='File', anchor=CENTER)
 
-        
+        #pdf viewer label
+        self.pdf_viewer_label=Label(self, text='PDF Viewer', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
+        self.pdf_viewer_label.place(x=1035, y=155)
 
-        #show records when pressing row
+        self.clickpdf_lbl = Label(self, text='Click on a book to view', font=('Arial', 14), bg=bgc, fg='black')
+        self.clickpdf_lbl.place(x=1015, y=185)
+
+        #pdf viewer for books
+        self.pdf_frame=Frame(self, bg=bgc, width=485, height=535, bd=2, relief=SOLID)
+        self.pdf_frame.place(x=850, y=225)
+
+        #zoom spinbox selector
+        self.zoom_lbl=Label(self, text='Zoom', font=f2, bg=bgc)
+        self.zoom_lbl.place(x=1235, y=175)
+        zoom_var=IntVar()
+        zoom_var.set(72)
+        self.zoom_spin=Spinbox(self, textvariable= zoom_var, from_=20, to=500,increment=5, width=3, font=f3)
+        self.zoom_spin.place(x=1285, y=175)
+
+
+        #show records and view book pdf when pressing row
         def show_book_record(e):
             #clear entries
             self.bookid_entry.delete(0, END)
@@ -873,6 +891,10 @@ class BooksView(tk.Frame):
             self.bookcat_entry.delete(0, END)
             self.bookfile_entry.config(text='Upload File')
             self.bookcover_entry.config(text='Upload Cover')
+            self.pdf_viewer_label.place(x=1035, y=175)
+            self.clickpdf_lbl.destroy()
+            
+
 
             #grab record number and values
             selected=my_tree.focus()
@@ -885,7 +907,7 @@ class BooksView(tk.Frame):
                                         database="all2")
             cur = con.cursor()
             #get image from db
-            data=cur.execute("SELECT bookcover FROM books WHERE idbooks=%s", (values[0],))
+            data=cur.execute("SELECT bookcover,bookfile FROM books WHERE idbooks=%s", (values[0],))
             data= cur.fetchone()
 
             #show image upon clicking treeview row
@@ -894,7 +916,14 @@ class BooksView(tk.Frame):
                 self.book_img = self.book_img.resize((115,165))
                 self.book_img = ImageTk.PhotoImage(self.book_img)
                 self.book_img_lbl=Label(self.book_img_frame, image=self.book_img, bg=bgc)
-                self.book_img_lbl.grid(row=0, column=0)
+                self.book_img_lbl.grid(row=0,column=0)
+
+                #showpdf
+                self.book_pdf = pdf.ShowPdf()
+                self.book_pdf.img_object_li.clear() #clear old pdf inside the frame
+                self.book=self.book_pdf.pdf_view(self.pdf_frame, bar=False, pdf_location=data[1], width=60, height=32, zoomDPI=zoom_var.get())
+                self.book.grid(row=1, column=0, columnspan=3)
+                
    
 
             #output to entry boxes
@@ -918,13 +947,6 @@ class BooksView(tk.Frame):
 
 
 
-
-        #connect to db and insert record
-        con = mysql.connector.connect(host="localhost",
-                                    user="root",
-                                    password="rootpass",
-                                    database="all2")
-        cur = con.cursor()
         cur.execute('''CREATE TABLE IF NOT EXISTS books( idbooks INT AUTO_INCREMENT PRIMARY KEY, 
                                                          bookname varchar(200) NOT NULL,
                                                          bookcategory varchar(45) NOT NULL, 
@@ -972,7 +994,7 @@ class BooksView(tk.Frame):
 
 
         #add delete books frame
-        self.booksrec_frame=Frame(self, bd=2, relief=SOLID, bg=bgc)  
+        self.booksrec_frame=Frame(self, bg=bgc, bd=2, relief=SOLID)  
         self.booksrec_frame.place(x=55, y=500)
 
         bookcat=['Maths', 'Computer Science', 'Design']
@@ -1003,8 +1025,6 @@ class BooksView(tk.Frame):
         self.bookcover_lbl.grid(row=1, column=2, sticky=W, pady=10, padx=10)
         self.bookcover_entry= Button(self.booksrec_frame,text='Upload Cover', font=f, width=12, cursor='hand2', command=upload_bookcover)
         self.bookcover_entry.grid(row=1, column=3, pady=10, padx=10)
-
-        
 
         my_tree.bind('<ButtonRelease-1>', show_book_record)
 
@@ -1038,18 +1058,7 @@ class BooksView(tk.Frame):
         self.deletebook_btn= Button(self.booksrec_frame, text='Delete Book', font=f3, command=del_book_record)
         self.deletebook_btn.grid(row=4, column=2, sticky=W, pady=10, padx=10)
 
-        #pdf viewer for books
-        self.pdf_frame=Frame(self, bd=2, relief=SOLID, bg=bgc)
-        self.pdf_frame.place(x=850, y=155)
-
-        #pdf viewer label
-        self.pdf_viewer_label=Label(self.pdf_frame, text='PDF Viewer', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
-        self.pdf_viewer_label.pack(pady=10)
-
-        #showpdf
-        self.book_pdf = pdf.ShowPdf()
-        self.book=self.book_pdf.pdf_view(self.pdf_frame, bar=False, pdf_location=r'books/The-Design-of-Everyday-Things-Don-Norman.pdf', width=60, height=32, zoomDPI=75)
-        self.book.pack()
+        
 
 
 
