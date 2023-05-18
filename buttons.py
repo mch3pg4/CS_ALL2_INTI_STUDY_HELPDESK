@@ -1,4 +1,4 @@
-import bcrypt, re, random, io, string
+import textwrap
 import datetime
 from tkcalendar import Calendar
 from tkinter import *
@@ -36,6 +36,7 @@ def ui_bg(self, image_file):
     self.background_label = tk.Label(self, image=self.background_image)
     self.background_label.place(x=-5,y=-5)
     self.background_label.image = self.background_image
+
 
 #toggle show/hide password function
 def toggle_password(pwd_tf, pwd_btn):
