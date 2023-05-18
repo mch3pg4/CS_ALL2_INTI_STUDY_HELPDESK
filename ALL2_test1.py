@@ -1,4 +1,4 @@
-import bcrypt, re, random, io, string, os
+import bcrypt, re, random, io, string, os, textwrap
 import datetime
 from tkcalendar import Calendar
 from tkinter import *
@@ -800,16 +800,17 @@ class BooksView(tk.Frame):
         show_books_frame=Frame(self, bd=2, relief=SOLID, bg=bgc)
         show_books_frame.place(x=40, y=155)
 
-        #student view label
-        student_view_label=Label(show_books_frame, text='Book View', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
-        student_view_label.pack(pady=10)
+        #book view label
+        self.book_view_lbl=Label(show_books_frame, text='Book View', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
+        self.book_view_lbl.pack(pady=5)
 
         #show students treeview
         style=ttk.Style()
         style.theme_use('clam')
         style.configure('Treeview.Heading', font=f)
         style.configure('Treeview', font=f2)
-        style.configure('Treeview',rowheight=35)
+        style.configure('Treeview', rowheight=35)
+        ttk.Style().configure("Custom.Treeview", rowheight=100) 
 
         tree_frame=Frame(show_books_frame)
         tree_frame.pack(pady=10)
@@ -817,26 +818,26 @@ class BooksView(tk.Frame):
         tree_scroll=Scrollbar(tree_frame)
         tree_scroll.pack(side=RIGHT, fill=Y)
 
-        my_tree=ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, selectmode='extended', height=6)
+        my_tree=ttk.Treeview(tree_frame, style='Custom.Treeview', yscrollcommand=tree_scroll.set, selectmode='browse', height=2)
         my_tree.pack()
 
         tree_scroll.config(command=my_tree.yview)
 
-        my_tree['columns']= ('ID', 'Book Cover','Book Name', 'Category', 'File')
+        my_tree['columns']= ('ID', 'Book Name', 'Category', 'File')
 
         #format columns
-        my_tree.column('#0', width=0, stretch=NO)
-        my_tree.column('ID', width=80, anchor=CENTER, stretch=NO)
-        my_tree.column('Book Cover', width=150, anchor=CENTER, stretch=NO)
+        my_tree.column('#0', width=120, stretch=NO)
+        my_tree.column('ID', width=60, anchor=CENTER, stretch=NO)
+        # my_tree.column('Book Cover', width=150, anchor=CENTER, stretch=NO)
         my_tree.column('Book Name', width=210, anchor=CENTER, stretch=NO)
-        my_tree.column('Category', width=165, anchor=CENTER, stretch=NO)
-        my_tree.column('File', width=140, anchor=CENTER, stretch=NO)
+        my_tree.column('Category', width=145, anchor=CENTER, stretch=NO)
+        my_tree.column('File', width=225, anchor=CENTER, stretch=NO)
 
 
         #column headings
         my_tree.heading('#0', text='', anchor=CENTER)
         my_tree.heading('ID', text='ID', anchor=CENTER)
-        my_tree.heading('Book Cover', text='Book Cover', anchor=CENTER)
+        # my_tree.heading('Book Cover', text='Book Cover', anchor=CENTER)
         my_tree.heading('Book Name', text='Book Name', anchor=CENTER)
         my_tree.heading('Category', text='Category', anchor=CENTER)
         my_tree.heading('File', text='File', anchor=CENTER)
@@ -848,21 +849,18 @@ class BooksView(tk.Frame):
                                     password="rootpass",
                                     database="all2")
         cur = con.cursor()
-        r_set=cur.execute("SELECT idbooks, bookcover, bookname, bookcategory, bookfile from books;")
+        r_set=cur.execute("SELECT bookcover, idbooks, bookname, bookcategory, bookfile from books;")
         r_set=cur.fetchall()
         for row in r_set:
-            print(row[1])
-            self.book_img = Image.open(row[1])
-            self.book_img = self.book_img.resize((80,100), Image.LANCZOS)
+            self.book_img = Image.open(row[0])
+            self.book_img = self.book_img.resize((90,100))
             self.book_img = ImageTk.PhotoImage(self.book_img)
-            # self.book_coverimg = Label(my_tree, image=self.book_img)
-            # self.book_coverimg.place(x=0, y=0)
-            # self.book_coverimg.image = self.book_img
+            wraptxt1= textwrap.fill(row[2], width=20)
+            wraptxt2= textwrap.fill(row[4], width=22)
 
 
-            my_tree.insert("", tk.END, values=(row[0],'', row[2], row[3], row[4]), image=self.book_img)
-            # my_tree.item(my_tree.selection(),image=self.book_img)\
-            # tk.Label.image = self.book_img
+            my_tree.insert("", tk.END, image=self.book_img, values=(row[1], wraptxt1, row[3], wraptxt2))
+
 
 
         #upload book pdf file path
