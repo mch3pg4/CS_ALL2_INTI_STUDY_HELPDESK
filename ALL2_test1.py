@@ -13,7 +13,7 @@ from mysql.connector import Error
 from captcha.image import ImageCaptcha
 from tktooltip import ToolTip
 from tkPDFViewer import tkPDFViewer as pdf
-from buttons import clockdate, ui_bg, log_out_btn, toggle_password, admin_btns, view_user
+from buttons import clockdate, ui_bg, log_out_btn, toggle_password, admin_btns, view_user, back_btn
 
 
 
@@ -631,7 +631,7 @@ class StudentsView(tk.Frame):
         log_out_btn(self, Loginpage, controller)
         admin_btns(self, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments,controller)
 
-        self.show_students_frame=Frame(self, bd=2, relief=SOLID, bg=bgc)
+        self.show_students_frame=Frame(self, bg=bgc)
         self.show_students_frame.place(x=40, y=155)
 
         #student view label
@@ -650,7 +650,7 @@ class StudentsView(tk.Frame):
         tree_scroll=Scrollbar(self.tree_frame)
         tree_scroll.pack(side=RIGHT, fill=Y)
 
-        my_tree=ttk.Treeview(self.tree_frame, yscrollcommand=tree_scroll.set, selectmode='extended', height=5)
+        my_tree=ttk.Treeview(self.tree_frame, yscrollcommand=tree_scroll.set, selectmode='extended', height=7)
         my_tree.pack()
 
         tree_scroll.config(command=my_tree.yview)
@@ -691,7 +691,7 @@ class StudentsView(tk.Frame):
 
         #edit student record frame
         self.edit_frame=Frame(self, bd=2, relief=SOLID, bg=bgc)
-        self.edit_frame.place(x=125, y=500)
+        self.edit_frame.place(x=100, y=535)
         #entry boxes
         self.name_lbl= Label(self.edit_frame, text='Name', font=f3, bg=bgc)
         self.name_lbl.grid(row=0, column=0, sticky=W, pady=10, padx=10)
@@ -801,8 +801,8 @@ class BooksView(tk.Frame):
         admin_btns(self, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments,controller)
 
 
-        show_books_frame=Frame(self, bg=bgc)
-        show_books_frame.place(x=40, y=155)
+        self.show_books_frame=Frame(self, bg=bgc)
+        self.show_books_frame.place(x=40, y=155)
 
         
         #upload book pdf file path
@@ -822,23 +822,23 @@ class BooksView(tk.Frame):
                 self.bookcover_entry.config(text='Uploaded')
 
         #book view label
-        self.book_view_lbl=Label(show_books_frame, text='Book View', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
+        self.book_view_lbl=Label(self.show_books_frame, text='Book View', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
         self.book_view_lbl.grid(row=0, column=1, columnspan=2)
 
         #book image frame
-        self.book_img_frame=Frame(show_books_frame, bg=bgc)
+        self.book_img_frame=Frame(self.show_books_frame, bg=bgc)
         self.book_img_frame.grid(row=1, column=0)
         self.book_img_frame.config(width=115, height=165)
 
-        #show students treeview
+        #show books treeview
         style=ttk.Style()
         style.theme_use('clam')
         style.configure('Treeview.Heading', font=f)
         style.configure('Treeview', font=f2)
         style.configure('Treeview', rowheight=35)
-        ttk.Style().configure("Custom.Treeview", rowheight=107) 
+        ttk.Style().configure("Custom.Treeview", rowheight=127) 
 
-        tree_frame=Frame(show_books_frame)
+        tree_frame=Frame(self.show_books_frame)
         tree_frame.grid(row=1, column=1)
 
         tree_scroll=Scrollbar(tree_frame)
@@ -975,7 +975,7 @@ class BooksView(tk.Frame):
             if check_counter == 2:
                 try:
                     #get user entries
-                    book_id= None
+                    book_id= self.bookid_entry.get()
                     book_name= self.bookname_entry.get()
                     book_cat= self.bookcat_entry.get()
                     book_file= bookfile_path
@@ -987,7 +987,14 @@ class BooksView(tk.Frame):
 
                     con.commit()
                     messagebox.showinfo('Register', 'Book Added Successfully!')
-                    my_tree.insert("", tk.END, values=(book_cover, book_id, book_name, book_cat, book_file))
+                    wraptxt1= textwrap.fill(book_name, width=20)
+                    wraptxt2= textwrap.fill(book_file, width=22)
+                    my_tree.insert("", tk.END, values=(book_id, wraptxt1, book_cat, wraptxt2))
+
+                    #clear entries
+                    self.bookid_entry.delete(0, END)
+                    self.bookname_entry.delete(0, END)
+                    self.bookcat_entry.delete(0, END)
         
 
                 except Exception as ep:
@@ -1055,19 +1062,13 @@ class BooksView(tk.Frame):
             messagebox.showinfo('Delete', 'Book Deleted Successfully!')
 
 
-        self.addbook_btn= Button(self.booksrec_frame, text='Add Book', font=f3, command=insert_books)
+        self.addbook_btn= Button(self.booksrec_frame, text='Add Book', font=f3, relief=SOLID, cursor='hand2', command=insert_books)
         self.addbook_btn.grid(row=4, column=1, sticky=W, pady=10, padx=65)
 
-        self.deletebook_btn= Button(self.booksrec_frame, text='Delete Book', font=f3, command=del_book_record)
+        self.deletebook_btn= Button(self.booksrec_frame, text='Delete Book', font=f3, relief=SOLID ,cursor='hand2',command=del_book_record)
         self.deletebook_btn.grid(row=4, column=2, sticky=W, pady=10, padx=10)
 
         
-
-
-
-
-
-
 
 class QuizAdmin(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
@@ -1333,6 +1334,8 @@ class Subject1(tk.Frame):
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
+        #back btn
+        back_btn(self, Homepage, controller)
         #logout btn
         log_out_btn(self,Loginpage, controller)
 
@@ -1357,15 +1360,131 @@ class Books(tk.Frame):
         log_out_btn(self, Loginpage, controller)
 
         #Books Title
-        w = Label(self, text ='Books', font = ('Arial', 28), bg='antique white' )
+        w = Label(self, text ='Books', font = ('Arial', 28), bg=bgc )
         w.pack()
-        w.place(x=445, y=120)
+        w.place(x=610, y=90)
+
+        #search books
+        #frame for search button and icon
+        self.searchbtn_frame=Frame(self, bg=bgc, bd=1, relief=SOLID)
+        self.searchbtn_frame.place(x=165, y=135)
+
+        self.searchbk_lbl=Label(self.searchbtn_frame, text='Search', font=('Arial', 18), bg=bgc)
+        self.searchbk_lbl.grid(row=0, column=0)
+        self.searchbk_entry=Entry(self.searchbtn_frame, font=f3, width=18)
+        self.searchbk_entry.grid(row=0, column=1)
+
+        #search icon
+        self.search_icon=Image.open('images\search.png')
+        self.search_icon=self.search_icon.resize((25,25))
+        self.search_icon=ImageTk.PhotoImage(self.search_icon)
+        self.searchbk_btn=Button(self.searchbtn_frame, image=self.search_icon , cursor='hand2')
+        self.searchbk_btn.grid(row=0, column=2)
+
+        #show available books treeview
+        self.bk_tree_frame=Frame(self, bg=bgc, bd=2, relief=SOLID)
+        self.bk_tree_frame.place(x=115, y=180)
+
+        style=ttk.Style()
+        style.theme_use('clam')
+        style.configure('Treeview.Heading', font=f)
+        style.configure('Treeview', font=f2)
+        ttk.Style().configure('Books.Treeview', rowheight=60)
+
+        tree_frame=Frame(self.bk_tree_frame)
+        tree_frame.grid(row=0, column=0)
+
+        tree_scroll=Scrollbar(tree_frame)
+        tree_scroll.pack(side=RIGHT, fill=Y)
+
+        my_tree=ttk.Treeview(tree_frame, style='Books.Treeview',yscrollcommand=tree_scroll.set, selectmode='browse', height=9)
+        my_tree.pack()
+
+        tree_scroll.config(command=my_tree.yview)
+
+        my_tree['columns']= ('ID', 'Book Name', 'Category')
+
+        #format columns
+        my_tree.column('#0', width=0, stretch=NO)
+        my_tree.column('ID', width=60, anchor=CENTER, stretch=NO)
+        my_tree.column('Book Name', width=250, anchor=CENTER, stretch=NO)
+        my_tree.column('Category', width=155, anchor=CENTER, stretch=NO)
+
+
+        #column headings
+        my_tree.heading('#0', text='', anchor=CENTER)
+        my_tree.heading('ID', text='ID', anchor=CENTER)
+        my_tree.heading('Book Name', text='Book Name', anchor=CENTER)
+        my_tree.heading('Category', text='Category', anchor=CENTER)
+
+        #pdf viewer label
+        self.pdf_viewer_label=Label(self, text='PDF Viewer', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
+        self.pdf_viewer_label.place(x=955, y=135)
+
+        #pdf viewer for books
+        self.pdf_frame=Frame(self, bg=bgc)
+        self.pdf_frame.place(x=675, y=180)
+
+        
+        #zoom spinbox selector
+        self.zoom_lbl=Label(self, text='Zoom', font=f, bg=bgc)
+        self.zoom_lbl.place(x=1245, y=152)
+        zoom_var=IntVar()
+        zoom_var.set(72)
+        self.zoom_spin=Spinbox(self, textvariable= zoom_var, from_=20, to=500,increment=5, width=3, font=f2)
+        self.zoom_spin.place(x=1308, y=155)
+
+        #showpdf
+        self.book_pdf = pdf.ShowPdf()
+        self.book_pdf.img_object_li.clear() #clear old pdf inside the frame
+        self.book=self.book_pdf.pdf_view(self.pdf_frame, bar=False, pdf_location=None, width=82, height=34, zoomDPI=zoom_var.get())
+        self.book.grid(row=1, column=0, columnspan=3)
+
 
         #view books
-        #list down available books
+        con = mysql.connector.connect(host="localhost",
+                                    user="root",
+                                    password="rootpass",
+                                    database="all2")
+        cur = con.cursor()
+        r_set=cur.execute("SELECT idbooks, bookname, bookcategory from books;")
+        r_set=cur.fetchall()
+        for row in r_set:
+            wraptxt1= textwrap.fill(row[1], width=30)
+            my_tree.insert("", tk.END, values=(row[0], wraptxt1, row[2]))
+
+        #show pdf when click on treeview row
+        def show_book_record(e):
+            #grab record number and values
+            selected=my_tree.focus()
+            values=my_tree.item(selected, 'values')
+
+            #get data from database
+            con = mysql.connector.connect(host="localhost",
+                                        user="root",
+                                        password="rootpass",
+                                        database="all2")
+            cur = con.cursor()
+            #get image from db
+            data=cur.execute("SELECT bookfile FROM books WHERE idbooks=%s", (values[0],))
+            data= cur.fetchone()
+
+            #show image upon clicking treeview row
+            if data :
+                self.book=self.book_pdf.pdf_view(self.pdf_frame, bar=False, pdf_location=data[0], width=82, height=34, zoomDPI=zoom_var.get())
+                self.book.grid(row=1, column=0, columnspan=3)
+
+        my_tree.bind('<ButtonRelease-1>', show_book_record)
+
+
+
+
+
+
         #recent books
-        #search books 
+         
         #by category
+        
 
 
 
