@@ -1,4 +1,4 @@
-import bcrypt, re, random,  textwrap
+import bcrypt, re, random, textwrap
 import datetime
 from tkcalendar import Calendar
 from tkinter import *
@@ -731,6 +731,7 @@ class StudentsView(tk.Frame):
         def show_stud_record(e):
             #clear entries
             self.name_entry.delete(0, END)
+            self.id_entry.config(state='normal')
             self.id_entry.delete(0, END)
             self.email_entry.delete(0, END)
             self.subj1_entry.set('')
@@ -745,36 +746,38 @@ class StudentsView(tk.Frame):
             #output to entry boxes
             self.name_entry.insert(0, values[0])
             self.id_entry.insert(0, values[1])
+            self.id_entry.config(state='disabled')
             self.email_entry.insert(0, values[2])
             self.subj1_entry.insert(0, values[3])
             self.subj2_entry.insert(0, values[4])
             self.subj3_entry.insert(0, values[5])
             self.subj4_entry.insert(0, values[6])
         
-        # #update student records
-        # def update_stud_record():
-        #     selected=my_tree.focus()
-        #     my_tree.item(selected, text='', values=(self.name_entry.get(), self.id_entry.get(), self.email_entry.get(), self.subj1_entry.get(), self.subj2_entry.get(), self.subj3_entry.get(), self.subj4_entry.get()))
-        #     con = mysql.connector.connect(host="localhost",
-        #                                   user="root",
-        #                                   password="rootpass",
-        #                                   database="all2")      
-        #     cur = con.cursor()
-        #     cur.execute("UPDATE userdata, usersubjects SET userdata.name=%s, usersubjects.user_id=%s, userdata.email=%s, usersubjects.subj1=%s, usersubjects.subj2=%s, usersubjects.subj3=%s, usersubjects.subj4=&s WHERE usersubjects.user_id= userdata.user_id AND userdata.user_id =%s", (self.name_entry.get(), self.id_entry.get(), self.email_entry.get(), self.subj1_entry.get(), self.subj2_entry.get(), self.subj3_entry.get(), self.subj4_entry.get()))
-        #     con.commit()
-        #     con.close()
+        #update student records
+        def update_stud_record():
+            selected=my_tree.focus()
+            my_tree.item(selected, text='', values=(self.name_entry.get(), self.id_entry.get(), self.email_entry.get(), self.subj1_entry.get(), self.subj2_entry.get(), self.subj3_entry.get(), self.subj4_entry.get()))
+            con = mysql.connector.connect(host="localhost",
+                                          user="root",
+                                          password="rootpass",
+                                          database="all2")      
+            cur = con.cursor()
+            cur.execute("UPDATE userdata, usersubjects SET userdata.name=%s, userdata.user_id=%s, userdata.email=%s, usersubjects.subject1=%s, usersubjects.subject2=%s, usersubjects.subject3=%s, usersubjects.subject4=%s WHERE usersubjects.user_id = userdata.user_id AND userdata.user_id = %s", (self.name_entry.get(), self.id_entry.get(), self.email_entry.get(), self.subj1_entry.get(), self.subj2_entry.get(), self.subj3_entry.get(), self.subj4_entry.get(), self.id_entry.get()))
+            con.commit()
+            con.close()
 
-        #     #clear entries
-        #     self.name_entry.delete(0, END)
-        #     self.id_entry.delete(0, END)
-        #     self.email_entry.delete(0, END)
-        #     self.subj1_entry.delete(0, END)
-        #     self.subj2_entry.delete(0, END)
-        #     self.subj3_entry.delete(0, END)
-        #     self.subj4_entry.delete(0, END)
+            #clear entries
+            self.name_entry.delete(0, END)
+            self.id_entry.config(state='normal')
+            self.id_entry.delete(0, END)
+            self.email_entry.delete(0, END)
+            self.subj1_entry.delete(0, END)
+            self.subj2_entry.delete(0, END)
+            self.subj3_entry.delete(0, END)
+            self.subj4_entry.delete(0, END)
         
         #Update student record btn
-        self.update_btn=Button(self.edit_frame, text='Update Record', font=f, width=15, relief=SOLID, cursor='hand2')
+        self.update_btn=Button(self.edit_frame, text='Update Record', font=f, width=15, relief=SOLID, cursor='hand2', command=update_stud_record)
         self.update_btn.grid(row=2, column=6, pady=10, padx=10, columnspan=2)
 
         my_tree.bind('<ButtonRelease-1>', show_stud_record)
