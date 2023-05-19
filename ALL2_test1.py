@@ -1378,8 +1378,7 @@ class Books(tk.Frame):
         self.search_icon=Image.open('images\search.png')
         self.search_icon=self.search_icon.resize((25,25))
         self.search_icon=ImageTk.PhotoImage(self.search_icon)
-        self.searchbk_btn=Button(self.searchbtn_frame, image=self.search_icon , cursor='hand2')
-        self.searchbk_btn.grid(row=0, column=2)
+        
 
         #show available books treeview
         self.bk_tree_frame=Frame(self, bg=bgc, bd=2, relief=SOLID)
@@ -1447,7 +1446,7 @@ class Books(tk.Frame):
                                     password="rootpass",
                                     database="all2")
         cur = con.cursor()
-        r_set=cur.execute("SELECT idbooks, bookname, bookcategory from books;")
+        r_set=cur.execute("SELECT idbooks, bookname, bookcategory FROM books;")
         r_set=cur.fetchall()
         for row in r_set:
             wraptxt1= textwrap.fill(row[1], width=30)
@@ -1471,10 +1470,41 @@ class Books(tk.Frame):
 
             #show image upon clicking treeview row
             if data :
+                self.book_pdf.img_object_li.clear() #clear old pdf inside the frame
                 self.book=self.book_pdf.pdf_view(self.pdf_frame, bar=False, pdf_location=data[0], width=82, height=34, zoomDPI=zoom_var.get())
                 self.book.grid(row=1, column=0, columnspan=3)
 
         my_tree.bind('<ButtonRelease-1>', show_book_record)
+
+        #search bar function
+        def search_book():
+            if self.searchbk_entry.get() != "":
+                con = mysql.connector.connect(host="localhost",
+                                    user="root",
+                                    password="rootpass",
+                                    database="all2")
+                cur = con.cursor()
+                my_tree.delete(*my_tree.get_children())
+                r_set=cur.execute('''SELECT idbooks, bookname, bookcategory FROM books WHERE bookname LIKE %s OR bookcategory LIKE %s''' , ('%'+(self.searchbk_entry.get())+'%', '%'+(self.searchbk_entry.get())+'%'))
+                r_set = cur.fetchall()
+                for row in r_set:
+                    wraptxt1= textwrap.fill(row[1], width=30)
+                    my_tree.insert("", tk.END, values=(row[0], wraptxt1, row[2]))
+            else:
+                con = mysql.connector.connect(host="localhost",
+                                    user="root",
+                                    password="rootpass",
+                                    database="all2")
+                cur = con.cursor()
+                my_tree.delete(*my_tree.get_children())
+                r_set=cur.execute("SELECT idbooks, bookname, bookcategory FROM books;")
+                r_set=cur.fetchall()
+                for row in r_set:
+                    wraptxt1= textwrap.fill(row[1], width=30)
+                    my_tree.insert("", tk.END, values=(row[0], wraptxt1, row[2]))
+        
+        self.searchbk_btn=Button(self.searchbtn_frame, image=self.search_icon , cursor='hand2', command=search_book)
+        self.searchbk_btn.grid(row=0, column=2)
 
 
 
