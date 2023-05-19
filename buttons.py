@@ -85,8 +85,11 @@ def admin_btns(self, frame1, frame2, frame3, frame4, frame5, frame6, controller)
     self.appointments_btn.place(x=47*23.75, y=100)
 
 #back button
-def back_btn(frame, controller):
+def back_btn(self,frame, controller):
     controller.show_frame(frame)
+
+    self.back_btn=tk.Button(self, text='< Back', font=f, width=7, cursor='hand2', command=lambda:controller.show_frame(frame))
+    self.back_btn.place(x=90, y=105)
 
 
 #view as student button
