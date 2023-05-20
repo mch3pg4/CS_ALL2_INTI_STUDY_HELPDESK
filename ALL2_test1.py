@@ -1128,7 +1128,33 @@ class CourseMaterials(tk.Frame):
         course_materials_label=Label(self, text='Course Materials', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
         course_materials_label.place(x=40, y=155)
 
-        #show course materials
+        #show course materials in hierarchy treeview
+        #treeview frame
+        self.material_tv_frame=Frame(self, bg=bgc)
+        self.material_tv_frame.place(x=40, y=200)
+
+        # create a treeview
+        tree = ttk.Treeview(self.material_tv_frame)
+        tree.heading('#0', text='Departments', anchor=tk.W)
+
+
+        # adding data
+        tree.insert('', tk.END, text='Administration', iid=0, open=False)
+        tree.insert('', tk.END, text='Logistics', iid=1, open=False)
+        tree.insert('', tk.END, text='Sales', iid=2, open=False)
+        tree.insert('', tk.END, text='Finance', iid=3, open=False)
+        tree.insert('', tk.END, text='IT', iid=4, open=False)
+
+        # adding children of first node
+        tree.insert('', tk.END, text='John Doe', iid=5, open=False)
+        tree.insert('', tk.END, text='Jane Doe', iid=6, open=False)
+        tree.move(5, 0, 0)
+        tree.move(6, 0, 1)
+
+        # place the Treeview widget on the root window
+        tree.grid(row=0, column=0, sticky=tk.NSEW)
+
+        
         #upload files, images, documents
         #view files, images, documents
 
