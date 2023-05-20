@@ -1128,6 +1128,10 @@ class CourseMaterials(tk.Frame):
         course_materials_label=Label(self, text='Course Materials', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
         course_materials_label.place(x=40, y=155)
 
+        #show course materials
+        #upload files, images, documents
+        #view files, images, documents
+
 class AdminAppointments(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
         global show_students_frame, show_books_frame
@@ -1409,7 +1413,6 @@ class Books(tk.Frame):
         my_tree.column('Book Name', width=250, anchor=CENTER, stretch=NO)
         my_tree.column('Category', width=155, anchor=CENTER, stretch=NO)
 
-
         #column headings
         my_tree.heading('#0', text='', anchor=CENTER)
         my_tree.heading('ID', text='ID', anchor=CENTER)
@@ -1476,7 +1479,8 @@ class Books(tk.Frame):
 
         my_tree.bind('<ButtonRelease-1>', show_book_record)
 
-        #search bar function
+        #search bar function 
+        #by category
         def search_book():
             if self.searchbk_entry.get() != "":
                 con = mysql.connector.connect(host="localhost",
@@ -1506,14 +1510,7 @@ class Books(tk.Frame):
         self.searchbk_btn=Button(self.searchbtn_frame, image=self.search_icon , cursor='hand2', command=search_book)
         self.searchbk_btn.grid(row=0, column=2)
 
-
-
-
-
-
-        #recent books
-         
-        #by category
+                
         
 
 
