@@ -1138,14 +1138,14 @@ class CourseMaterials(tk.Frame):
         tree.heading('#0', text='Departments', anchor=tk.W)
 
 
-        # adding data
+        
         tree.insert('', tk.END, text='Administration', iid=0, open=False)
         tree.insert('', tk.END, text='Logistics', iid=1, open=False)
         tree.insert('', tk.END, text='Sales', iid=2, open=False)
         tree.insert('', tk.END, text='Finance', iid=3, open=False)
         tree.insert('', tk.END, text='IT', iid=4, open=False)
 
-        # adding children of first node
+        #treeview children
         tree.insert('', tk.END, text='John Doe', iid=5, open=False)
         tree.insert('', tk.END, text='Jane Doe', iid=6, open=False)
         tree.move(5, 0, 0)
@@ -1154,7 +1154,7 @@ class CourseMaterials(tk.Frame):
         # place the Treeview widget on the root window
         tree.grid(row=0, column=0, sticky=tk.NSEW)
 
-        
+
         #upload files, images, documents
         #view files, images, documents
 
