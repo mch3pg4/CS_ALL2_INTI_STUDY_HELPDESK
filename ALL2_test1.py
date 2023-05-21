@@ -1156,19 +1156,26 @@ class CourseMaterials(tk.Frame):
         tree.insert('', tk.END, text='Chapter 1-Machine Level Representation of Data', iid=5, open=False)
         tree.insert('', tk.END, text='Chapter 2-Number Systems', iid=6, open=False)
         tree.insert('', tk.END, text='Lab 1', iid=7, open=False)
-        tree.insert('', tk.END, text='Chapter 3-Boolean Algebra and Logic Gates', iid=8, open=False)
-        tree.insert('', tk.END, text='Chapter 4-Combinational Logic', iid=9, open=False)
+        tree.insert('', tk.END, text='Chapter 3-Data Representation', iid=8, open=False)
+        tree.insert('', tk.END, text='Exercise 3-Data Representation', iid=9, open=False)
+        tree.insert('', tk.END, text='Chapter 4-Digital Logic & Digital Systems Part A', iid=10, open=False)
         tree.move(5, 0, 0)
         tree.move(6, 1, 0)
         tree.move(7, 1, 1)
         tree.move(8, 2, 0)
-        tree.move(9, 3, 0)
+        tree.move(9, 2, 1)
+        tree.move(10, 3, 0)
+        
+        #for loop for showing parent and children node from db
+        #select distinct week from course_materials
+        #select material name from course_materials where week=week
+
 
         #upload files, images, documents from database
         #upload material popup form
         def uploadmaterial_popup():
             top = Toplevel(ws)
-            top.geometry('600x500+485+120')
+            top.geometry('600x550+445+120')
             top.title("Upload Course Materials Form")
             top.resizable(False,False)
 
@@ -1202,21 +1209,95 @@ class CourseMaterials(tk.Frame):
             name_label=Label(top, text='Name', font=f3)
             name_label.grid(row=3, column=0, padx=20, pady=20, sticky=W)
 
-            name_entry=Entry(top, font=f3)
+            name_entry=Text(top, font=f, width=30, height=2, wrap=WORD)
             name_entry.grid(row=3, column=1, padx=20, pady=20, sticky=W, columnspan=2)
 
             file_label=Label(top, text='File', font=f3)
             file_label.grid(row=4, column=0, padx=20, pady=20, sticky=W)
 
-            file_entry=Entry(top, font=f3)
+            file_entry=Text(top, font=f, width=30, height=5, wrap=WORD)
             file_entry.grid(row=4, column=1, padx=20, pady=20, sticky=W, columnspan=2)
 
+            #connect to db
+            con = mysql.connector.connect(host="localhost",
+                                    user="root",
+                                    password="rootpass",
+                                    database="all2")
+            cur = con.cursor()
+            cur.execute('''CREATE TABLE IF NOT EXISTS coursematerials( idcoursematerials INT AUTO_INCREMENT PRIMARY KEY,
+                                                                            week INT NOT NULL,
+                                                                            subj_name varchar(100) NOT NULL,
+                                                                            material_name LONGTEXT NOT NULL,
+                                                                            material_file LONGTEXT NOT NULL)''')
+            con.commit()
+
+            def upload_materialfile():
+                global file_path
+                upload_file_btn.config(text='Upload File')
+                file_path = filedialog.askopenfilename(parent=top,title="Select Course Material", filetypes=(("PDF Files", "*.pdf"), ("Word Files", "*.docx"), ("Powerpoint Files", "*.pptx"), ('PNG Files', '*.png'),("All Files", "*.*")))
+                #change btn name to uploaded
+                if file_path != '':
+                    upload_file_btn.config(text='Uploaded')
+                    file_entry.insert(END, file_path)
+
+            def add_material():
+                check_counter =0
+                warn=' '
+                if subject_entry.get() == '':
+                    warn='Please select a subject'
+                else:
+                    check_counter +=1
+
+                if week_entry.get() == '':
+                    warn='Please select a week'
+                else:
+                    check_counter +=1
+                
+                if name_entry.get('1.0', END) == '':
+                    warn='Please enter material name'
+                else:
+                    check_counter +=1
+                
+                if file_entry.get('1.0', END) == '':
+                    warn='Please select a file'
+                else:
+                    check_counter +=1
+                
+                if check_counter == 4:
+                    try:
+                        con = mysql.connector.connect(host="localhost",
+                                                      user="root",
+                                                      password="rootpass",
+                                                      database="all2")
+                        cur=con.cursor()
+
+                        #get user entry
+                        idcoursematerials=None
+                        subject=subject_entry.get()
+                        week=week_entry.get()
+                        name=name_entry.get('1.0', END)
+                        file=file_entry.get('1.0', END)
+
+                        insert_material = ("INSERT INTO  coursematerials(idcoursematerials, week, subj_name, material_name, material_file) VALUES (%s, %s, %s, %s, %s);")
+                        data_material = (idcoursematerials, week, subject, name, file)
+                        cur.execute(insert_material, data_material)
+                        con.commit()
+                        con.close()
+                        messagebox.showinfo('Success', 'Course Material Added Successfully!')
+                        top.destroy()
+
+                    except Exception as ep:
+                        messagebox.showerror('', ep)
+                else:
+                    messagebox.showerror('', warn)
+
+
             #upload file buttom
-            upload_file_btn=Button(top, text='Upload File', font=f3, cursor='hand2')
+            upload_file_btn=Button(top, text='Upload File', font=f3, cursor='hand2', command=upload_materialfile)
             upload_file_btn.grid(row=5, column=1, padx=20, pady=20, sticky=W)
 
             #add material btn
-            add_material_btn=Button(top, text='Add Material', font=f3, cursor='hand2')
+            add_material_btn=Button(top, text='Add Material', font=f3, cursor='hand2', command=add_material)
             add_material_btn.grid(row=5, column=2, padx=20, pady=20, sticky=W)
 
 
