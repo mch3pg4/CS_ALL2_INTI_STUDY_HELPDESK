@@ -30,6 +30,7 @@ school=['Select','School of Computing']
 program=['Select','BCSCUN','BCTCUN']
 semester=['Select','1','2','3']
 subjects=['Select','Computer Architecture & Networks', 'Objected Oriented Programming', 'Mathematics for Computer Science', 'Database Systems', 'Programming & Algorithms']
+weeks=['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15']
 
 
 #top buttons
@@ -1125,38 +1126,115 @@ class CourseMaterials(tk.Frame):
         admin_btns(self, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments,controller)
 
         #course materials label
-        course_materials_label=Label(self, text='Course Materials', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
-        course_materials_label.place(x=40, y=155)
+        course_materials_label=Label(self, text='Course Materials', font=('Arial', 22, 'bold'), bg=bgc, fg='black')
+        course_materials_label.place(x=525, y=155)
 
         #show course materials in hierarchy treeview
         #treeview frame
         self.material_tv_frame=Frame(self, bg=bgc)
         self.material_tv_frame.place(x=40, y=200)
 
-        # create a treeview
-        tree = ttk.Treeview(self.material_tv_frame)
-        tree.heading('#0', text='Departments', anchor=tk.W)
+        #vertical scrollbar
+        tree_scroll=Scrollbar(self.material_tv_frame)
+        tree_scroll.pack(side=RIGHT, fill=Y)
 
+        tree = ttk.Treeview(self.material_tv_frame, yscrollcommand=tree_scroll.set)
+        tree.pack()
+        tree_scroll.config(command=tree.yview)
 
-        
-        tree.insert('', tk.END, text='Administration', iid=0, open=False)
-        tree.insert('', tk.END, text='Logistics', iid=1, open=False)
-        tree.insert('', tk.END, text='Sales', iid=2, open=False)
-        tree.insert('', tk.END, text='Finance', iid=3, open=False)
-        tree.insert('', tk.END, text='IT', iid=4, open=False)
+        tree.column('#0', width=400, stretch=False, minwidth=400)
+        tree.heading('#0', text='Course Materials',  anchor=W)
+  
+        # adding data
+        tree.insert('', tk.END, text='Week 1', iid=0, open=False)
+        tree.insert('', tk.END, text='Week 2', iid=1, open=False)
+        tree.insert('', tk.END, text='Week 3', iid=2, open=False)
+        tree.insert('', tk.END, text='Week 4', iid=3, open=False)
+        tree.insert('', tk.END, text='Week 5', iid=4, open=False)
 
-        #treeview children
-        tree.insert('', tk.END, text='John Doe', iid=5, open=False)
-        tree.insert('', tk.END, text='Jane Doe', iid=6, open=False)
+        # adding children of first node
+        tree.insert('', tk.END, text='Chapter 1-Machine Level Representation of Data', iid=5, open=False)
+        tree.insert('', tk.END, text='Chapter 2-Number Systems', iid=6, open=False)
+        tree.insert('', tk.END, text='Lab 1', iid=7, open=False)
+        tree.insert('', tk.END, text='Chapter 3-Boolean Algebra and Logic Gates', iid=8, open=False)
+        tree.insert('', tk.END, text='Chapter 4-Combinational Logic', iid=9, open=False)
         tree.move(5, 0, 0)
-        tree.move(6, 0, 1)
+        tree.move(6, 1, 0)
+        tree.move(7, 1, 1)
+        tree.move(8, 2, 0)
+        tree.move(9, 3, 0)
 
-        # place the Treeview widget on the root window
-        tree.grid(row=0, column=0, sticky=tk.NSEW)
+        #upload files, images, documents from database
+        #upload material popup form
+        def uploadmaterial_popup():
+            top = Toplevel(ws)
+            top.geometry('600x500+485+120')
+            top.title("Upload Course Materials Form")
+            top.resizable(False,False)
+
+            iconpic = ImageTk.PhotoImage(file='images\inti_icon.png')
+            top.iconphoto(False,iconpic)
+
+            #frame
+            upload_material_frame=Frame(top, bg=bgc, relief=SOLID, bd=2)
+            upload_material_frame.place(x=0, y=0)
+
+            #upload material label
+            upload_material_label=Label(top, text='Upload Course Materials', font=('Arial', 20, 'bold'))
+            upload_material_label.grid(row=0, column=1, columnspan=2, padx=20, pady=20)
+
+            #subject, week, name, file
+            subject_label=Label(top, text='Subject', font=f3)
+            subject_label.grid(row=1, column=0, padx=20, pady=20, sticky=W)
+
+            subject_entry=ttk.Combobox(top, font=f3)
+            subject_entry['values']=subjects
+            subject_entry.current(1)
+            subject_entry.grid(row=1, column=1, padx=20, pady=20, sticky=W, columnspan=2)
+
+            week_label=Label(top, text='Week', font=f3)
+            week_label.grid(row=2, column=0, padx=20, pady=20, sticky=W)
+
+            week_entry=ttk.Combobox(top, font=f3)
+            week_entry['values']=weeks
+            week_entry.grid(row=2, column=1, padx=20, pady=20, sticky=W, columnspan=2)
+
+            name_label=Label(top, text='Name', font=f3)
+            name_label.grid(row=3, column=0, padx=20, pady=20, sticky=W)
+
+            name_entry=Entry(top, font=f3)
+            name_entry.grid(row=3, column=1, padx=20, pady=20, sticky=W, columnspan=2)
+
+            file_label=Label(top, text='File', font=f3)
+            file_label.grid(row=4, column=0, padx=20, pady=20, sticky=W)
+
+            file_entry=Entry(top, font=f3)
+            file_entry.grid(row=4, column=1, padx=20, pady=20, sticky=W, columnspan=2)
+
+            #upload file buttom
+            upload_file_btn=Button(top, text='Upload File', font=f3, cursor='hand2')
+            upload_file_btn.grid(row=5, column=1, padx=20, pady=20, sticky=W)
+
+            #add material btn
+            add_material_btn=Button(top, text='Add Material', font=f3, cursor='hand2')
+            add_material_btn.grid(row=5, column=2, padx=20, pady=20, sticky=W)
 
 
-        #upload files, images, documents
-        #view files, images, documents
+
+        #button
+        self.upload_btn=Button(self, text='Add Materials', font=f3, relief=SOLID, cursor='hand2', command=uploadmaterial_popup)
+        self.upload_btn.place(x=70, y=600)
+
+        #remove files, images, documents
+        self.delete_btn=Button(self, text='Remove Materials', font=f3, relief=SOLID, cursor='hand2')
+        self.delete_btn.place(x=250, y=600)
+        
+
+
+
+        #view files, images, documents frame
+        self.view_materials_frame=Frame(self, bg=bgc, relief=SOLID, bd=2, width=500, height=500)
+        self.view_materials_frame.place(x=700, y=200)
 
 class AdminAppointments(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
