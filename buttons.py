@@ -92,6 +92,7 @@ def back_btn(self,frame, controller):
     self.back_btn.place(x=90, y=105)
 
 
+
 #view as student button
 def view_user(self, frame, controller):
     image=Image.open('images\\student.png')
