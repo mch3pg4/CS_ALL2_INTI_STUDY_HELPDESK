@@ -1144,32 +1144,34 @@ class CourseMaterials(tk.Frame):
 
         tree.column('#0', width=400, stretch=False, minwidth=400)
         tree.heading('#0', text='Course Materials',  anchor=W)
-  
-        # adding data
-        tree.insert('', tk.END, text='Week 1', iid=0, open=False)
-        tree.insert('', tk.END, text='Week 2', iid=1, open=False)
-        tree.insert('', tk.END, text='Week 3', iid=2, open=False)
-        tree.insert('', tk.END, text='Week 4', iid=3, open=False)
-        tree.insert('', tk.END, text='Week 5', iid=4, open=False)
 
-        # adding children of first node
-        tree.insert('', tk.END, text='Chapter 1-Machine Level Representation of Data', iid=5, open=False)
-        tree.insert('', tk.END, text='Chapter 2-Number Systems', iid=6, open=False)
-        tree.insert('', tk.END, text='Lab 1', iid=7, open=False)
-        tree.insert('', tk.END, text='Chapter 3-Data Representation', iid=8, open=False)
-        tree.insert('', tk.END, text='Exercise 3-Data Representation', iid=9, open=False)
-        tree.insert('', tk.END, text='Chapter 4-Digital Logic & Digital Systems Part A', iid=10, open=False)
-        tree.move(5, 0, 0)
-        tree.move(6, 1, 0)
-        tree.move(7, 1, 1)
-        tree.move(8, 2, 0)
-        tree.move(9, 2, 1)
-        tree.move(10, 3, 0)
-        
         #for loop for showing parent and children node from db
+        
+        con = mysql.connector.connect(host="localhost",
+                                    user="root",
+                                    password="rootpass",
+                                    database="all2")
+        cur = con.cursor()
+        w_set=cur.execute("SELECT DISTINCT week FROM coursematerials;")
+        w_set=cur.fetchall()
+        my_index=0
         #select distinct week from course_materials
-        #select material name from course_materials where week=week
+        for wk in w_set:
+            wk_id=tree.insert(parent='', text='Week '+str(wk[0]), index=my_index, open=False)
+            my_index+=1
+            #select material name from course_materials where week=week
+            m_set=cur.execute("SELECT material_name FROM coursematerials WHERE week=%s;",(wk[0],))
+            m_set=cur.fetchall()
+            for mat in m_set:
+                tree.insert(parent=wk_id, text=mat[0], index= my_index,open=False)
+                my_index+=1
+                # tree.move(mat[0], wk, mat[1])
+                # for i in range(0, len(mat)-1):
+                #     tree.insert('', tk.END, text=mat[i], iid=i, open=False)
+                    
 
+
+        
 
         #upload files, images, documents from database
         #upload material popup form
