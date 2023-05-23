@@ -1166,10 +1166,6 @@ class CourseMaterials(tk.Frame):
                 tree.insert(parent=wk_id, text=mat[0], index= my_index,open=False)
                 my_index+=1
 
-                    
-
-
-        
 
         #upload files, images, documents from database
         #upload material popup form
