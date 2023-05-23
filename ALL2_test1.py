@@ -1165,9 +1165,7 @@ class CourseMaterials(tk.Frame):
             for mat in m_set:
                 tree.insert(parent=wk_id, text=mat[0], index= my_index,open=False)
                 my_index+=1
-                # tree.move(mat[0], wk, mat[1])
-                # for i in range(0, len(mat)-1):
-                #     tree.insert('', tk.END, text=mat[i], iid=i, open=False)
+
                     
 
 
