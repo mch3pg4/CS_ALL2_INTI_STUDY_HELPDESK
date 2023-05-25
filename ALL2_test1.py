@@ -13,7 +13,7 @@ from mysql.connector import Error
 from captcha.image import ImageCaptcha
 from tktooltip import ToolTip
 from tkPDFViewer import tkPDFViewer as pdf
-from buttons import clockdate, ui_bg, log_out_btn, toggle_password, admin_btns, view_user, back_btn
+from buttons import clockdate, ui_bg, log_out_btn, toggle_password, admin_btns, view_user, back_btn, expand_tv, collapse_tv
 
 
 
@@ -1215,7 +1215,7 @@ class CourseMaterials(tk.Frame):
         my_index=0
         #select distinct week from course_materials
         for wk in w_set:
-            wk_id=tree.insert(parent='', text='Week '+str(wk[0]), index=my_index, open=False)
+            wk_id=tree.insert(parent='', text='Week '+str(wk[0]), index=my_index, open=True)
             my_index+=1
             #select material name from course_materials where week=week
             m_set=cur.execute("SELECT material_name FROM coursematerials WHERE week=%s;",(wk[0],))
@@ -1354,7 +1354,8 @@ class CourseMaterials(tk.Frame):
             add_material_btn=Button(top, text='Add Material', font=f3, cursor='hand2', command=add_material)
             add_material_btn.grid(row=5, column=2, padx=20, pady=20, sticky=W)
 
-
+        def deletematerial_popUP():
+            pass
 
         #button
         self.upload_btn=Button(self, text='Add Materials', font=f3, relief=SOLID, cursor='hand2', command=uploadmaterial_popup)
@@ -1363,6 +1364,14 @@ class CourseMaterials(tk.Frame):
         #remove files, images, documents
         self.delete_btn=Button(self, text='Remove Materials', font=f3, relief=SOLID, cursor='hand2')
         self.delete_btn.place(x=250, y=600)
+
+        #expand all nodes btn
+        self.expandtv_btn=Button(self, text='Expand All', font=f3, relief=SOLID, cursor='hand2', command=lambda:expand_tv(tree))
+        self.expandtv_btn.place(x=70, y=650)
+
+        #colapse all nodes btn
+        self.collapsetv_btn=Button(self, text='Collapse All', font=f3, relief=SOLID, cursor='hand2',command=lambda:collapse_tv(tree))
+        self.collapsetv_btn.place(x=250, y=650)
         
 
 
@@ -1586,7 +1595,54 @@ class Subject1(tk.Frame):
         self.subj1_title = Label(self, text ='Computer Architecture & Networks', font = ('Arial', 28), bg=bgc )
         self.subj1_title.pack()
         self.subj1_title.place(x=350, y=100)
- 
+
+         #show course materials in hierarchy treeview
+        #treeview frame
+        self.subj1_tv_frame=Frame(self, bg=bgc)
+        self.subj1_tv_frame.place(x=100, y=200)
+
+        #vertical scrollbar
+        tree_scroll=Scrollbar(self.subj1_tv_frame)
+        tree_scroll.pack(side=RIGHT, fill=Y)
+
+        tree = ttk.Treeview(self.subj1_tv_frame, yscrollcommand=tree_scroll.set)
+        tree.pack()
+        tree_scroll.config(command=tree.yview)
+
+        tree.column('#0', width=400, stretch=False, minwidth=400)
+        tree.heading('#0', text='Course Materials',  anchor=W)
+
+        #for loop for showing parent and children node from db
+        
+        con = mysql.connector.connect(host="localhost",
+                                    user="root",
+                                    password="rootpass",
+                                    database="all2")
+        cur = con.cursor()
+        w_set=cur.execute("SELECT DISTINCT week FROM coursematerials;")
+        w_set=cur.fetchall()
+        my_index=0
+        #select distinct week from course_materials
+        for wk in w_set:
+            wk_id=tree.insert(parent='', text='Week '+str(wk[0]), index=my_index, open=True)
+            my_index+=1
+            #select material name from course_materials where week=week
+            m_set=cur.execute("SELECT material_name FROM coursematerials WHERE week=%s;",(wk[0],))
+            m_set=cur.fetchall()
+            for mat in m_set:
+                tree.insert(parent=wk_id, text=mat[0], index= my_index,open=False)
+                my_index+=1
+        con.close()
+
+        #expand all nodes btn
+        self.expand_btn=Button(self, text='Expand All', font=f, relief=SOLID, cursor='hand2', command=lambda:expand_tv(tree))
+        self.expand_btn.place(x=150, y=600)
+
+        #colapse all nodes btn
+        self.collapse_btn=Button(self, text='Collapse All', font=f, relief=SOLID, cursor='hand2',command=lambda:collapse_tv(tree))
+        self.collapse_btn.place(x=350, y=600)
+
+
 
 class Books(tk.Frame):
     def __init__(self, parent, controller):
