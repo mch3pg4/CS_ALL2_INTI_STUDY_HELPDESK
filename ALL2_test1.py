@@ -779,10 +779,68 @@ class StudentsView(tk.Frame):
         
         #Update student record btn
         self.update_btn=Button(self.edit_frame, text='Update Record', font=f, width=15, relief=SOLID, cursor='hand2', command=update_stud_record)
-        self.update_btn.grid(row=2, column=6, pady=10, padx=10, columnspan=2)
+        self.update_btn.grid(row=1, column=6, pady=10, padx=10, columnspan=2)
+
+        #delete student record
+        def delete_stud_record():
+            x=my_tree.selection()[0]
+            my_tree.delete(x)
+            con = mysql.connector.connect(host="localhost", 
+                                          user="root",
+                                          password="rootpass", 
+                                          database="all2")
+            cur = con.cursor()
+            cur.execute("DELETE a, b FROM userdata a JOIN usersubjects b ON a.user_id = b.user_id WHERE a.user_id = %s", (self.id_entry.get(),))
+            con.commit()
+            con.close()
+
+            #clear entries
+            self.name_entry.delete(0, END)
+            self.id_entry.config(state='normal')
+            self.id_entry.delete(0, END)
+            self.email_entry.delete(0, END)
+            self.subj1_entry.delete(0, END)
+            self.subj2_entry.delete(0, END)
+            self.subj3_entry.delete(0, END)
+            self.subj4_entry.delete(0, END)
+
+        #delete student record btn
+        self.delete_btn=Button(self.edit_frame, text='Delete Record', font=f, width=15, relief=SOLID, cursor='hand2', command=delete_stud_record)
+        self.delete_btn.grid(row=2, column=6, pady=10, padx=10, columnspan=2)
 
         my_tree.bind('<ButtonRelease-1>', show_stud_record)
 
+        #search bar for student records
+        self.searchstud_lbl=Label(self, text='Search', font=f3, bg=bgc)
+        self.searchstud_lbl.place(x=900, y=168)
+        self.searchstud_entry=Entry(self, font=f3, width=18)
+        self.searchstud_entry.place(x=975, y=168)
+        self.searchstud_icon=Image.open('images\search.png')
+        self.searchstud_icon=self.searchstud_icon.resize((25, 25))
+        self.searchstud_icon=ImageTk.PhotoImage(self.searchstud_icon)
+
+        def search_stud():
+            if self.searchstud_entry !='':
+                con = mysql.connector.connect(host="localhost",
+                                    user="root",
+                                    password="rootpass",
+                                    database="all2")
+                cur = con.cursor()
+                my_tree.delete(*my_tree.get_children())
+                s_set=cur.execute("SELECT a.name, a.user_id, a.email, b.subject1, b.subject2, b.subject3, b.subject4 FROM userdata a, usersubjects b WHERE a.user_id = b.user_id AND a.name LIKE %s", ('%'+(self.searchstud_entry.get())+'%',))
+                s_set=cur.fetchall()
+                for rec in s_set:
+                    my_tree.insert('', tk.END, values=(rec[0], rec[1], rec[2], rec[3], rec[4], rec[5], rec[6]))
+                con.commit()
+            else:
+                my_tree.delete(*my_tree.get_children())
+                s_set=cur.execute("SELECT a.name, a.user_id, a.email, b.subject1, b.subject2, b.subject3, b.subject4 FROM userdata a, usersubjects b WHERE a.usertype='Student' AND a.user_id = b.user_id;")
+                s_set=cur.fetchall()
+                for rec in s_set:
+                    my_tree.insert("", tk.END, values=row)
+        
+        self.searchstud_btn=Button(self,image=self.searchstud_icon, cursor='hand2',command=search_stud)
+        self.searchstud_btn.place(x=1195, y=168)
             
 
 #add/delete /view books
