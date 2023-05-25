@@ -91,7 +91,14 @@ def back_btn(self,frame, controller):
     self.back_btn=tk.Button(self, text='< Back', font=f, width=7, cursor='hand2', command=lambda:controller.show_frame(frame))
     self.back_btn.place(x=90, y=105)
 
+#expand, collapse treeview children nodes
+def expand_tv(tree):
+    for node in tree.get_children():
+        tree.item(node, open=True)
 
+def collapse_tv(tree):
+    for node in tree.get_children():
+        tree.item(node, open=False)
 
 #view as student button
 def view_user(self, frame, controller):
