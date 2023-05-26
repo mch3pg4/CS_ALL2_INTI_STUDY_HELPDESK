@@ -1607,9 +1607,10 @@ class Subject1(tk.Frame):
 
         tree = ttk.Treeview(self.subj1_tv_frame, yscrollcommand=tree_scroll.set)
         tree.pack()
+
         tree_scroll.config(command=tree.yview)
 
-        tree.column('#0', width=400, stretch=False, minwidth=400)
+        tree.column('#0',  width=400, stretch=False, minwidth=400)
         tree.heading('#0', text='Course Materials',  anchor=W)
 
         #for loop for showing parent and children node from db
@@ -1641,6 +1642,9 @@ class Subject1(tk.Frame):
         #colapse all nodes btn
         self.collapse_btn=Button(self, text='Collapse All', font=f, relief=SOLID, cursor='hand2',command=lambda:collapse_tv(tree))
         self.collapse_btn.place(x=350, y=600)
+
+        #view pdf, ppt files
+        
 
 
 
@@ -1689,13 +1693,13 @@ class Books(tk.Frame):
         style.configure('Treeview', font=f2)
         ttk.Style().configure('Books.Treeview', rowheight=60)
 
-        tree_frame=Frame(self.bk_tree_frame)
-        tree_frame.grid(row=0, column=0)
+        self.tree_frame=Frame(self.bk_tree_frame)
+        self.tree_frame.grid(row=0, column=0)
 
-        tree_scroll=Scrollbar(tree_frame)
+        tree_scroll=Scrollbar(self.tree_frame)
         tree_scroll.pack(side=RIGHT, fill=Y)
 
-        my_tree=ttk.Treeview(tree_frame, style='Books.Treeview',yscrollcommand=tree_scroll.set, selectmode='browse', height=9)
+        my_tree=ttk.Treeview(self.tree_frame, style='Books.Treeview',yscrollcommand=tree_scroll.set, selectmode='browse', height=9)
         my_tree.pack()
 
         tree_scroll.config(command=my_tree.yview)
