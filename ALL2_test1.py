@@ -1226,111 +1226,106 @@ class CourseMaterials(tk.Frame):
 
 
         #upload files, images, documents from database
-        #upload material popup form
-        def uploadmaterial_popup():
-            top = Toplevel(ws)
-            top.geometry('600x550+445+120')
-            top.title("Upload Course Materials Form")
-            top.resizable(False,False)
-
-            iconpic = ImageTk.PhotoImage(file='images\inti_icon.png')
-            top.iconphoto(False,iconpic)
-
-            #frame
-            upload_material_frame=Frame(top, bg=bgc, relief=SOLID, bd=2)
-            upload_material_frame.place(x=0, y=0)
+        #files accepted only in pdf
+        #upload material frame
+        def uploadmaterial_frame():
+            self.upload_material_frame=Frame(self, bg=bgc, relief=SOLID, bd=2)
+            self.upload_material_frame.place(x=1000, y=85)
 
             #upload material label
-            upload_material_label=Label(top, text='Upload Course Materials', font=('Arial', 20, 'bold'))
-            upload_material_label.grid(row=0, column=1, columnspan=2, padx=20, pady=20)
+            self.upload_material_label=Label(self.upload_material_frame, text='Upload Course Materials', font=('Arial', 20, 'bold'))
+            self.upload_material_label.grid(row=0, column=1, columnspan=2, padx=20, pady=20)
 
             #subject, week, name, file
-            subject_label=Label(top, text='Subject', font=f3)
-            subject_label.grid(row=1, column=0, padx=20, pady=20, sticky=W)
+            self.subject_label=Label(self.upload_material_frame, text='Subject', font=f3)
+            self.subject_label.grid(row=1, column=0, padx=20, pady=20, sticky=W)
 
-            subject_entry=ttk.Combobox(top, font=f3)
-            subject_entry['values']=subjects
-            subject_entry.current(1)
-            subject_entry.grid(row=1, column=1, padx=20, pady=20, sticky=W, columnspan=2)
+            self.subject_entry=ttk.Combobox(self.upload_material_frame, font=f3)
+            self.subject_entry['values']=subjects
+            self.subject_entry.current(1)
+            self.subject_entry.grid(row=1, column=1, padx=20, pady=20, sticky=W, columnspan=2)
 
-            week_label=Label(top, text='Week', font=f3)
-            week_label.grid(row=2, column=0, padx=20, pady=20, sticky=W)
+            self.week_label=Label(self.upload_material_frame, text='Week', font=f3)
+            self.week_label.grid(row=2, column=0, padx=20, pady=20, sticky=W)
 
-            week_entry=ttk.Combobox(top, font=f3)
-            week_entry['values']=weeks
-            week_entry.grid(row=2, column=1, padx=20, pady=20, sticky=W, columnspan=2)
+            self.week_entry=ttk.Combobox(self.upload_material_frame, font=f3)
+            self.week_entry['values']=weeks
+            self.week_entry.grid(row=2, column=1, padx=20, pady=20, sticky=W, columnspan=2)
 
-            name_label=Label(top, text='Name', font=f3)
-            name_label.grid(row=3, column=0, padx=20, pady=20, sticky=W)
+            self.name_label=Label(self.upload_material_frame, text='Name', font=f3)
+            self.name_label.grid(row=3, column=0, padx=20, pady=20, sticky=W)
 
-            name_entry=Text(top, font=f, width=30, height=2, wrap=WORD)
-            name_entry.grid(row=3, column=1, padx=20, pady=20, sticky=W, columnspan=2)
+            self.name_entry=Text(self.upload_material_frame, font=f, width=30, height=2, wrap=WORD)
+            self.name_entry.grid(row=3, column=1, padx=20, pady=20, sticky=W, columnspan=2)
 
-            file_label=Label(top, text='File', font=f3)
-            file_label.grid(row=4, column=0, padx=20, pady=20, sticky=W)
+            self.file_label=Label(self.upload_material_frame, text='File', font=f3)
+            self.file_label.grid(row=4, column=0, padx=20, pady=20, sticky=W)
 
-            file_entry=Text(top, font=f, width=30, height=5, wrap=WORD)
-            file_entry.grid(row=4, column=1, padx=20, pady=20, sticky=W, columnspan=2)
+            self.file_entry=Text(self.upload_material_frame, font=f, width=30, height=5, wrap=WORD)
+            self.file_entry.grid(row=4, column=1, padx=20, pady=20, sticky=W, columnspan=2)
 
             #connect to db
             con = mysql.connector.connect(host="localhost",
-                                    user="root",
-                                    password="rootpass",
-                                    database="all2")
+                                        user="root",
+                                        password="rootpass",
+                                        database="all2")
             cur = con.cursor()
             cur.execute('''CREATE TABLE IF NOT EXISTS coursematerials( idcoursematerials INT AUTO_INCREMENT PRIMARY KEY,
-                                                                            week INT NOT NULL,
-                                                                            subj_name varchar(100) NOT NULL,
-                                                                            material_name LONGTEXT NOT NULL,
-                                                                            material_file LONGTEXT NOT NULL)''')
+                                                                                week INT NOT NULL,
+                                                                                subj_name varchar(100) NOT NULL,
+                                                                                material_name LONGTEXT NOT NULL,
+                                                                                material_file LONGTEXT NOT NULL)''')
             con.commit()
 
             def upload_materialfile():
                 global file_path
-                upload_file_btn.config(text='Upload File')
-                file_path = filedialog.askopenfilename(parent=top,title="Select Course Material", filetypes=(("PDF Files", "*.pdf"), ("Word Files", "*.docx"), ("Powerpoint Files", "*.pptx"), ('PNG Files', '*.png'),("All Files", "*.*")))
+                self.upload_file_btn.config(text='Upload File')
+                file_path = filedialog.askopenfilename(title="Select Course Material", filetypes=(("PDF Files", "*.pdf"), ("All Files", "*.*")))
                 #change btn name to uploaded
-                if file_path != '':
-                    upload_file_btn.config(text='Uploaded')
-                    file_entry.insert(END, file_path)
+                if file_path != '' or re.match(r'.*\.pdf', file_path):
+                    self.upload_file_btn.config(text='Uploaded')
+                    self.file_entry.insert(END, file_path)
+                elif file_path != '' or re.match(r'.*\.pdf', file_path) == False:
+                    self.upload_file_btn.config(text='Upload File')
+                    messagebox.showerror('Error', 'Please select a pdf file')
 
             def add_material():
                 check_counter =0
                 warn=' '
-                if subject_entry.get() == '':
+                if self.subject_entry.get() == '':
                     warn='Please select a subject'
                 else:
                     check_counter +=1
 
-                if week_entry.get() == '':
+                if self.week_entry.get() == '':
                     warn='Please select a week'
                 else:
                     check_counter +=1
-                
-                if name_entry.get('1.0', END) == '':
+                    
+                if self.name_entry.get('1.0', END) == '':
                     warn='Please enter material name'
                 else:
                     check_counter +=1
-                
-                if file_entry.get('1.0', END) == '':
+                    
+                if self.file_entry.get('1.0', END) == '':
                     warn='Please select a file'
                 else:
                     check_counter +=1
-                
+                    
                 if check_counter == 4:
                     try:
                         con = mysql.connector.connect(host="localhost",
-                                                      user="root",
-                                                      password="rootpass",
-                                                      database="all2")
+                                                        user="root",
+                                                        password="rootpass",
+                                                        database="all2")
                         cur=con.cursor()
 
                         #get user entry
                         idcoursematerials=None
-                        subject=subject_entry.get()
-                        week=week_entry.get()
-                        name=name_entry.get('1.0', END)
-                        file=file_entry.get('1.0', END)
+                        subject=self.subject_entry.get()
+                        week=self.week_entry.get()
+                        name=self.name_entry.get('1.0', END)
+                        file=self.file_entry.get('1.0', END)
 
                         insert_material = ("INSERT INTO  coursematerials(idcoursematerials, week, subj_name, material_name, material_file) VALUES (%s, %s, %s, %s, %s);")
                         data_material = (idcoursematerials, week, subject, name, file)
@@ -1338,27 +1333,25 @@ class CourseMaterials(tk.Frame):
                         con.commit()
                         con.close()
                         messagebox.showinfo('Success', 'Course Material Added Successfully!')
-                        top.destroy()
 
                     except Exception as ep:
                         messagebox.showerror('', ep)
                 else:
                     messagebox.showerror('', warn)
 
-
             #upload file buttom
-            upload_file_btn=Button(top, text='Upload File', font=f3, cursor='hand2', command=upload_materialfile)
-            upload_file_btn.grid(row=5, column=1, padx=20, pady=20, sticky=W)
+            self.upload_file_btn=Button(self.upload_material_frame, text='Upload File', font=f3, cursor='hand2', command=upload_materialfile)
+            self.upload_file_btn.grid(row=5, column=1, padx=20, pady=20, sticky=W)
 
             #add material btn
-            add_material_btn=Button(top, text='Add Material', font=f3, cursor='hand2', command=add_material)
-            add_material_btn.grid(row=5, column=2, padx=20, pady=20, sticky=W)
+            self.add_material_btn=Button(self.upload_material_frame, text='Add Material', font=f3, cursor='hand2', command=add_material)
+            self.add_material_btn.grid(row=5, column=2, padx=20, pady=20, sticky=W)
 
         def deletematerial_popUP():
             pass
 
         #button
-        self.upload_btn=Button(self, text='Add Materials', font=f3, relief=SOLID, cursor='hand2', command=uploadmaterial_popup)
+        self.upload_btn=Button(self, text='Add Materials', font=f3, relief=SOLID, cursor='hand2', command=uploadmaterial_frame)
         self.upload_btn.place(x=70, y=600)
 
         #remove files, images, documents
@@ -1373,12 +1366,30 @@ class CourseMaterials(tk.Frame):
         self.collapsetv_btn=Button(self, text='Collapse All', font=f3, relief=SOLID, cursor='hand2',command=lambda:collapse_tv(tree))
         self.collapsetv_btn.place(x=250, y=650)
         
-
-
-
         #view files, images, documents frame
         self.view_materials_frame=Frame(self, bg=bgc, relief=SOLID, bd=2, width=500, height=500)
         self.view_materials_frame.place(x=700, y=200)
+
+        def show_material(e):
+            #grab material name
+            selected=tree.focus()
+            values=tree.item(selected, 'values')
+            print(values)
+
+            #connect to db
+            con = mysql.connector.connect(host="localhost", user="root", password="rootpass", database="all2")
+            cur = con.cursor()
+            file=cur.execute("SELECT material_file FROM coursematerials WHERE material_name=%s", (values[0],))
+            file=cur.fetchone()
+
+
+            #show pdf
+            if file:
+                self.view_materials_frame = pdf.ShowPDF()
+                self.view_materials_frame.img_object_li.clear()
+                self.view_materials_frame.pdf_view(self.view_materials_frame, pdf_location=file[0])
+                self.view_materials_frame.pack()
+        tree.bind('<ButtonRelease-1>', show_material)
 
 class AdminAppointments(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
