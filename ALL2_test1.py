@@ -1230,35 +1230,35 @@ class CourseMaterials(tk.Frame):
         #upload material frame
         def uploadmaterial_frame():
             self.upload_material_frame=Frame(self, bg=bgc, relief=SOLID, bd=2)
-            self.upload_material_frame.place(x=1000, y=85)
+            self.upload_material_frame.place(x=700, y=200)
 
             #upload material label
-            self.upload_material_label=Label(self.upload_material_frame, text='Upload Course Materials', font=('Arial', 20, 'bold'))
-            self.upload_material_label.grid(row=0, column=1, columnspan=2, padx=20, pady=20)
+            self.upload_material_label=Label(self.upload_material_frame, text='Upload Course Materials', font=('Arial', 20, 'bold'), bg=bgc)
+            self.upload_material_label.grid(row=0, column=0, columnspan=3, padx=20, pady=20)
 
             #subject, week, name, file
-            self.subject_label=Label(self.upload_material_frame, text='Subject', font=f3)
+            self.subject_label=Label(self.upload_material_frame, text='Subject', font=f3, bg=bgc)
             self.subject_label.grid(row=1, column=0, padx=20, pady=20, sticky=W)
 
-            self.subject_entry=ttk.Combobox(self.upload_material_frame, font=f3)
+            self.subject_entry=ttk.Combobox(self.upload_material_frame, font=f3, width=28)
             self.subject_entry['values']=subjects
             self.subject_entry.current(1)
             self.subject_entry.grid(row=1, column=1, padx=20, pady=20, sticky=W, columnspan=2)
 
-            self.week_label=Label(self.upload_material_frame, text='Week', font=f3)
+            self.week_label=Label(self.upload_material_frame, text='Week', font=f3, bg=bgc)
             self.week_label.grid(row=2, column=0, padx=20, pady=20, sticky=W)
 
-            self.week_entry=ttk.Combobox(self.upload_material_frame, font=f3)
+            self.week_entry=ttk.Combobox(self.upload_material_frame, font=f3, width=7)
             self.week_entry['values']=weeks
             self.week_entry.grid(row=2, column=1, padx=20, pady=20, sticky=W, columnspan=2)
 
-            self.name_label=Label(self.upload_material_frame, text='Name', font=f3)
+            self.name_label=Label(self.upload_material_frame, text='Name', font=f3, bg=bgc)
             self.name_label.grid(row=3, column=0, padx=20, pady=20, sticky=W)
 
             self.name_entry=Text(self.upload_material_frame, font=f, width=30, height=2, wrap=WORD)
             self.name_entry.grid(row=3, column=1, padx=20, pady=20, sticky=W, columnspan=2)
 
-            self.file_label=Label(self.upload_material_frame, text='File', font=f3)
+            self.file_label=Label(self.upload_material_frame, text='File', font=f3, bg=bgc)
             self.file_label.grid(row=4, column=0, padx=20, pady=20, sticky=W)
 
             self.file_entry=Text(self.upload_material_frame, font=f, width=30, height=5, wrap=WORD)
