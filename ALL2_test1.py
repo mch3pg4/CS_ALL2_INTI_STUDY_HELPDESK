@@ -1190,17 +1190,20 @@ class CourseMaterials(tk.Frame):
         #show course materials in hierarchy treeview
         #treeview frame
         self.material_tv_frame=Frame(self, bg=bgc)
-        self.material_tv_frame.place(x=40, y=200)
+        self.material_tv_frame.place(x=30, y=200)
 
         #vertical scrollbar
         tree_scroll=Scrollbar(self.material_tv_frame)
         tree_scroll.pack(side=RIGHT, fill=Y)
 
-        tree = ttk.Treeview(self.material_tv_frame, yscrollcommand=tree_scroll.set)
+        style=ttk.Style()
+        style.configure('Book.Treeview', font=f, rowheight=45)
+
+        tree = ttk.Treeview(self.material_tv_frame, yscrollcommand=tree_scroll.set, style='Book.Treeview', height=8)
         tree.pack()
         tree_scroll.config(command=tree.yview)
 
-        tree.column('#0', width=400, stretch=False, minwidth=400)
+        tree.column('#0', width=480, stretch=False, minwidth=480)
         tree.heading('#0', text='Course Materials',  anchor=W)
 
         #for loop for showing parent and children node from db
@@ -1231,13 +1234,22 @@ class CourseMaterials(tk.Frame):
         # #view files, images, documents frame
         self.view_materials_frame=Frame(self, bg=bgc, relief=SOLID, bd=2, width=500, height=500)
 
+        #zoom spinbox
+        #zoom spinbox selector
+        self.zoom_lbl_mat=Label(self, text='Zoom', font=f, bg=bgc)
+        zoom_var2=IntVar()
+        zoom_var2.set(72)
+        self.zoom_spinmat=Spinbox(self, textvariable= zoom_var2, from_=20, to=500,increment=5, width=3, font=f2)
+        
+        
         #upload files, images, documents from database
         #files accepted only in pdf
-        
         def uploadmaterial_frame():
             #forget place view material frame
             self.upload_material_frame.place(x=700, y=200)
             self.view_materials_frame.place_forget()
+            self.zoom_lbl_mat.place_forget()
+            self.zoom_spinmat.place_forget()
             
             #upload material label
             self.upload_material_label=Label(self.upload_material_frame, text='Upload Course Materials', font=('Arial', 20, 'bold'), bg=bgc)
@@ -1355,17 +1367,21 @@ class CourseMaterials(tk.Frame):
             self.add_material_btn=Button(self.upload_material_frame, text='Add Material', font=f3, cursor='hand2', command=add_material)
             self.add_material_btn.grid(row=5, column=2, padx=20, pady=20, sticky=W)
 
-        def deletematerial_popUP():
+        def deletematerial_frame():
             pass
+        
 
 
         def show_material(e):
             #forget upload frame place
-            self.view_materials_frame.place(x=495, y=200)    
+            self.view_materials_frame.place(x=535, y=200)    
             self.upload_material_frame.place_forget()     
+            self.zoom_lbl_mat.place(x=1245, y=172)
+            self.zoom_spinmat.place(x=1308, y=175)
             #grab material name
             selected=tree.selection()[0]
             values=tree.item(selected)['text']  
+            
 
             #connect to db
             con = mysql.connector.connect(host="localhost", user="root", password="rootpass", database="all2")
@@ -1373,11 +1389,13 @@ class CourseMaterials(tk.Frame):
             file=cur.execute("SELECT material_file FROM coursematerials WHERE material_name=%s", (values,))
             file=cur.fetchone()
 
+            
+
             #show pdf
             if file:
                 self.view_mat_pdf = pdf.ShowPdf()
                 self.view_mat_pdf.img_object_li.clear()
-                self.material=self.view_mat_pdf.pdf_view(self.view_materials_frame, pdf_location=file[0], width=100, height=31,bar=False)
+                self.material=self.view_mat_pdf.pdf_view(self.view_materials_frame, pdf_location=file[0], width=100, height=31,bar=False, zoomDPI=zoom_var2.get())
                 self.material.grid(row=0, column=0)
         tree.bind('<ButtonRelease-1>', show_material)
 
@@ -1611,7 +1629,7 @@ class Subject1(tk.Frame):
         #Subject title
         self.subj1_title = Label(self, text ='Computer Architecture & Networks', font = ('Arial', 28), bg=bgc )
         self.subj1_title.pack()
-        self.subj1_title.place(x=350, y=100)
+        self.subj1_title.place(x=400, y=100)
 
          #show course materials in hierarchy treeview
         #treeview frame
@@ -1622,13 +1640,12 @@ class Subject1(tk.Frame):
         tree_scroll=Scrollbar(self.subj1_tv_frame)
         tree_scroll.pack(side=RIGHT, fill=Y)
 
-        tree = ttk.Treeview(self.subj1_tv_frame, yscrollcommand=tree_scroll.set)
-        tree.pack()
+        subj_tree = ttk.Treeview(self.subj1_tv_frame,style='Book.Treeview', yscrollcommand=tree_scroll.set,  height=10)
+        subj_tree.pack()
+        tree_scroll.config(command=subj_tree.yview)
 
-        tree_scroll.config(command=tree.yview)
-
-        tree.column('#0',  width=400, stretch=False, minwidth=400)
-        tree.heading('#0', text='Course Materials',  anchor=W)
+        subj_tree.column('#0',  width=480, stretch=False, minwidth=480)
+        subj_tree.heading('#0', text='Course Materials',  anchor=W)
 
         #for loop for showing parent and children node from db
         
@@ -1642,25 +1659,55 @@ class Subject1(tk.Frame):
         my_index=0
         #select distinct week from course_materials
         for wk in w_set:
-            wk_id=tree.insert(parent='', text='Week '+str(wk[0]), index=my_index, open=True)
+            wk_id=subj_tree.insert(parent='', text='Week '+str(wk[0]), index=my_index, open=True)
             my_index+=1
             #select material name from course_materials where week=week
             m_set=cur.execute("SELECT material_name FROM coursematerials WHERE week=%s;",(wk[0],))
             m_set=cur.fetchall()
             for mat in m_set:
-                tree.insert(parent=wk_id, text=mat[0], index= my_index,open=False)
+                subj_tree.insert(parent=wk_id, text=mat[0], index= my_index,open=False)
                 my_index+=1
         con.close()
 
         #expand all nodes btn
-        self.expand_btn=Button(self, text='Expand All', font=f, relief=SOLID, cursor='hand2', command=lambda:expand_tv(tree))
-        self.expand_btn.place(x=150, y=600)
+        self.expand_btn=Button(self, text='Expand All', font=f, relief=SOLID, cursor='hand2', command=lambda:expand_tv(subj_tree))
+        self.expand_btn.place(x=150, y=700)
 
         #colapse all nodes btn
-        self.collapse_btn=Button(self, text='Collapse All', font=f, relief=SOLID, cursor='hand2',command=lambda:collapse_tv(tree))
-        self.collapse_btn.place(x=350, y=600)
+        self.collapse_btn=Button(self, text='Collapse All', font=f, relief=SOLID, cursor='hand2',command=lambda:collapse_tv(subj_tree))
+        self.collapse_btn.place(x=350, y=700)
 
-        #view pdf, ppt files
+        #view pdf files
+        self.view_subj1_frame=Frame(self, bg=bgc, width=750, height=500, relief=SOLID, bd=2)
+        self.view_subj1_frame.place(x=615, y=200)
+
+        #zoom spinbox
+        self.zoom_lbl_subj1=Label(self, text='Zoom', font=f, bg=bgc)
+        self.zoom_lbl_subj1.place(x=1265, y=172)
+        zoom_var2=IntVar()
+        zoom_var2.set(72)
+        self.zoom_spinsubj1=Spinbox(self, textvariable= zoom_var2, from_=20, to=500,increment=5, width=3, font=f2)
+        self.zoom_spinsubj1.place(x=1319, y=174)
+
+        def show_material(e):
+
+            #grab material name
+            selected=subj_tree.selection()[0]
+            values=subj_tree.item(selected)['text']  
+
+            #connect to db
+            con = mysql.connector.connect(host="localhost", user="root", password="rootpass", database="all2")
+            cur = con.cursor()
+            file=cur.execute("SELECT material_file FROM coursematerials WHERE material_name=%s", (values,))
+            file=cur.fetchone()
+            con.close()
+            #show pdf
+            if file:
+                self.view_subj1_pdf = pdf.ShowPdf()
+                self.view_subj1_pdf.img_object_li.clear()
+                self.subj1=self.view_subj1_pdf.pdf_view(self.view_subj1_frame, pdf_location=file[0], width=91, height=31,bar=False, zoomDPI=zoom_var2.get())
+                self.subj1.grid(row=0, column=0)
+        subj_tree.bind('<ButtonRelease-1>', show_material)
         
 
 
