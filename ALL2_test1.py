@@ -1199,7 +1199,7 @@ class CourseMaterials(tk.Frame):
         style=ttk.Style()
         style.configure('Book.Treeview', font=f, rowheight=45)
 
-        tree = ttk.Treeview(self.material_tv_frame, yscrollcommand=tree_scroll.set, style='Book.Treeview', height=8)
+        tree = ttk.Treeview(self.material_tv_frame, yscrollcommand=tree_scroll.set, style='Book.Treeview', height=8, selectmode='browse')
         tree.pack()
         tree_scroll.config(command=tree.yview)
 
@@ -1367,10 +1367,23 @@ class CourseMaterials(tk.Frame):
             self.add_material_btn=Button(self.upload_material_frame, text='Add Material', font=f3, cursor='hand2', command=add_material)
             self.add_material_btn.grid(row=5, column=2, padx=20, pady=20, sticky=W)
 
-        def deletematerial_frame():
-            pass
-        
+        def deletematerial():
+            x=tree.selection()[0]
+            value=tree.item(x)['text']
+            tree.delete(x)
+            con = mysql.connector.connect(host="localhost", 
+                                          user="root",
+                                          password="rootpass", 
+                                          database="all2")
+            cur = con.cursor()
+            cur.execute("DELETE FROM coursematerials WHERE material_name=%s", (value,))
+            con.commit()
+            con.close()
 
+            # clear pdf
+            self.view_mat_pdf.img_object_li.clear()
+
+        
 
         def show_material(e):
             #forget upload frame place
@@ -1404,7 +1417,7 @@ class CourseMaterials(tk.Frame):
         self.upload_btn.place(x=70, y=600)
 
         #remove files, images, documents
-        self.delete_btn=Button(self, text='Remove Materials', font=f3, relief=SOLID, cursor='hand2')
+        self.delete_btn=Button(self, text='Remove Materials', font=f3, relief=SOLID, cursor='hand2', command=deletematerial)
         self.delete_btn.place(x=250, y=600)
 
         #expand all nodes btn
