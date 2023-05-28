@@ -1223,15 +1223,22 @@ class CourseMaterials(tk.Frame):
             for mat in m_set:
                 tree.insert(parent=wk_id, text=mat[0], index= my_index,open=False)
                 my_index+=1
+        con.close()
+        
+        # #upload material frame
+        self.upload_material_frame=Frame(self, bg=bgc, relief=SOLID, bd=2)
 
+        # #view files, images, documents frame
+        self.view_materials_frame=Frame(self, bg=bgc, relief=SOLID, bd=2, width=500, height=500)
 
         #upload files, images, documents from database
         #files accepted only in pdf
-        #upload material frame
+        
         def uploadmaterial_frame():
-            self.upload_material_frame=Frame(self, bg=bgc, relief=SOLID, bd=2)
+            #forget place view material frame
             self.upload_material_frame.place(x=700, y=200)
-
+            self.view_materials_frame.place_forget()
+            
             #upload material label
             self.upload_material_label=Label(self.upload_material_frame, text='Upload Course Materials', font=('Arial', 20, 'bold'), bg=bgc)
             self.upload_material_label.grid(row=0, column=0, columnspan=3, padx=20, pady=20)
@@ -1282,12 +1289,13 @@ class CourseMaterials(tk.Frame):
                 self.upload_file_btn.config(text='Upload File')
                 file_path = filedialog.askopenfilename(title="Select Course Material", filetypes=(("PDF Files", "*.pdf"), ("All Files", "*.*")))
                 #change btn name to uploaded
-                if file_path != '' or re.match(r'.*\.pdf', file_path):
+                if file_path != '' and not re.match(r'.*\.pdf', file_path):
+                    self.upload_file_btn.config(text='Upload File')
+                    self.file_entry.delete('1.0', END)
+                    messagebox.showerror('Error', 'Please select a pdf file')
+                elif file_path != '' and re.match(r'.*\.pdf', file_path):
                     self.upload_file_btn.config(text='Uploaded')
                     self.file_entry.insert(END, file_path)
-                elif file_path != '' or re.match(r'.*\.pdf', file_path) == False:
-                    self.upload_file_btn.config(text='Upload File')
-                    messagebox.showerror('Error', 'Please select a pdf file')
 
             def add_material():
                 check_counter =0
@@ -1350,7 +1358,30 @@ class CourseMaterials(tk.Frame):
         def deletematerial_popUP():
             pass
 
-        #button
+
+        def show_material(e):
+            #forget upload frame place
+            self.view_materials_frame.place(x=495, y=200)    
+            self.upload_material_frame.place_forget()     
+            #grab material name
+            selected=tree.selection()[0]
+            values=tree.item(selected)['text']  
+
+            #connect to db
+            con = mysql.connector.connect(host="localhost", user="root", password="rootpass", database="all2")
+            cur = con.cursor()
+            file=cur.execute("SELECT material_file FROM coursematerials WHERE material_name=%s", (values,))
+            file=cur.fetchone()
+
+            #show pdf
+            if file:
+                self.view_mat_pdf = pdf.ShowPdf()
+                self.view_mat_pdf.img_object_li.clear()
+                self.material=self.view_mat_pdf.pdf_view(self.view_materials_frame, pdf_location=file[0], width=100, height=31,bar=False)
+                self.material.grid(row=0, column=0)
+        tree.bind('<ButtonRelease-1>', show_material)
+
+        #add materials button
         self.upload_btn=Button(self, text='Add Materials', font=f3, relief=SOLID, cursor='hand2', command=uploadmaterial_frame)
         self.upload_btn.place(x=70, y=600)
 
@@ -1365,31 +1396,6 @@ class CourseMaterials(tk.Frame):
         #colapse all nodes btn
         self.collapsetv_btn=Button(self, text='Collapse All', font=f3, relief=SOLID, cursor='hand2',command=lambda:collapse_tv(tree))
         self.collapsetv_btn.place(x=250, y=650)
-        
-        #view files, images, documents frame
-        self.view_materials_frame=Frame(self, bg=bgc, relief=SOLID, bd=2, width=500, height=500)
-        self.view_materials_frame.place(x=700, y=200)
-
-        def show_material(e):
-            #grab material name
-            selected=tree.focus()
-            values=tree.item(selected, 'values')
-            print(values)
-
-            #connect to db
-            con = mysql.connector.connect(host="localhost", user="root", password="rootpass", database="all2")
-            cur = con.cursor()
-            file=cur.execute("SELECT material_file FROM coursematerials WHERE material_name=%s", (values[0],))
-            file=cur.fetchone()
-
-
-            #show pdf
-            if file:
-                self.view_materials_frame = pdf.ShowPDF()
-                self.view_materials_frame.img_object_li.clear()
-                self.view_materials_frame.pdf_view(self.view_materials_frame, pdf_location=file[0])
-                self.view_materials_frame.pack()
-        tree.bind('<ButtonRelease-1>', show_material)
 
 class AdminAppointments(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
