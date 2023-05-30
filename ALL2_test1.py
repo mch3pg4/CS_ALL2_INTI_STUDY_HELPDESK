@@ -1927,9 +1927,9 @@ class Calculator(tk.Frame):
         log_out_btn(self, Loginpage, controller)
 
         #Calculator title
-        w = Label(self, text ='Calculator', font = ('Arial', 28) , bg='antique white')
+        w = Label(self, text ='Calculator', font = ('Arial', 28) , bg=bgc)
         w.pack()
-        w.place(x=465, y=100)
+        w.place(x=585, y=100)
 
         #calculator webview
 
@@ -1948,18 +1948,52 @@ class Chat(tk.Frame):
         #logout btn
         log_out_btn(self, Loginpage, controller)
 
-        #Calculator title
-        w = Label(self, text ='Chat', font = ('Arial', 28) , bg='antique white')
-        w.pack()
-        w.place(x=465, y=100)
+        ## Chat title
+        # w = Label(self, text ='Chat', font = ('Arial', 28) , bg=bgc)
+        # w.pack()
+        # w.place(x=465, y=100)
 
-        #websockets chat server
+        #discussions server treeview scroll
+        self.discussions_frame=Frame(self, width=300, height=500, bg=bgc)
+        self.discussions_frame.place(x=125, y=100)
 
+        self.discussions_txt=Label(self.discussions_frame, text='Discussions', font=('Arial', 29), bg=bgc)
+        self.discussions_txt.grid(row=0, column=0, pady=10)
+
+        self.discussions_tv_frame=Frame(self.discussions_frame, bg=bgc)
+        self.discussions_tv_frame.grid(row=1, column=0)
+
+        self.discussions_tv_scroll=Scrollbar(self.discussions_tv_frame)
+        self.discussions_tv_scroll.pack(side=RIGHT, fill=Y)
+
+        self.discussions_tv=ttk.Treeview(self.discussions_tv_frame, yscrollcommand=self.discussions_tv_scroll.set, height=15)
+        self.discussions_tv.pack()
+
+        self.discussions_tv_scroll.config(command=self.discussions_tv.yview)
+
+        self.discussions_tv.column('#0', width=435, minwidth=435)
+        self.discussions_tv.heading('#0', text='Discussion Servers', anchor=W)
+
+        #chat msg screen
+        self.chat_frame=Frame(self, width=675, height=485, bg='white', relief=SOLID, bd=2)
+        self.chat_frame.place(x=650, y=115)
+
+        #chat msg input entry
+        #frame
+        self.chat_entry_frame=Frame(self, width=675, height=50, bg=bgc)
+        self.chat_entry_frame.place(x=641, y=600)
+
+        self.chat_entry=Text(self.chat_entry_frame, height=5,width=52, font=f, wrap=WORD,relief=SOLID, bd=2)
+        self.chat_entry.grid(row=0, column=0, padx=10, pady=5)
+
+        #send btn
+        self.send_btn=Button(self.chat_entry_frame, text='Send', font=f, relief=SOLID, bd=2, cursor='hand2')
+        self.send_btn.grid(row=0, column=1, padx=10, pady=5)
 
 
 class Profile(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg='antique white')
+        tk.Frame.__init__(self, parent)
         global login_details
 
         # ui_bg
@@ -1972,12 +2006,15 @@ class Profile(tk.Frame):
         log_out_btn(self, Loginpage, controller)
 
         #Profile Title
-        w = Label(self, text ='Profile', font = ('Arial', 28), bg='antique white')
-        w.pack()
-        w.place(x=500, y=100)
+        self.profile_lbl = Label(self, text ='Profile', font = ('Arial', 28), bg=bgc)
+        self.profile_lbl.place(x=600, y=100)
 
         #edit profile details
         #view profile details
+
+        #view subjects
+
+
         #change password????
 
 
