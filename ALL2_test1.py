@@ -3,7 +3,7 @@ import datetime
 from tkcalendar import Calendar
 from tkinter import *
 from PIL import Image,ImageTk
-from tkinter import messagebox, ttk, filedialog,  Label, Entry, Button, END
+from tkinter import messagebox, ttk, filedialog,  Label, Entry, Button, END, scrolledtext
 import tkinter as tk
 import tkinter.ttk as ttk
 from time import strftime
@@ -21,6 +21,7 @@ f=('Arial', 14)
 f2=('Arial', 12)
 f3=('Arial', 16)
 bgc='#F9D3B9'
+
 img_file='images\Slide4.png'
 
 #optionmenu values
@@ -1948,11 +1949,6 @@ class Chat(tk.Frame):
         #logout btn
         log_out_btn(self, Loginpage, controller)
 
-        ## Chat title
-        # w = Label(self, text ='Chat', font = ('Arial', 28) , bg=bgc)
-        # w.pack()
-        # w.place(x=465, y=100)
-
         #discussions server treeview scroll
         self.discussions_frame=Frame(self, width=300, height=500, bg=bgc)
         self.discussions_frame.place(x=125, y=100)
@@ -1974,9 +1970,12 @@ class Chat(tk.Frame):
         self.discussions_tv.column('#0', width=435, minwidth=435)
         self.discussions_tv.heading('#0', text='Discussion Servers', anchor=W)
 
+        #insert server name
+        self.discussions_tv.insert(parent='', index='end', iid=0, text='Computer Architecture & Networks')
+
         #chat msg screen
-        self.chat_frame=Frame(self, width=675, height=485, bg='white', relief=SOLID, bd=2)
-        self.chat_frame.place(x=650, y=115)
+        self.chat_scrolledtxt=scrolledtext.ScrolledText(self,width=58,height=21,bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
+        self.chat_scrolledtxt.place(x=650, y=115)
 
         #chat msg input entry
         #frame
