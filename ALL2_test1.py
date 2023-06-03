@@ -1148,6 +1148,49 @@ class QuizAdmin(tk.Frame):
         #quiz admin label
         quiz_admin_label=Label(self, text='Quiz Admin', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
         quiz_admin_label.place(x=40, y=155)
+
+        #quiz subject selection frame
+        self.quiz_subjsel_frame=Frame(self, bg=bgc, width=800, height=100)
+        self.quiz_subjsel_frame.place(x=40, y=200)
+
+        self.quiz_subjsel_lbl=Label(self.quiz_subjsel_frame, text='Subject', font=f3, bg=bgc)
+        self.quiz_subjsel_lbl.grid(row=0, column=0, pady=10, padx=10)
+
+        self.quiz_subjsel=ttk.Combobox(self.quiz_subjsel_frame, font=f3, width=26, values=['Select', 'Computer Architecture & Networks'])
+        self.quiz_subjsel.current(1)
+        self.quiz_subjsel.grid(row=0, column=1, pady=10)
+
+        #quiz treeview list
+        self.quiztv_frame=Frame(self, bg=bgc)
+        self.quiztv_frame.place(x=40, y=255)
+
+        #quiz treeview
+        self.quiz_tv_scroll=Scrollbar(self.quiztv_frame)
+        self.quiz_tv_scroll.pack(side=RIGHT, fill=Y)
+
+        self.quiz_tv=ttk.Treeview(self.quiztv_frame, yscrollcommand=self.quiz_tv_scroll.set, height=10)
+        self.quiz_tv.pack()
+
+        self.quiz_tv_scroll.config(command=self.quiz_tv.yview)
+
+        self.quiz_tv.column('#0', width=435, minwidth=435)
+        self.quiz_tv.heading('#0', text='Quiz Chapters', anchor=W)
+
+        self.quiz_tv.insert(parent='', index='end', iid=0, text='Chapter 1')
+
+        #quiz add, delete btns
+        self.quiz_btn_frame=Frame(self, bg=bgc, width=800, height=400)
+        self.quiz_btn_frame.place(x=40, y=650)
+
+        self.addquiz_btn=Button(self.quiz_btn_frame, text='Add Quiz', font=f3, relief=SOLID, cursor='hand2')
+        self.addquiz_btn.grid(row=0, column=0, sticky=W, pady=10, padx=65)
+
+        self.deletequiz_btn=Button(self.quiz_btn_frame, text='Delete Quiz', font=f3, relief=SOLID, cursor='hand2')
+        self.deletequiz_btn.grid(row=0, column=1, sticky=W, pady=10, padx=10)
+
+        #quiz questions frame
+        self.quizques_frame=Frame(self, bg='white', width=800, height=550, relief=SOLID, bd=2)
+        self.quizques_frame.place(x=535, y=200)
   
 
 class ChatAdmin(tk.Frame):
@@ -1168,6 +1211,8 @@ class ChatAdmin(tk.Frame):
         #chat admin label
         chat_admin_label=Label(self, text='Chat Admin', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
         chat_admin_label.place(x=40, y=155)
+
+        
 
 class CourseMaterials(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
