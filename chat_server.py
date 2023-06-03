@@ -10,24 +10,24 @@ server.bind((host,port))
 server.listen()
 
 clients=[]
-nicknames=[]
+names=[]
 
-def broadcast(message, prefix=""):
+def broadcast(message):
     for client in clients:
-        client.send(prefix.encode('utf-8')+message)
+        client.send(message)
 
 def handle_client(client):
     while True:
         try:
             message=client.recv(1024)
-            print(f"{nicknames[clients.index(client)]}")
-            broadcast(message,nicknames[clients.index(client)]+": ")
+            print(f"{names[clients.index(client)]}")
+            broadcast(message)
         except:
             index=clients.index(client)
             clients.remove(client)
             client.close()
-            nickname=nicknames[index]
-            nicknames.remove(nickname)
+            name=names[index]
+            names.remove(name)
             break
 
 def accept_msg():
@@ -35,15 +35,15 @@ def accept_msg():
         client,address=server.accept()
         print(f"Connected with {str(address)}")
 
-        client.send("NICK".encode('utf-8'))
-        nickname=client.recv(1024)
+        # client.send("Enter name".encode('utf-8'))
+        name=client.recv(1024).decode('utf-8')
 
-        nicknames.append(nickname)
+        names.append(name)
         clients.append(client)
 
-        print(f"Nickname of the client is {nickname}")
-        broadcast(f"{nickname} has connected to the server!\n".encode('utf-8'))
-        client.send("Connected to the server".encode('utf-8'))
+        print(f"Nickname of the client is {name}")
+        broadcast(f"{name} has connected to the server!\n".encode('utf-8'))
+        client.send("You have connected to the server".encode('utf-8'))
 
         thread=Thread(target=handle_client,args=(client,))
         thread.start()
