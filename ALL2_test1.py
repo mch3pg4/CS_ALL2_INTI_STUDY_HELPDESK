@@ -32,6 +32,7 @@ program=['Select','BCSCUN','BCTCUN']
 semester=['Select','1','2','3']
 subjects=['Select','Computer Architecture & Networks', 'Objected Oriented Programming', 'Mathematics for Computer Science', 'Database Systems', 'Programming & Algorithms']
 weeks=['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15']
+questions=['5', '10', '15']
 
 
 #top buttons
@@ -1178,20 +1179,126 @@ class QuizAdmin(tk.Frame):
 
         self.quiz_tv.insert(parent='', index='end', iid=0, text='Chapter 1')
 
+        
+        #quiz questions frame
+        self.quizques_frame=Frame(self, bg='white', width=800, height=600, relief=SOLID, bd=2)
+        # self.quizques_frame.place(x=550, y=245)
+        self.quizques_frame.pack(side=RIGHT, padx=40, anchor=E)
+        self.quizques_frame.propagate(0)
+
+        #quiz chapter title, 1 question, 4 options, previous, next btns
+        self.quiz_chapter_title=Label(self.quizques_frame, text='Chapter 1-Machine Level Representation of Data', font=('Arial', 19,'bold'), bg='white')   
+        self.quiz_chapter_title.grid(row=0, column=0, pady=10, padx=10, columnspan=3)
+
+        self.quiz_question=Label(self.quizques_frame, text='1. Which of the following operations is/are performed by the ALU?', font=f3, bg='white', wraplength=600)
+        self.quiz_question.grid(row=1, column=1, pady=10, padx=10)
+
+        self.quiz_option1=Radiobutton(self.quizques_frame, text='Data manipulation', font=f, bg='white', cursor='hand2')
+        self.quiz_option1.grid(row=2, column=1, pady=10, padx=10, sticky=W)
+
+        self.quiz_option2=Radiobutton(self.quizques_frame, text='Exponential', font=f, bg='white', cursor='hand2')
+        self.quiz_option2.grid(row=3, column=1, pady=10, padx=10, sticky=W)
+
+        self.quiz_option3=Radiobutton(self.quizques_frame, text='Square root', font=f, bg='white',  cursor='hand2')
+        self.quiz_option3.grid(row=4, column=1, pady=10, padx=10, sticky=W)
+
+        self.quiz_option4=Radiobutton(self.quizques_frame, text='All of the above', font=f, bg='white', cursor='hand2')
+        self.quiz_option4.grid(row=5, column=1, pady=10, padx=10, sticky=W)
+
+        self.quiz_prev_btn=Button(self.quizques_frame, text='Previous', font=f3, relief=SOLID, cursor='hand2')
+        self.quiz_prev_btn.grid(row=6, column=0, pady=10, padx=10, sticky=E)
+
+        self.quiz_next_btn=Button(self.quizques_frame, text='Next', font=f3, relief=SOLID, cursor='hand2')
+        self.quiz_next_btn.grid(row=6, column=2, pady=10, padx=10, sticky=W)
+
+        #add quiz popup
+        def addquiz_popup():
+            self.addquiz_popup=Toplevel()
+            self.addquiz_popup.title('Add Quiz')
+            # self.addquiz_popup.geometry('400x300+500+200')
+            self.addquiz_popup.resizable(False, False)
+            self.addquiz_popup.focus_force()
+
+            self.addquiz_popup_frame=Frame(self.addquiz_popup)
+            self.addquiz_popup_frame.pack()
+
+            self.addquiz_popup_label=Label(self.addquiz_popup_frame, text='Add Quiz', font=('Arial', 20, 'bold') )
+            self.addquiz_popup_label.grid(row=0, column=0, pady=10, padx=10, columnspan=2)
+
+            self.subjsel_label=Label(self.addquiz_popup_frame, text='Subject', font=f3)
+            self.subjsel_label.grid(row=1, column=0, pady=10, padx=10, sticky=W)
+
+            self.subjsel_combo=ttk.Combobox(self.addquiz_popup_frame, font=f3, width=26, values=['Select', 'Computer Architecture & Networks'])
+            self.subjsel_combo.current(1)
+            self.subjsel_combo.grid(row=1, column=1, pady=10)
+
+            self.addquiz_popup_chapter_label=Label(self.addquiz_popup_frame, text='Chapter', font=f3)
+            self.addquiz_popup_chapter_label.grid(row=2, column=0, pady=10, padx=10, sticky=W)
+
+            self.addquiz_popup_chapter_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
+            self.addquiz_popup_chapter_entry.grid(row=2, column=1, pady=10, padx=10, sticky=W)
+
+            #get no. of questions from user then for loop to create entry boxes, then add into db
+            self.addquiz_popup_noq_label=Label(self.addquiz_popup_frame, text='No. of Questions', font=f3)
+            self.addquiz_popup_noq_label.grid(row=3, column=0, pady=10, padx=10, sticky=W)
+
+            self.addquiz_popup_noq_entry=ttk.Combobox(self.addquiz_popup_frame, font=f3, values=questions)
+            self.addquiz_popup_noq_entry.grid(row=3, column=1, pady=10, padx=10, sticky=W)
+
+            self.addquiz_questitle_label=Label(self.addquiz_popup_frame, text='Question Title', font=f3)
+            self.addquiz_questitle_label.grid(row=4, column=0, pady=10, padx=10, sticky=W)
+
+            self.addquiz_questitle_entry=Text(self.addquiz_popup_frame, font=f, bd=2, height=4, width=25, wrap=WORD)
+            self.addquiz_questitle_entry.grid(row=4, column=1, pady=10, padx=10, sticky=W)
+
+            self.addquiz_opA_label=Label(self.addquiz_popup_frame, text='Option A', font=f3)
+            self.addquiz_opA_label.grid(row=5, column=0, pady=10, padx=10, sticky=W)
+
+            self.addquiz_opA_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
+            self.addquiz_opA_entry.grid(row=5, column=1, pady=10, padx=10, sticky=W)
+
+            self.addquiz_opB_label=Label(self.addquiz_popup_frame, text='Option B', font=f3)
+            self.addquiz_opB_label.grid(row=6, column=0, pady=10, padx=10, sticky=W)
+
+            self.addquiz_opB_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
+            self.addquiz_opB_entry.grid(row=6, column=1, pady=10, padx=10, sticky=W)
+
+            self.addquiz_opC_label=Label(self.addquiz_popup_frame, text='Option C', font=f3)
+            self.addquiz_opC_label.grid(row=7, column=0, pady=10, padx=10, sticky=W)
+
+            self.addquiz_opC_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
+            self.addquiz_opC_entry.grid(row=7, column=1, pady=10, padx=10, sticky=W)
+
+            self.addquiz_opD_label=Label(self.addquiz_popup_frame, text='Option D', font=f3)
+            self.addquiz_opD_label.grid(row=8, column=0, pady=10, padx=10, sticky=W)
+
+            self.addquiz_opD_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
+            self.addquiz_opD_entry.grid(row=8, column=1, pady=10, padx=10, sticky=W)
+
+            #next question btn
+            #previous question btn  #if first question then disable
+            #questions counter 
+
+
+
+            self.addquiz_popup_add_btn=Button(self.addquiz_popup_frame, text='Add', font=f3, relief=SOLID, width=10,cursor='hand2')
+            self.addquiz_popup_add_btn.grid(row=9, column=1, pady=10, padx=10, columnspan=2, sticky=W)
+
+
+        #delete quiz popup
+
         #quiz add, delete btns
         self.quiz_btn_frame=Frame(self, bg=bgc, width=800, height=400)
         self.quiz_btn_frame.place(x=40, y=650)
 
-        self.addquiz_btn=Button(self.quiz_btn_frame, text='Add Quiz', font=f3, relief=SOLID, cursor='hand2')
+        self.addquiz_btn=Button(self.quiz_btn_frame, text='Add Quiz', font=f3, relief=SOLID, cursor='hand2', command=addquiz_popup)
         self.addquiz_btn.grid(row=0, column=0, sticky=W, pady=10, padx=65)
 
         self.deletequiz_btn=Button(self.quiz_btn_frame, text='Delete Quiz', font=f3, relief=SOLID, cursor='hand2')
         self.deletequiz_btn.grid(row=0, column=1, sticky=W, pady=10, padx=10)
 
-        #quiz questions frame
-        self.quizques_frame=Frame(self, bg='white', width=800, height=550, relief=SOLID, bd=2)
-        self.quizques_frame.place(x=535, y=200)
-  
+
+
 
 class ChatAdmin(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
