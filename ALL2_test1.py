@@ -1307,28 +1307,19 @@ class QuizAdmin(tk.Frame):
 
 
 
-            ques_titles=[]
-            opA=[]
-            opB=[]
-            opC=[]
-            opD=[]
-            correctop=[]
+            self.ques_titles=[]
+            self.opA=[]
+            self.opB=[]
+            self.opC=[]
+            self.opD=[]
+            self.correctop=[]
 
             def ques_cb_selected(event):
                 self.ques_no=1
-
                 self.questitle_lbl.config(text='Question '+str(self.ques_no))
-                ques_titles.append(self.questitle_entry.get('1.0', END))
-                opA.append(self.opA_entry.get())
-                opB.append(self.opB_entry.get())
-                opC.append(self.opC_entry.get())
-                opD.append(self.opD_entry.get())
-                correctop.append(self.correctop_entry.get())
-                print(self.ques_no)
 
 
 
-            
 
             #next btn to add quiz title (if questions more than user entry then disable btn)
             def next():
@@ -1340,24 +1331,45 @@ class QuizAdmin(tk.Frame):
                 else:
                     self.nextques_btn.config(state=NORMAL)
                     self.prevques_btn.config(state=NORMAL)
+
                     
 
                 self.questitle_lbl.config(text='Question '+str(self.ques_no))
-                #clear entries
-                self.questitle_entry.delete('1.0', END)
-                self.opA_entry.delete(0, END)
-                self.opB_entry.delete(0, END)
-                self.opC_entry.delete(0, END)
-                self.opD_entry.delete(0, END)
-                self.correctop_entry.set('')
+                #get entries if previously entered by user, if not then append user entry to list
+                if (self.ques_no < len(self.ques_titles)) :
+                    #clear entries
+                    self.questitle_entry.delete('1.0', END)
+                    self.opA_entry.delete(0, END)
+                    self.opB_entry.delete(0, END)
+                    self.opC_entry.delete(0, END)
+                    self.opD_entry.delete(0, END)
+                    self.correctop_entry.set('')
 
-                #get entries
-                ques_titles.append(self.questitle_entry.get('1.0', END))
-                opA.append(self.opA_entry.get())
-                opB.append(self.opB_entry.get())
-                opC.append(self.opC_entry.get())
-                opD.append(self.opD_entry.get())
-                correctop.append(self.correctop_entry.get())
+                    self.questitle_entry.insert(1.0, self.questitles[self.ques_no])
+                    self.opA.insert(0, self.opA[self.ques_no])
+                    self.opB.insert(0, self.opB[self.ques_no])
+                    self.opC.insert(0, self.opC[self.ques_no])
+                    self.opD.insert(0, self.opD[self.ques_no])
+                    self.correctop.insert(0, self.correctop[self.ques_no])
+
+                
+                else:
+                    self.ques_titles.append(self.questitle_entry.get('1.0', 'end-1c'))
+                    self.opA.append(self.opA_entry.get())
+                    self.opB.append(self.opB_entry.get())
+                    self.opC.append(self.opC_entry.get())
+                    self.opD.append(self.opD_entry.get())
+                    self.correctop.append(self.correctop_entry.get())
+                
+                    #clear entries
+                    self.questitle_entry.delete('1.0', END)
+                    self.opA_entry.delete(0, END)
+                    self.opB_entry.delete(0, END)
+                    self.opC_entry.delete(0, END)
+                    self.opD_entry.delete(0, END)
+                    self.correctop_entry.set('')
+
+                
 
             #previous btn 
             def previous():
@@ -1380,20 +1392,18 @@ class QuizAdmin(tk.Frame):
                 self.correctop_entry.set('')
 
                 #get entries from list
-                # self.questitle_entry.insert('1.0', ques_titles[ques_no-1])
-                # self.opA_entry.insert(0, opA[ques_no-1])
-                # self.opB_entry.insert(0, opB[ques_no-1])
-                # self.opC_entry.insert(0, opC[ques_no-1])
-                # self.opD_entry.insert(0, opD[ques_no-1])
-                # self.correctop_entry.set(correctop[ques_no-1])
+                self.questitle_entry.insert('1.0', self.ques_titles[self.ques_no-1])
+                self.opA_entry.insert(0, self.opA[self.ques_no-1])
+                self.opB_entry.insert(0, self.opB[self.ques_no-1])
+                self.opC_entry.insert(0, self.opC[self.ques_no-1])
+                self.opD_entry.insert(0, self.opD[self.ques_no-1])
+                self.correctop_entry.set(self.correctop[self.ques_no-1])
 
                 #bind combo selected event
 
                 
             
             self.noq_cb.bind('<<ComboboxSelected>>', ques_cb_selected)
-
-                
 
 
             #previous question btn  #if first question then disable
@@ -1404,19 +1414,39 @@ class QuizAdmin(tk.Frame):
             self.nextques_btn=Button(self.addquiz_popup_frame, text='Next', font=f, relief=SOLID, width=7,cursor='hand2', command=next)
             self.nextques_btn.grid(row=10, column=2, pady=10, padx=10,  sticky=W)
 
-            
-            # # insert_ques=('''INSERT INTO quiz(subj_name, chap_name, ques_title, opA, opB, opC, opD, correct_op) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''')
-            # ques_data=('Computer Architecture & Networks', self.chapter_entry.get(), self.questitle_entry.get('1.0', END), self.opA_entry.get(), self.opB_entry.get(), self.opC_entry.get(), self.opD_entry.get(), self.correctop_entry.get()
-            # cur.execute(insert_ques, ques_data)
-            # con.commit()
-            #clear list after database add
+            def add_quiz():
+                #add final entries into list
+                self.ques_titles.append(self.questitle_entry.get('1.0', 'end-1c'))
+                self.opA.append(self.opA_entry.get())
+                self.opB.append(self.opB_entry.get())
+                self.opC.append(self.opC_entry.get())
+                self.opD.append(self.opD_entry.get())
+                self.correctop.append(self.correctop_entry.get())
+                print(self.ques_titles)
+                print(self.opA)
+                print(self.opB)
+                print(self.opC)
+                print(self.opD)
+                print(self.correctop)
+
+
+
+                # if len(self.ques_titles) == len(self.opA) == len(self.opB) == len(self.opC) == len(self.opD) == len(self.correctop):
+                #     for i in range(len(self.ques_titles)):
+                #         insert_ques=('''INSERT INTO quiz(idquiz, subj_name, chap_name, ques_title, opA, opB, opC, opD, correct_op) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''')
+                #         ques_data=(None, 'Computer Architecture & Networks', self.chapter_entry.get(),self.ques_titles[i], self.opA[i], self.opB[i], self.opC[i], self.opD[i], self.correctop[i])
+                #         cur.execute(insert_ques, ques_data)
+                #         con.commit()
+                # # #clear list after database add
+                # #close window after add
+                # self.addquiz_popup.destroy()
+                
 
 
 
 
-
-            self.addquiz_popup_add_btn=Button(self.addquiz_popup_frame, text='Add', font=f3, relief=SOLID, width=10,cursor='hand2')
-            self.addquiz_popup_add_btn.grid(row=10, column=1, pady=10, padx=10, sticky=W)
+            self.addquiz_btn=Button(self.addquiz_popup_frame, text='Add', font=f3, relief=SOLID, width=10,cursor='hand2', command=add_quiz)
+            self.addquiz_btn.grid(row=10, column=1, pady=10, padx=10, sticky=W)
 
 
         #delete quiz popup
