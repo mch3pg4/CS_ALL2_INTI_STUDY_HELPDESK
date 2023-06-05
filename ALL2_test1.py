@@ -33,6 +33,7 @@ semester=['Select','1','2','3']
 subjects=['Select','Computer Architecture & Networks', 'Objected Oriented Programming', 'Mathematics for Computer Science', 'Database Systems', 'Programming & Algorithms']
 weeks=['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15']
 questions=['5', '10', '15']
+options=['A', 'B', 'C', 'D']
 
 
 #top buttons
@@ -1157,7 +1158,7 @@ class QuizAdmin(tk.Frame):
         self.quiz_subjsel_lbl=Label(self.quiz_subjsel_frame, text='Subject', font=f3, bg=bgc)
         self.quiz_subjsel_lbl.grid(row=0, column=0, pady=10, padx=10)
 
-        self.quiz_subjsel=ttk.Combobox(self.quiz_subjsel_frame, font=f3, width=26, values=['Select', 'Computer Architecture & Networks'])
+        self.quiz_subjsel=ttk.Combobox(self.quiz_subjsel_frame, font=f3, width=26, values=['Select', 'Computer Architecture & Networks'], state='readonly')
         self.quiz_subjsel.current(1)
         self.quiz_subjsel.grid(row=0, column=1, pady=10)
 
@@ -1222,67 +1223,200 @@ class QuizAdmin(tk.Frame):
             self.addquiz_popup_frame=Frame(self.addquiz_popup)
             self.addquiz_popup_frame.pack()
 
+            #connect to db
+            con = mysql.connector.connect(host='localhost', 
+                                          user='root', 
+                                          password='rootpass', 
+                                          database='all2')
+            cur = con.cursor()
+            cur.execute('''CREATE TABLE IF NOT EXISTS quiz(idquiz INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+                                                            subj_name VARCHAR(45) NOT NULL,
+                                                            chap_name VARCHAR(85) NOT NULL,
+                                                            ques_title VARCHAR(105) NOT NULL,
+                                                            opA VARCHAR(45) NOT NULL,
+                                                            opB VARCHAR(45) NOT NULL,
+                                                            opC VARCHAR(45) NOT NULL,
+                                                            opD VARCHAR(45) NOT NULL,
+                                                            correct_op VARCHAR(45) NOT NULL)''')
+            con.commit()
+
+
             self.addquiz_popup_label=Label(self.addquiz_popup_frame, text='Add Quiz', font=('Arial', 20, 'bold') )
             self.addquiz_popup_label.grid(row=0, column=0, pady=10, padx=10, columnspan=2)
 
             self.subjsel_label=Label(self.addquiz_popup_frame, text='Subject', font=f3)
             self.subjsel_label.grid(row=1, column=0, pady=10, padx=10, sticky=W)
 
-            self.subjsel_combo=ttk.Combobox(self.addquiz_popup_frame, font=f3, width=26, values=['Select', 'Computer Architecture & Networks'])
+            self.subjsel_combo=ttk.Combobox(self.addquiz_popup_frame, font=f3, width=26, values=['Select', 'Computer Architecture & Networks'], state='readonly')
             self.subjsel_combo.current(1)
-            self.subjsel_combo.grid(row=1, column=1, pady=10)
+            self.subjsel_combo.grid(row=1, column=1, pady=10, columnspan=2)
 
-            self.addquiz_popup_chapter_label=Label(self.addquiz_popup_frame, text='Chapter', font=f3)
-            self.addquiz_popup_chapter_label.grid(row=2, column=0, pady=10, padx=10, sticky=W)
+            self.chapter_label=Label(self.addquiz_popup_frame, text='Chapter', font=f3)
+            self.chapter_label.grid(row=2, column=0, pady=10, padx=10, sticky=W)
 
-            self.addquiz_popup_chapter_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
-            self.addquiz_popup_chapter_entry.grid(row=2, column=1, pady=10, padx=10, sticky=W)
+            self.chapter_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
+            self.chapter_entry.grid(row=2, column=1, pady=10, padx=10, sticky=W, columnspan=2)
 
             #get no. of questions from user then for loop to create entry boxes, then add into db
-            self.addquiz_popup_noq_label=Label(self.addquiz_popup_frame, text='No. of Questions', font=f3)
-            self.addquiz_popup_noq_label.grid(row=3, column=0, pady=10, padx=10, sticky=W)
+            self.noq_label=Label(self.addquiz_popup_frame, text='No. of Questions', font=f3)
+            self.noq_label.grid(row=3, column=0, pady=10, padx=10, sticky=W)
 
-            self.addquiz_popup_noq_entry=ttk.Combobox(self.addquiz_popup_frame, font=f3, values=questions)
-            self.addquiz_popup_noq_entry.grid(row=3, column=1, pady=10, padx=10, sticky=W)
+            self.noq_cb=ttk.Combobox(self.addquiz_popup_frame, font=f3, values=questions, width=8, state='readonly')
+            self.noq_cb.grid(row=3, column=1, pady=10, padx=10, sticky=W, columnspan=2)
 
-            self.addquiz_questitle_label=Label(self.addquiz_popup_frame, text='Question Title', font=f3)
-            self.addquiz_questitle_label.grid(row=4, column=0, pady=10, padx=10, sticky=W)
+            
 
-            self.addquiz_questitle_entry=Text(self.addquiz_popup_frame, font=f, bd=2, height=4, width=25, wrap=WORD)
-            self.addquiz_questitle_entry.grid(row=4, column=1, pady=10, padx=10, sticky=W)
 
-            self.addquiz_opA_label=Label(self.addquiz_popup_frame, text='Option A', font=f3)
-            self.addquiz_opA_label.grid(row=5, column=0, pady=10, padx=10, sticky=W)
 
-            self.addquiz_opA_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
-            self.addquiz_opA_entry.grid(row=5, column=1, pady=10, padx=10, sticky=W)
+            #questiontitle with question counter
+            self.questitle_lbl=Label(self.addquiz_popup_frame, text='Question', font=f3)
+            self.questitle_lbl.grid(row=4, column=0, pady=10, padx=10, sticky=W)
 
-            self.addquiz_opB_label=Label(self.addquiz_popup_frame, text='Option B', font=f3)
-            self.addquiz_opB_label.grid(row=6, column=0, pady=10, padx=10, sticky=W)
+            self.questitle_entry=Text(self.addquiz_popup_frame, font=f, bd=2, height=4, width=25, wrap=WORD)
+            self.questitle_entry.grid(row=4, column=1, pady=10, padx=10, sticky=W, columnspan=2)
 
-            self.addquiz_opB_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
-            self.addquiz_opB_entry.grid(row=6, column=1, pady=10, padx=10, sticky=W)
+            self.opA_label=Label(self.addquiz_popup_frame, text='Option A', font=f3)
+            self.opA_label.grid(row=5, column=0, pady=10, padx=10, sticky=W)
 
-            self.addquiz_opC_label=Label(self.addquiz_popup_frame, text='Option C', font=f3)
-            self.addquiz_opC_label.grid(row=7, column=0, pady=10, padx=10, sticky=W)
+            self.opA_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
+            self.opA_entry.grid(row=5, column=1, pady=10, padx=10, sticky=W, columnspan=2)
 
-            self.addquiz_opC_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
-            self.addquiz_opC_entry.grid(row=7, column=1, pady=10, padx=10, sticky=W)
+            self.opB_label=Label(self.addquiz_popup_frame, text='Option B', font=f3)
+            self.opB_label.grid(row=6, column=0, pady=10, padx=10, sticky=W)
 
-            self.addquiz_opD_label=Label(self.addquiz_popup_frame, text='Option D', font=f3)
-            self.addquiz_opD_label.grid(row=8, column=0, pady=10, padx=10, sticky=W)
+            self.opB_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
+            self.opB_entry.grid(row=6, column=1, pady=10, padx=10, sticky=W, columnspan=2)
 
-            self.addquiz_opD_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
-            self.addquiz_opD_entry.grid(row=8, column=1, pady=10, padx=10, sticky=W)
+            self.opC_label=Label(self.addquiz_popup_frame, text='Option C', font=f3)
+            self.opC_label.grid(row=7, column=0, pady=10, padx=10, sticky=W)
 
-            #next question btn
+            self.opC_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
+            self.opC_entry.grid(row=7, column=1, pady=10, padx=10, sticky=W, columnspan=2)
+
+            self.opD_label=Label(self.addquiz_popup_frame, text='Option D', font=f3)
+            self.opD_label.grid(row=8, column=0, pady=10, padx=10, sticky=W)
+
+            self.opD_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
+            self.opD_entry.grid(row=8, column=1, pady=10, padx=10, sticky=W, columnspan=2)
+
+            self.correctop_label=Label(self.addquiz_popup_frame, text='Correct Option', font=f3)
+            self.correctop_label.grid(row=9, column=0, pady=10, padx=10, sticky=W)
+
+            self.correctop_entry=ttk.Combobox(self.addquiz_popup_frame, font=f3, values=options, width=8, state='readonly')
+            self.correctop_entry.grid(row=9, column=1, pady=10, padx=10, sticky=W, columnspan=2)
+
+
+
+            ques_titles=[]
+            opA=[]
+            opB=[]
+            opC=[]
+            opD=[]
+            correctop=[]
+
+            def ques_cb_selected(event):
+                self.ques_no=1
+
+                self.questitle_lbl.config(text='Question '+str(self.ques_no))
+                ques_titles.append(self.questitle_entry.get('1.0', END))
+                opA.append(self.opA_entry.get())
+                opB.append(self.opB_entry.get())
+                opC.append(self.opC_entry.get())
+                opD.append(self.opD_entry.get())
+                correctop.append(self.correctop_entry.get())
+                print(self.ques_no)
+
+
+
+            
+
+            #next btn to add quiz title (if questions more than user entry then disable btn)
+            def next():
+                
+                if self.ques_no < (int(self.noq_cb.get())):
+                    self.ques_no+=1
+                if self.ques_no == (int(self.noq_cb.get())):
+                    self.nextques_btn.config(state=DISABLED)
+                else:
+                    self.nextques_btn.config(state=NORMAL)
+                    self.prevques_btn.config(state=NORMAL)
+                    
+
+                self.questitle_lbl.config(text='Question '+str(self.ques_no))
+                #clear entries
+                self.questitle_entry.delete('1.0', END)
+                self.opA_entry.delete(0, END)
+                self.opB_entry.delete(0, END)
+                self.opC_entry.delete(0, END)
+                self.opD_entry.delete(0, END)
+                self.correctop_entry.set('')
+
+                #get entries
+                ques_titles.append(self.questitle_entry.get('1.0', END))
+                opA.append(self.opA_entry.get())
+                opB.append(self.opB_entry.get())
+                opC.append(self.opC_entry.get())
+                opD.append(self.opD_entry.get())
+                correctop.append(self.correctop_entry.get())
+
+            #previous btn 
+            def previous():
+                self.ques_no
+                if self.ques_no > 1:
+                    self.ques_no -= 1
+                if self.ques_no == 1:
+                    self.prevques_btn.config(state=DISABLED)
+                else:
+                    self.prevques_btn.config(state=NORMAL)
+                    self.nextques_btn.config(state=NORMAL)
+                
+                self.questitle_lbl.config(text='Question '+str(self.ques_no))
+                #clear entries
+                self.questitle_entry.delete('1.0', END)
+                self.opA_entry.delete(0, END)
+                self.opB_entry.delete(0, END)
+                self.opC_entry.delete(0, END)
+                self.opD_entry.delete(0, END)
+                self.correctop_entry.set('')
+
+                #get entries from list
+                # self.questitle_entry.insert('1.0', ques_titles[ques_no-1])
+                # self.opA_entry.insert(0, opA[ques_no-1])
+                # self.opB_entry.insert(0, opB[ques_no-1])
+                # self.opC_entry.insert(0, opC[ques_no-1])
+                # self.opD_entry.insert(0, opD[ques_no-1])
+                # self.correctop_entry.set(correctop[ques_no-1])
+
+                #bind combo selected event
+
+                
+            
+            self.noq_cb.bind('<<ComboboxSelected>>', ques_cb_selected)
+
+                
+
+
             #previous question btn  #if first question then disable
-            #questions counter 
+            self.prevques_btn=Button(self.addquiz_popup_frame, text='Previous', font=f, relief=SOLID, width=7,cursor='hand2', command=previous, state=DISABLED)
+            self.prevques_btn.grid(row=10, column=0, pady=10, padx=10,  sticky=W)
+            
+            #next question btn
+            self.nextques_btn=Button(self.addquiz_popup_frame, text='Next', font=f, relief=SOLID, width=7,cursor='hand2', command=next)
+            self.nextques_btn.grid(row=10, column=2, pady=10, padx=10,  sticky=W)
+
+            
+            # # insert_ques=('''INSERT INTO quiz(subj_name, chap_name, ques_title, opA, opB, opC, opD, correct_op) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''')
+            # ques_data=('Computer Architecture & Networks', self.chapter_entry.get(), self.questitle_entry.get('1.0', END), self.opA_entry.get(), self.opB_entry.get(), self.opC_entry.get(), self.opD_entry.get(), self.correctop_entry.get()
+            # cur.execute(insert_ques, ques_data)
+            # con.commit()
+            #clear list after database add
+
+
 
 
 
             self.addquiz_popup_add_btn=Button(self.addquiz_popup_frame, text='Add', font=f3, relief=SOLID, width=10,cursor='hand2')
-            self.addquiz_popup_add_btn.grid(row=9, column=1, pady=10, padx=10, columnspan=2, sticky=W)
+            self.addquiz_popup_add_btn.grid(row=10, column=1, pady=10, padx=10, sticky=W)
 
 
         #delete quiz popup
