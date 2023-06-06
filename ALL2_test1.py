@@ -1251,10 +1251,10 @@ class QuizAdmin(tk.Frame):
             self.subjsel_combo.current(1)
             self.subjsel_combo.grid(row=1, column=1, pady=10, columnspan=2)
 
-            self.chapter_label=Label(self.addquiz_popup_frame, text='Chapter', font=f3)
+            self.chapter_label=Label(self.addquiz_popup_frame, text='Chapter', font=f)
             self.chapter_label.grid(row=2, column=0, pady=10, padx=10, sticky=W)
 
-            self.chapter_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
+            self.chapter_entry=Entry(self.addquiz_popup_frame, font=f, bd=2, width=26)
             self.chapter_entry.grid(row=2, column=1, pady=10, padx=10, sticky=W, columnspan=2)
 
             #get no. of questions from user then for loop to create entry boxes, then add into db
@@ -1272,7 +1272,7 @@ class QuizAdmin(tk.Frame):
             self.questitle_lbl=Label(self.addquiz_popup_frame, text='Question', font=f3)
             self.questitle_lbl.grid(row=4, column=0, pady=10, padx=10, sticky=W)
 
-            self.questitle_entry=Text(self.addquiz_popup_frame, font=f, bd=2, height=4, width=25, wrap=WORD)
+            self.questitle_entry=Text(self.addquiz_popup_frame, font=f, bd=2, height=4, width=26, wrap=WORD)
             self.questitle_entry.grid(row=4, column=1, pady=10, padx=10, sticky=W, columnspan=2)
 
             self.opA_label=Label(self.addquiz_popup_frame, text='Option A', font=f3)
@@ -1317,6 +1317,7 @@ class QuizAdmin(tk.Frame):
             def ques_cb_selected(event):
                 self.ques_no=1
                 self.questitle_lbl.config(text='Question '+str(self.ques_no))
+                print(self.ques_no)
 
 
 
@@ -1345,12 +1346,12 @@ class QuizAdmin(tk.Frame):
                     self.opD_entry.delete(0, END)
                     self.correctop_entry.set('')
 
-                    self.questitle_entry.insert(1.0, self.questitles[self.ques_no])
-                    self.opA.insert(0, self.opA[self.ques_no])
-                    self.opB.insert(0, self.opB[self.ques_no])
-                    self.opC.insert(0, self.opC[self.ques_no])
-                    self.opD.insert(0, self.opD[self.ques_no])
-                    self.correctop.insert(0, self.correctop[self.ques_no])
+                    self.questitle_entry.insert(1.0, self.ques_titles[self.ques_no-1])
+                    self.opA.insert(0, self.opA[self.ques_no-1])
+                    self.opB.insert(0, self.opB[self.ques_no-1])
+                    self.opC.insert(0, self.opC[self.ques_no-1])
+                    self.opD.insert(0, self.opD[self.ques_no-1])
+                    self.correctop.insert(0, self.correctop[self.ques_no-1])
 
                 
                 else:
@@ -1368,6 +1369,7 @@ class QuizAdmin(tk.Frame):
                     self.opC_entry.delete(0, END)
                     self.opD_entry.delete(0, END)
                     self.correctop_entry.set('')
+                print(self.ques_no)
 
                 
 
@@ -1399,10 +1401,10 @@ class QuizAdmin(tk.Frame):
                 self.opD_entry.insert(0, self.opD[self.ques_no-1])
                 self.correctop_entry.set(self.correctop[self.ques_no-1])
 
-                #bind combo selected event
+                print(self.ques_no)
 
-                
             
+            #bind combo selected event
             self.noq_cb.bind('<<ComboboxSelected>>', ques_cb_selected)
 
 
@@ -1431,15 +1433,22 @@ class QuizAdmin(tk.Frame):
 
 
 
-                # if len(self.ques_titles) == len(self.opA) == len(self.opB) == len(self.opC) == len(self.opD) == len(self.correctop):
-                #     for i in range(len(self.ques_titles)):
-                #         insert_ques=('''INSERT INTO quiz(idquiz, subj_name, chap_name, ques_title, opA, opB, opC, opD, correct_op) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''')
-                #         ques_data=(None, 'Computer Architecture & Networks', self.chapter_entry.get(),self.ques_titles[i], self.opA[i], self.opB[i], self.opC[i], self.opD[i], self.correctop[i])
-                #         cur.execute(insert_ques, ques_data)
-                #         con.commit()
-                # # #clear list after database add
-                # #close window after add
-                # self.addquiz_popup.destroy()
+                if len(self.ques_titles) == len(self.opA) == len(self.opB) == len(self.opC) == len(self.opD) == len(self.correctop):
+                    for i in range(len(self.ques_titles)):
+                        insert_ques=('''INSERT INTO quiz(idquiz, subj_name, chap_name, ques_title, opA, opB, opC, opD, correct_op) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)''')
+                        ques_data=(None, 'Computer Architecture & Networks', self.chapter_entry.get(),self.ques_titles[i], self.opA[i], self.opB[i], self.opC[i], self.opD[i], self.correctop[i])
+                        cur.execute(insert_ques, ques_data)
+                        con.commit()
+                # #clear list after database add
+                    self.ques_titles.clear()
+                    self.opA.clear()
+                    self.opB.clear()
+                    self.opC.clear()
+                    self.opD.clear()
+                    self.correctop.clear()
+
+                #close window after add
+                self.addquiz_popup.destroy()
                 
 
 
