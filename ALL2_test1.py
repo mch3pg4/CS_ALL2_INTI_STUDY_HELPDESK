@@ -1170,7 +1170,10 @@ class QuizAdmin(tk.Frame):
         self.quiz_tv_scroll=Scrollbar(self.quiztv_frame)
         self.quiz_tv_scroll.pack(side=RIGHT, fill=Y)
 
-        self.quiz_tv=ttk.Treeview(self.quiztv_frame, yscrollcommand=self.quiz_tv_scroll.set, height=10)
+        style=ttk.Style()
+        style.configure('Quiz.Treeview', font=f)
+
+        self.quiz_tv=ttk.Treeview(self.quiztv_frame, yscrollcommand=self.quiz_tv_scroll.set, style='Quiz.Treeview',height=10)
         self.quiz_tv.pack()
 
         self.quiz_tv_scroll.config(command=self.quiz_tv.yview)
@@ -1178,39 +1181,136 @@ class QuizAdmin(tk.Frame):
         self.quiz_tv.column('#0', width=435, minwidth=435)
         self.quiz_tv.heading('#0', text='Quiz Chapters', anchor=W)
 
-        self.quiz_tv.insert(parent='', index='end', iid=0, text='Chapter 1')
-
         
         #quiz questions frame
-        self.quizques_frame=Frame(self, bg='white', width=800, height=600, relief=SOLID, bd=2)
-        # self.quizques_frame.place(x=550, y=245)
-        self.quizques_frame.pack(side=RIGHT, padx=40, anchor=E)
-        self.quizques_frame.propagate(0)
+        self.quizques_frame=Frame(self, bg='white',  relief=SOLID, bd=2)
+        self.quizques_frame.place(x=543, y=252)
+        # self.quizques_frame.pack(side=RIGHT, padx=40, anchor=E)
+        # self.quizques_frame.propagate(1)
 
         #quiz chapter title, 1 question, 4 options, previous, next btns
-        self.quiz_chapter_title=Label(self.quizques_frame, text='Chapter 1-Machine Level Representation of Data', font=('Arial', 19,'bold'), bg='white')   
+        self.quiz_chapter_title=Label(self.quizques_frame, text='', font=('Arial', 19,'bold'), bg='white')   
         self.quiz_chapter_title.grid(row=0, column=0, pady=10, padx=10, columnspan=3)
 
-        self.quiz_question=Label(self.quizques_frame, text='1. Which of the following operations is/are performed by the ALU?', font=f3, bg='white', wraplength=600)
-        self.quiz_question.grid(row=1, column=1, pady=10, padx=10)
+        self.quiz_question=Label(self.quizques_frame, text='', font=f3, bg='white', wraplength=600)
+        self.quiz_question.grid(row=1, column=0, pady=10, padx=10, columnspan=3)
 
-        self.quiz_option1=Radiobutton(self.quizques_frame, text='Data manipulation', font=f, bg='white', cursor='hand2')
-        self.quiz_option1.grid(row=2, column=1, pady=10, padx=10, sticky=W)
+        self.quiz_option1=Radiobutton(self.quizques_frame, text='', font=f, bg='white', cursor='hand2')
+        self.quiz_option1.grid(row=2, column=1, pady=10, padx=10, sticky=W, columnspan=3)
 
-        self.quiz_option2=Radiobutton(self.quizques_frame, text='Exponential', font=f, bg='white', cursor='hand2')
-        self.quiz_option2.grid(row=3, column=1, pady=10, padx=10, sticky=W)
+        self.quiz_option2=Radiobutton(self.quizques_frame, text='', font=f, bg='white', cursor='hand2')
+        self.quiz_option2.grid(row=3, column=1, pady=10, padx=10, sticky=W, columnspan=3)
 
-        self.quiz_option3=Radiobutton(self.quizques_frame, text='Square root', font=f, bg='white',  cursor='hand2')
-        self.quiz_option3.grid(row=4, column=1, pady=10, padx=10, sticky=W)
+        self.quiz_option3=Radiobutton(self.quizques_frame, text='', font=f, bg='white',  cursor='hand2')
+        self.quiz_option3.grid(row=4, column=1, pady=10, padx=10, sticky=W, columnspan=3)
 
-        self.quiz_option4=Radiobutton(self.quizques_frame, text='All of the above', font=f, bg='white', cursor='hand2')
-        self.quiz_option4.grid(row=5, column=1, pady=10, padx=10, sticky=W)
+        self.quiz_option4=Radiobutton(self.quizques_frame, text='', font=f, bg='white', cursor='hand2')
+        self.quiz_option4.grid(row=5, column=1, pady=10, padx=10, sticky=W, columnspan=3)
 
-        self.quiz_prev_btn=Button(self.quizques_frame, text='Previous', font=f3, relief=SOLID, cursor='hand2')
-        self.quiz_prev_btn.grid(row=6, column=0, pady=10, padx=10, sticky=E)
 
-        self.quiz_next_btn=Button(self.quizques_frame, text='Next', font=f3, relief=SOLID, cursor='hand2')
-        self.quiz_next_btn.grid(row=6, column=2, pady=10, padx=10, sticky=W)
+
+        #show distinct chapters in treeview
+        def show_quizchp(e):
+            if self.quiz_subjsel.get()=='Select':
+                #show blank treeview
+                self.quiz_tv.delete(*self.quiz_tv.get_children())
+
+            else:
+                #connect to db
+                con = mysql.connector.connect(host='localhost', 
+                                              user='root', 
+                                              password='rootpass', 
+                                              database='all2')
+                cur = con.cursor()
+                s_set=cur.execute('''SELECT DISTINCT chap_name FROM quiz WHERE subj_name=%s''', (self.quiz_subjsel.get(),))
+                s_set=cur.fetchall()
+                for row in s_set:
+                    self.quiz_tv.insert('',tk.END, text='Chapter ' +(row[0]))
+                con.commit()
+                con.close()
+        
+        #show quiz chapters in treeview first
+        show_quizchp(e=None)
+        self.quiz_subjsel.bind('<<ComboboxSelected>>', show_quizchp)
+
+
+        #bind event: user selects from treeview the quiz chapter, then quiz is shown in quiz frame, for loop  quiz questions from db, prev next btn
+        #show quiz questions in quiz frame
+        def show_quizques(e):
+            selected=self.quiz_tv.focus()
+            if selected:
+                self.values=self.quiz_tv.item(selected, 'text')
+                #connect to db
+                con = mysql.connector.connect(host='localhost', 
+                                            user='root', 
+                                            password='rootpass', 
+                                            database='all2')
+                cur = con.cursor()
+                self.q_set=cur.execute('''SELECT ques_title, opA, opB, opC, opD, correct_op FROM quiz WHERE chap_name=%s''', (self.values.replace("Chapter ", ""),))
+                self.q_set=cur.fetchall()
+                # for row in q_set:
+                #     print(row[0],", " , row[1], ", ", row[2],", ", row[3],", ", row[4], ", ",row[5])
+
+                self.ques_num=0
+                self.quiz_chapter_title.config(text=self.values)
+                self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
+                self.quiz_option1.config(text=self.q_set[self.ques_num][1])
+                self.quiz_option2.config(text=self.q_set[self.ques_num][2])
+                self.quiz_option3.config(text=self.q_set[self.ques_num][3])
+                self.quiz_option4.config(text=self.q_set[self.ques_num][4])
+                con.commit()
+
+        self.quiz_tv.bind('<ButtonRelease-1>', show_quizques)
+
+        #show quiz by default
+        show_quizques(e=None)
+
+        #next question
+        def next_ques():
+            if self.ques_num < (len(self.q_set)-1):
+                self.ques_num+=1
+            if self.ques_num == (len(self.q_set)-1):
+                self.quiz_next_btn.config(state=DISABLED)
+            else:
+                self.quiz_next_btn.config(state=NORMAL)
+                self.quiz_prev_btn.config(state=NORMAL)
+
+            self.quiz_chapter_title.config(text=self.values)
+            self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
+            self.quiz_option1.config(text=self.q_set[self.ques_num][1])
+            self.quiz_option2.config(text=self.q_set[self.ques_num][2])
+            self.quiz_option3.config(text=self.q_set[self.ques_num][3])
+            self.quiz_option4.config(text=self.q_set[self.ques_num][4])
+
+
+        def prev_ques():
+            if self.ques_num > 0:
+                    self.ques_num -= 1
+            if self.ques_num == 0:
+                self.quiz_prev_btn.config(state=DISABLED)
+            else:
+                self.quiz_prev_btn.config(state=NORMAL)
+                self.quiz_next_btn.config(state=NORMAL)
+
+            self.quiz_chapter_title.config(text=self.values)
+            self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
+            self.quiz_option1.config(text=self.q_set[self.ques_num][1])
+            self.quiz_option2.config(text=self.q_set[self.ques_num][2])
+            self.quiz_option3.config(text=self.q_set[self.ques_num][3])
+            self.quiz_option4.config(text=self.q_set[self.ques_num][4])
+
+        self.quiz_prev_btn=Button(self.quizques_frame, text='Previous', font=f3, relief=SOLID, cursor='hand2', width=10, command=prev_ques)
+        self.quiz_prev_btn.grid(row=6, column=0, pady=10, padx=10, sticky=W, columnspan=3)
+
+        self.quiz_next_btn=Button(self.quizques_frame, text='Next', font=f3, relief=SOLID, cursor='hand2', width=10, command=next_ques)
+        self.quiz_next_btn.grid(row=6, column=2, pady=10, padx=10, sticky=E, columnspan=3)
+
+
+        #show current question 1/5
+        #show quiz results to user, show score and percentage
+
+        
+
 
         #add quiz popup
         def addquiz_popup():
@@ -1375,7 +1475,6 @@ class QuizAdmin(tk.Frame):
 
             #previous btn 
             def previous():
-                self.ques_no
                 if self.ques_no > 1:
                     self.ques_no -= 1
                 if self.ques_no == 1:
@@ -1470,6 +1569,7 @@ class QuizAdmin(tk.Frame):
         self.deletequiz_btn=Button(self.quiz_btn_frame, text='Delete Quiz', font=f3, relief=SOLID, cursor='hand2')
         self.deletequiz_btn.grid(row=0, column=1, sticky=W, pady=10, padx=10)
 
+        
 
 
 
@@ -1552,6 +1652,7 @@ class CourseMaterials(tk.Frame):
             for mat in m_set:
                 tree.insert(parent=wk_id, text=mat[0], index= my_index,open=False)
                 my_index+=1
+        con.commit()
         con.close()
         
         # #upload material frame
@@ -2111,9 +2212,9 @@ class Books(tk.Frame):
 
         #format columns
         my_tree.column('#0', width=0, stretch=NO)
-        my_tree.column('ID', width=60, anchor=CENTER, stretch=NO)
-        my_tree.column('Book Name', width=250, anchor=CENTER, stretch=NO)
-        my_tree.column('Category', width=155, anchor=CENTER, stretch=NO)
+        my_tree.column('ID', width=60, anchor=CENTER, stretch=False, minwidth=60)
+        my_tree.column('Book Name', width=250, anchor=CENTER, stretch=NO, minwidth=250)
+        my_tree.column('Category', width=155, anchor=CENTER, stretch=NO, minwidth=155)
 
         #column headings
         my_tree.heading('#0', text='', anchor=CENTER)
@@ -2121,9 +2222,9 @@ class Books(tk.Frame):
         my_tree.heading('Book Name', text='Book Name', anchor=CENTER)
         my_tree.heading('Category', text='Category', anchor=CENTER)
 
-        #pdf viewer label
-        self.pdf_viewer_label=Label(self, text='PDF Viewer', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
-        self.pdf_viewer_label.place(x=955, y=135)
+        #view book label
+        self.view_bk_lbl=Label(self, text='View Book', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
+        self.view_bk_lbl.place(x=955, y=135)
 
         #pdf viewer for books
         self.pdf_frame=Frame(self, bg=bgc)
