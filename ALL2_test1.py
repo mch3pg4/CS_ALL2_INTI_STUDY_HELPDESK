@@ -355,6 +355,7 @@ class RegisterPage(tk.Frame):
                     cur.execute(insert_data,data)
 
                     con.commit()
+                    con.close()
                     messagebox.showinfo('Register', 'Account Created Successfully!')
                     if self.user_var.get()== 'Lecturer':
                         controller.show_frame(StudentsView)
@@ -542,6 +543,7 @@ class RegisterCourses(tk.Frame):
                     cur.execute(insert_subjectrecord,data)
 
                     con.commit()
+                    con.close()
                     messagebox.showinfo('Register', 'Subjects Registered Successfully!')
                     controller.show_frame(Homepage)
 
@@ -836,12 +838,15 @@ class StudentsView(tk.Frame):
                 for rec in s_set:
                     my_tree.insert('', tk.END, values=(rec[0], rec[1], rec[2], rec[3], rec[4], rec[5], rec[6]))
                 con.commit()
+                con.close()
             else:
                 my_tree.delete(*my_tree.get_children())
                 s_set=cur.execute("SELECT a.name, a.user_id, a.email, b.subject1, b.subject2, b.subject3, b.subject4 FROM userdata a, usersubjects b WHERE a.usertype='Student' AND a.user_id = b.user_id;")
                 s_set=cur.fetchall()
                 for rec in s_set:
                     my_tree.insert("", tk.END, values=row)
+                con.commit()
+                con.close()
         
         self.searchstud_btn=Button(self,image=self.searchstud_icon, cursor='hand2',command=search_stud)
         self.searchstud_btn.place(x=1195, y=168)
@@ -1049,6 +1054,7 @@ class BooksView(tk.Frame):
                     cur.execute(insert_bookrecord,data)
 
                     con.commit()
+                    con.close()
                     messagebox.showinfo('Register', 'Book Added Successfully!')
                     wraptxt1= textwrap.fill(book_name, width=20)
                     wraptxt2= textwrap.fill(book_file, width=22)
@@ -1182,11 +1188,34 @@ class QuizAdmin(tk.Frame):
         self.quiz_tv.column('#0', width=435, minwidth=435)
         self.quiz_tv.heading('#0', text='Quiz Chapters', anchor=W)
 
+        #show distinct chapters in treeview
+        def show_quizchp(e):
+            if self.quiz_subjsel.get()=='Select':
+                #show blank treeview
+                self.quiz_tv.delete(*self.quiz_tv.get_children())
+
+            else:
+                #connect to db
+                con = mysql.connector.connect(host='localhost', 
+                                            user='root', 
+                                            password='rootpass', 
+                                            database='all2')
+                cur = con.cursor()
+                s_set=cur.execute('''SELECT DISTINCT chap_name FROM quiz WHERE subj_name=%s''', (self.quiz_subjsel.get(),))
+                s_set=cur.fetchall()
+                for row in s_set:
+                    self.quiz_tv.insert('',tk.END, text='Chapter ' +(row[0]))
+                con.commit()
+                con.close()
         
-        #quiz questions frame
-        self.quizques_frame=Frame(self, bg='white',  width=695, height=420, relief=SOLID, bd=2)
-        self.quizques_frame.place(x=583, y=240)
-        self.quizques_frame.grid_propagate(False)
+        #show quiz chapters in treeview first
+        show_quizchp(e=None)
+        self.quiz_subjsel.bind('<<ComboboxSelected>>', show_quizchp)
+        
+        #quiz questions frame and add quiz frame func prototypes
+        self.quizques_frame=Frame(self, bg='white',  width=720, height=420, relief=SOLID, bd=2)
+        self.addquiz_frame=Frame(self, bg=bgc, width=450, height=300, relief=SOLID, bd=2)
+
 
         #fix frame row and column size
         self.quizques_frame.rowconfigure(1, weight=1)
@@ -1201,7 +1230,7 @@ class QuizAdmin(tk.Frame):
         self.quiz_chapter_title=Label(self.quizques_frame, text=empty_text, font=('Arial', 19,'bold'), bg='white')   
         self.quiz_chapter_title.grid(row=0, column=0, pady=10, padx=10, columnspan=3)
 
-        self.quiz_question=Label(self.quizques_frame, text=empty_text, font=f3, bg='white', wraplength=700)
+        self.quiz_question=Label(self.quizques_frame, text=empty_text, font=f3, bg='white', wraplength=655)
         self.quiz_question.grid(row=1, column=0, pady=10, padx=10, columnspan=3)
 
         self.quiz_option1=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white', cursor='hand2', variable=selected_option, value='A', tristatevalue=0)
@@ -1218,128 +1247,11 @@ class QuizAdmin(tk.Frame):
         self.quiz_option4.grid(row=5, column=1, pady=10, padx=10, sticky=W, columnspan=3)
 
 
-
-        #show distinct chapters in treeview
-        def show_quizchp(e):
-            if self.quiz_subjsel.get()=='Select':
-                #show blank treeview
-                self.quiz_tv.delete(*self.quiz_tv.get_children())
-
-            else:
-                #connect to db
-                con = mysql.connector.connect(host='localhost', 
-                                              user='root', 
-                                              password='rootpass', 
-                                              database='all2')
-                cur = con.cursor()
-                s_set=cur.execute('''SELECT DISTINCT chap_name FROM quiz WHERE subj_name=%s''', (self.quiz_subjsel.get(),))
-                s_set=cur.fetchall()
-                for row in s_set:
-                    self.quiz_tv.insert('',tk.END, text='Chapter ' +(row[0]))
-                con.commit()
-                con.close()
-        
-        #show quiz chapters in treeview first
-        show_quizchp(e=None)
-        self.quiz_subjsel.bind('<<ComboboxSelected>>', show_quizchp)
-
-
-        #bind event: user selects from treeview the quiz chapter, then quiz is shown in quiz frame, for loop  quiz questions from db, prev next btn
-        #show quiz questions in quiz frame
-        def show_quizques(e):
-            selected=self.quiz_tv.focus()
-            if selected:
-                self.values=self.quiz_tv.item(selected, 'text')
-                #connect to db
-                con = mysql.connector.connect(host='localhost', 
-                                            user='root', 
-                                            password='rootpass', 
-                                            database='all2')
-                cur = con.cursor()
-                self.q_set=cur.execute('''SELECT ques_title, opA, opB, opC, opD, correct_op FROM quiz WHERE chap_name=%s''', (self.values.replace("Chapter ", ""),))
-                self.q_set=cur.fetchall()
-
-
-                self.ques_num=0
-                self.quiz_chapter_title.config(text=self.values)
-                self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
-                self.quiz_option1.config(text=self.q_set[self.ques_num][1])
-                self.quiz_option2.config(text=self.q_set[self.ques_num][2])
-                self.quiz_option3.config(text=self.q_set[self.ques_num][3])
-                self.quiz_option4.config(text=self.q_set[self.ques_num][4])
-                con.commit()
-            
-            else: #show default
-                self.values=self.quiz_tv.item(self.quiz_tv.get_children()[0], 'text')
-
-                con = mysql.connector.connect(host='localhost', 
-                                            user='root', 
-                                            password='rootpass', 
-                                            database='all2')
-
-                cur = con.cursor()
-                self.q_set=cur.execute('''SELECT ques_title, opA, opB, opC, opD, correct_op FROM quiz WHERE chap_name=%s''', (self.values.replace("Chapter ", ""),))
-                self.q_set=cur.fetchall()
-
-                self.ques_num=0
-                self.quiz_chapter_title.config(text=self.values)
-                self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
-                self.quiz_option1.config(text=self.q_set[self.ques_num][1])
-                self.quiz_option2.config(text=self.q_set[self.ques_num][2])
-                self.quiz_option3.config(text=self.q_set[self.ques_num][3])
-                self.quiz_option4.config(text=self.q_set[self.ques_num][4])
-                con.commit()
-
-        self.quiz_tv.bind('<ButtonRelease-1>', show_quizques)
-
-        #show quiz by default
-        show_quizques(e=None)
-
-        self.quiz_score= 0
-        q_truefalse_set=[]
-        ##show quiz results to user, show score, true false and percentage in messagebox
-        def quiz_result():
-            self.user_ans= selected_option.get()
-            if self.user_ans==self.q_set[self.ques_num][5]:
-                self.quiz_score+=1
-                q_truefalse_set.append('Question '+str(self.ques_num)+': Correct')
-            else:
-                q_truefalse_set.append('Question '+str(self.ques_num)+': Incorrect')
-
-            score = str(self.quiz_score)+'/'+str(len(self.q_set))
-
-            #print each question is true or false in messagebox
-            ans_str=''
-            for i in range(len(q_truefalse_set)):
-                ans_str+= q_truefalse_set[i]+'\n'
-                
-            
-
-            tk.messagebox.showinfo('Quiz Result', 'Your score is: '+score+'\nResults: \n'+ ans_str)
-            #reset quiz
-            self.quiz_score=0
-            self.ques_num=0
-            self.quiz_chapter_title.config(text=self.values)
-            self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
-            self.quiz_option1.config(text=self.q_set[self.ques_num][1])
-            self.quiz_option2.config(text=self.q_set[self.ques_num][2])
-            self.quiz_option3.config(text=self.q_set[self.ques_num][3])
-            self.quiz_option4.config(text=self.q_set[self.ques_num][4])
-            self.quiz_next_btn.config(text='Next')
-            self.quiz_next_btn.config(command=next_ques)
-            self.quiz_prev_btn.config(state=DISABLED)
-            self.quiz_ques_num.config(text='Question '+str(self.ques_num+1)+'/'+str(len(self.q_set)))
-
         #next question
         def next_ques():
             #count score first
             self.user_ans= selected_option.get()
-            if self.user_ans==self.q_set[self.ques_num][5]:
-                self.quiz_score+=1
-                q_truefalse_set.append('Question '+str(self.ques_num)+': Correct')
-            else:
-                q_truefalse_set.append('Question '+str(self.ques_num)+': Incorrect')
-
+            selected_option.set(None)
 
             if self.ques_num < (len(self.q_set)-1):
                 self.ques_num+=1
@@ -1362,6 +1274,7 @@ class QuizAdmin(tk.Frame):
 
 
         def prev_ques():
+            selected_option.set(None)
             if self.ques_num > 0:
                     self.ques_num -= 1
             if self.ques_num == 0:
@@ -1380,34 +1293,106 @@ class QuizAdmin(tk.Frame):
             self.quiz_option4.config(text=self.q_set[self.ques_num][4])
             self.quiz_ques_num.config(text='Question '+str(self.ques_num+1)+'/'+str(len(self.q_set)))
 
-        self.quiz_prev_btn=Button(self.quizques_frame, text='Previous', font=f3, relief=SOLID, cursor='hand2', width=10, command=prev_ques, state=DISABLED)
-        self.quiz_prev_btn.grid(row=6, column=0, pady=10, padx=10, sticky=W)
 
-        self.quiz_next_btn=Button(self.quizques_frame, text='Next', font=f3, relief=SOLID, cursor='hand2', width=10, command=next_ques)
-        self.quiz_next_btn.grid(row=6, column=2, pady=10, padx=10)
+        #bind event: user selects from treeview the quiz chapter, then quiz is shown in quiz frame, for loop  quiz questions from db, prev next btn
+        #show quiz questions in quiz frame
+        def show_quizques(e):
+            selected=self.quiz_tv.focus()
+            if selected:
+                self.values=self.quiz_tv.item(selected, 'text')
+                self.quizques_frame.place(x=583, y=240)
+                self.quizques_frame.grid_propagate(False)
+                self.addquiz_frame.place_forget()
+                #connect to db
+                con = mysql.connector.connect(host='localhost', 
+                                            user='root', 
+                                            password='rootpass', 
+                                            database='all2')
+                cur = con.cursor()
+                self.q_set=cur.execute('''SELECT ques_title, opA, opB, opC, opD, correct_op FROM quiz WHERE chap_name=%s''', (self.values.replace("Chapter ", ""),))
+                self.q_set=cur.fetchall()
 
 
-        #show current question 1/5
-        self.quiz_ques_num=Label(self.quizques_frame, text='Question '+str(self.ques_num+1)+'/'+str(len(self.q_set)), font=f3, bg='white')
-        self.quiz_ques_num.grid(row=6, column=1, pady=10, padx=10, sticky=W)
+                self.ques_num=0
+                self.quiz_chapter_title.config(text=self.values)
+                self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
+                self.quiz_option1.config(text=self.q_set[self.ques_num][1])
+                self.quiz_option2.config(text=self.q_set[self.ques_num][2])
+                self.quiz_option3.config(text=self.q_set[self.ques_num][3])
+                self.quiz_option4.config(text=self.q_set[self.ques_num][4])
+                con.commit()
+            
+            else: #show default
+                self.values=self.quiz_tv.item(self.quiz_tv.get_children()[0], 'text')
+                self.quizques_frame.place(x=583, y=240)
+                self.quizques_frame.grid_propagate(False)
 
+                con = mysql.connector.connect(host='localhost', 
+                                            user='root', 
+                                            password='rootpass', 
+                                            database='all2')
 
-        #add quiz popup
-        def addquiz_popup():
-            self.addquiz_popup=Toplevel()
-            self.addquiz_popup.title('Add Quiz')
-            # self.addquiz_popup.geometry('400x300+500+200')
-            self.addquiz_popup.resizable(False, False)
-            self.addquiz_popup.focus_force()
+                cur = con.cursor()
+                self.q_set=cur.execute('''SELECT ques_title, opA, opB, opC, opD, correct_op FROM quiz WHERE chap_name=%s''', (self.values.replace("Chapter ", ""),))
+                self.q_set=cur.fetchall()
 
-            self.addquiz_popup_frame=Frame(self.addquiz_popup)
-            self.addquiz_popup_frame.pack()
+                self.ques_num=0
+                self.quiz_chapter_title.config(text=self.values)
+                self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
+                self.quiz_option1.config(text=self.q_set[self.ques_num][1])
+                self.quiz_option2.config(text=self.q_set[self.ques_num][2])
+                self.quiz_option3.config(text=self.q_set[self.ques_num][3])
+                self.quiz_option4.config(text=self.q_set[self.ques_num][4])
+                con.commit()
+
+            self.quiz_prev_btn=Button(self.quizques_frame, text='Previous', font=f3, relief=SOLID, cursor='hand2', width=10, command=prev_ques, state=DISABLED)
+            self.quiz_prev_btn.grid(row=6, column=0, pady=10, padx=10, sticky=W)
+
+            self.quiz_next_btn=Button(self.quizques_frame, text='Next', font=f3, relief=SOLID, cursor='hand2', width=10, command=next_ques)
+            self.quiz_next_btn.grid(row=6, column=2, pady=10, padx=10)
+
+            #show current question 1/5
+            self.quiz_ques_num=Label(self.quizques_frame, text='Question '+str(self.ques_num+1)+'/'+str(len(self.q_set)), font=f3, bg='white')
+            self.quiz_ques_num.grid(row=6, column=1, pady=10, padx=10, sticky=W)
+
+        #show quiz by default
+        show_quizques(e=None)
+        self.quiz_tv.bind('<ButtonRelease-1>', show_quizques)
+
+         
+
+        self.quiz_score= 0
+        ##show quiz results to user, show score, true false and percentage in messagebox
+        def quiz_result():
+            self.user_ans= selected_option.get()
+
+            score = str(self.quiz_score)+'/'+str(len(self.q_set))
+
+            tk.messagebox.showinfo('Quiz Result', 'Your score is: '+score+'\n')
+            #reset quiz
+            self.quiz_score=0
+            self.ques_num=0
+            self.quiz_chapter_title.config(text=self.values)
+            self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
+            self.quiz_option1.config(text=self.q_set[self.ques_num][1])
+            self.quiz_option2.config(text=self.q_set[self.ques_num][2])
+            self.quiz_option3.config(text=self.q_set[self.ques_num][3])
+            self.quiz_option4.config(text=self.q_set[self.ques_num][4])
+            self.quiz_next_btn.config(text='Next')
+            self.quiz_next_btn.config(command=next_ques)
+            self.quiz_prev_btn.config(state=DISABLED)
+            self.quiz_ques_num.config(text='Question '+str(self.ques_num+1)+'/'+str(len(self.q_set)))
+
+        #add quiz frame
+        def add_quiz_frame():
+            self.addquiz_frame.place(x=685, y=153)
+            self.quizques_frame.place_forget()
 
             #connect to db
             con = mysql.connector.connect(host='localhost', 
-                                          user='root', 
-                                          password='rootpass', 
-                                          database='all2')
+                                            user='root', 
+                                            password='rootpass', 
+                                            database='all2')
             cur = con.cursor()
             cur.execute('''CREATE TABLE IF NOT EXISTS quiz(idquiz INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
                                                             subj_name VARCHAR(45) NOT NULL,
@@ -1421,70 +1406,65 @@ class QuizAdmin(tk.Frame):
             con.commit()
 
 
-            self.addquiz_popup_label=Label(self.addquiz_popup_frame, text='Add Quiz', font=('Arial', 20, 'bold') )
-            self.addquiz_popup_label.grid(row=0, column=0, pady=10, padx=10, columnspan=2)
+            self.addquizlabel=Label(self.addquiz_frame, text='Add Quiz', font=('Arial', 20, 'bold'), bg=bgc )
+            self.addquizlabel.grid(row=0, column=0, pady=10, padx=10, columnspan=2, sticky=E)
 
-            self.subjsel_label=Label(self.addquiz_popup_frame, text='Subject', font=f3)
+            self.subjsel_label=Label(self.addquiz_frame, text='Subject', font=f3, bg=bgc)
             self.subjsel_label.grid(row=1, column=0, pady=10, padx=10, sticky=W)
 
-            self.subjsel_combo=ttk.Combobox(self.addquiz_popup_frame, font=f3, width=26, values=['Select', 'Computer Architecture & Networks'], state='readonly')
+            self.subjsel_combo=ttk.Combobox(self.addquiz_frame, font=f3, width=26, values=['Select', 'Computer Architecture & Networks'], state='readonly')
             self.subjsel_combo.current(1)
             self.subjsel_combo.grid(row=1, column=1, pady=10, columnspan=2)
 
-            self.chapter_label=Label(self.addquiz_popup_frame, text='Chapter', font=f)
+            self.chapter_label=Label(self.addquiz_frame, text='Chapter', font=f3, bg=bgc)
             self.chapter_label.grid(row=2, column=0, pady=10, padx=10, sticky=W)
 
-            self.chapter_entry=Entry(self.addquiz_popup_frame, font=f, bd=2, width=26)
+            self.chapter_entry=Entry(self.addquiz_frame, font=f, bd=2, width=26)
             self.chapter_entry.grid(row=2, column=1, pady=10, padx=10, sticky=W, columnspan=2)
 
             #get no. of questions from user then for loop to create entry boxes, then add into db
-            self.noq_label=Label(self.addquiz_popup_frame, text='No. of Questions', font=f3)
+            self.noq_label=Label(self.addquiz_frame, text='No. of Questions', font=f3, bg=bgc)
             self.noq_label.grid(row=3, column=0, pady=10, padx=10, sticky=W)
 
-            self.noq_cb=ttk.Combobox(self.addquiz_popup_frame, font=f3, values=questions, width=8, state='readonly')
+            self.noq_cb=ttk.Combobox(self.addquiz_frame, font=f3, values=questions, width=8, state='readonly')
             self.noq_cb.grid(row=3, column=1, pady=10, padx=10, sticky=W, columnspan=2)
 
-            
-
-
-
             #questiontitle with question counter
-            self.questitle_lbl=Label(self.addquiz_popup_frame, text='Question', font=f3)
+            self.questitle_lbl=Label(self.addquiz_frame, text='Question', font=f3, bg=bgc)
             self.questitle_lbl.grid(row=4, column=0, pady=10, padx=10, sticky=W)
 
-            self.questitle_entry=Text(self.addquiz_popup_frame, font=f, bd=2, height=4, width=26, wrap=WORD)
+            self.questitle_entry=Text(self.addquiz_frame, font=f, bd=2, height=3,width=26, wrap=WORD)
             self.questitle_entry.grid(row=4, column=1, pady=10, padx=10, sticky=W, columnspan=2)
 
-            self.opA_label=Label(self.addquiz_popup_frame, text='Option A', font=f3)
+            self.opA_label=Label(self.addquiz_frame, text='Option A', font=f3, bg=bgc)
             self.opA_label.grid(row=5, column=0, pady=10, padx=10, sticky=W)
 
-            self.opA_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
+            self.opA_entry=Entry(self.addquiz_frame, font=f3, bd=2)
             self.opA_entry.grid(row=5, column=1, pady=10, padx=10, sticky=W, columnspan=2)
 
-            self.opB_label=Label(self.addquiz_popup_frame, text='Option B', font=f3)
+            self.opB_label=Label(self.addquiz_frame, text='Option B', font=f3, bg=bgc)
             self.opB_label.grid(row=6, column=0, pady=10, padx=10, sticky=W)
 
-            self.opB_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
+            self.opB_entry=Entry(self.addquiz_frame, font=f3, bd=2)
             self.opB_entry.grid(row=6, column=1, pady=10, padx=10, sticky=W, columnspan=2)
 
-            self.opC_label=Label(self.addquiz_popup_frame, text='Option C', font=f3)
+            self.opC_label=Label(self.addquiz_frame, text='Option C', font=f3, bg=bgc)
             self.opC_label.grid(row=7, column=0, pady=10, padx=10, sticky=W)
 
-            self.opC_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
+            self.opC_entry=Entry(self.addquiz_frame, font=f3, bd=2)
             self.opC_entry.grid(row=7, column=1, pady=10, padx=10, sticky=W, columnspan=2)
 
-            self.opD_label=Label(self.addquiz_popup_frame, text='Option D', font=f3)
+            self.opD_label=Label(self.addquiz_frame, text='Option D', font=f3, bg=bgc)
             self.opD_label.grid(row=8, column=0, pady=10, padx=10, sticky=W)
 
-            self.opD_entry=Entry(self.addquiz_popup_frame, font=f3, bd=2)
+            self.opD_entry=Entry(self.addquiz_frame, font=f3, bd=2)
             self.opD_entry.grid(row=8, column=1, pady=10, padx=10, sticky=W, columnspan=2)
 
-            self.correctop_label=Label(self.addquiz_popup_frame, text='Correct Option', font=f3)
+            self.correctop_label=Label(self.addquiz_frame, text='Correct Option', font=f3, bg=bgc)
             self.correctop_label.grid(row=9, column=0, pady=10, padx=10, sticky=W)
 
-            self.correctop_entry=ttk.Combobox(self.addquiz_popup_frame, font=f3, values=options, width=8, state='readonly')
+            self.correctop_entry=ttk.Combobox(self.addquiz_frame, font=f3, values=options, width=8, state='readonly')
             self.correctop_entry.grid(row=9, column=1, pady=10, padx=10, sticky=W, columnspan=2)
-
 
 
             self.ques_titles=[]
@@ -1497,10 +1477,6 @@ class QuizAdmin(tk.Frame):
             def ques_cb_selected(event):
                 self.ques_no=1
                 self.questitle_lbl.config(text='Question '+str(self.ques_no))
-                print(self.ques_no)
-
-
-
 
             #next btn to add quiz title (if questions more than user entry then disable btn)
             def next():
@@ -1512,8 +1488,6 @@ class QuizAdmin(tk.Frame):
                 else:
                     self.nextques_btn.config(state=NORMAL)
                     self.prevques_btn.config(state=NORMAL)
-
-                    
 
                 self.questitle_lbl.config(text='Question '+str(self.ques_no))
                 #get entries if previously entered by user, if not then append user entry to list
@@ -1533,7 +1507,6 @@ class QuizAdmin(tk.Frame):
                     self.opD.insert(0, self.opD[self.ques_no-1])
                     self.correctop.insert(0, self.correctop[self.ques_no-1])
 
-                
                 else:
                     self.ques_titles.append(self.questitle_entry.get('1.0', 'end-1c'))
                     self.opA.append(self.opA_entry.get())
@@ -1549,8 +1522,6 @@ class QuizAdmin(tk.Frame):
                     self.opC_entry.delete(0, END)
                     self.opD_entry.delete(0, END)
                     self.correctop_entry.set('')
-                print(self.ques_no)
-
                 
 
             #previous btn 
@@ -1579,20 +1550,17 @@ class QuizAdmin(tk.Frame):
                 self.opC_entry.insert(0, self.opC[self.ques_no-1])
                 self.opD_entry.insert(0, self.opD[self.ques_no-1])
                 self.correctop_entry.set(self.correctop[self.ques_no-1])
-
-                print(self.ques_no)
-
             
             #bind combo selected event
             self.noq_cb.bind('<<ComboboxSelected>>', ques_cb_selected)
 
 
             #previous question btn  #if first question then disable
-            self.prevques_btn=Button(self.addquiz_popup_frame, text='Previous', font=f, relief=SOLID, width=7,cursor='hand2', command=previous, state=DISABLED)
+            self.prevques_btn=Button(self.addquiz_frame, text='Previous', font=f, relief=SOLID, width=7,cursor='hand2', command=previous, state=DISABLED)
             self.prevques_btn.grid(row=10, column=0, pady=10, padx=10,  sticky=W)
             
             #next question btn
-            self.nextques_btn=Button(self.addquiz_popup_frame, text='Next', font=f, relief=SOLID, width=7,cursor='hand2', command=next)
+            self.nextques_btn=Button(self.addquiz_frame, text='Next', font=f, relief=SOLID, width=7,cursor='hand2', command=next)
             self.nextques_btn.grid(row=10, column=2, pady=10, padx=10,  sticky=W)
 
             def add_quiz():
@@ -1626,14 +1594,7 @@ class QuizAdmin(tk.Frame):
                     self.opD.clear()
                     self.correctop.clear()
 
-                #close window after add
-                self.addquiz_popup.destroy()
-                
-
-
-
-
-            self.addquiz_btn=Button(self.addquiz_popup_frame, text='Add', font=f3, relief=SOLID, width=10,cursor='hand2', command=add_quiz)
+            self.addquiz_btn=Button(self.addquiz_frame, text='Add', font=f3, relief=SOLID, width=10,cursor='hand2', command=add_quiz)
             self.addquiz_btn.grid(row=10, column=1, pady=10, padx=10, sticky=W)
 
         #delete quiz popup
@@ -1642,7 +1603,7 @@ class QuizAdmin(tk.Frame):
         self.quiz_btn_frame=Frame(self, bg=bgc, width=800, height=400)
         self.quiz_btn_frame.place(x=40, y=650)
 
-        self.addquiz_btn=Button(self.quiz_btn_frame, text='Add Quiz', font=f3, relief=SOLID, cursor='hand2', command=addquiz_popup)
+        self.addquiz_btn=Button(self.quiz_btn_frame, text='Add Quiz', font=f3, relief=SOLID, cursor='hand2', command=add_quiz_frame)
         self.addquiz_btn.grid(row=0, column=0, sticky=W, pady=10, padx=65)
 
         self.deletequiz_btn=Button(self.quiz_btn_frame, text='Delete Quiz', font=f3, relief=SOLID, cursor='hand2')
@@ -1905,9 +1866,7 @@ class CourseMaterials(tk.Frame):
             con = mysql.connector.connect(host="localhost", user="root", password="rootpass", database="all2")
             cur = con.cursor()
             file=cur.execute("SELECT material_file FROM coursematerials WHERE material_name=%s", (values,))
-            file=cur.fetchone()
-
-            
+            file=cur.fetchone()         
 
             #show pdf
             if file:
@@ -2529,6 +2488,7 @@ class Quiz(tk.Frame):
                 self.quiz_option3.config(text=self.q_set[self.ques_num][3])
                 self.quiz_option4.config(text=self.q_set[self.ques_num][4])
                 con.commit()
+                con.close()
             
             else: #show default
                 self.values=self.quiz_tv.item(self.quiz_tv.get_children()[0], 'text')
@@ -2550,6 +2510,7 @@ class Quiz(tk.Frame):
                 self.quiz_option3.config(text=self.q_set[self.ques_num][3])
                 self.quiz_option4.config(text=self.q_set[self.ques_num][4])
                 con.commit()
+                con.close()
 
         self.quiz_tv.bind('<ButtonRelease-1>', show_quizques)
 
