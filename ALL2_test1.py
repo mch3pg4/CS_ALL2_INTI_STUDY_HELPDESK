@@ -1192,6 +1192,9 @@ class QuizAdmin(tk.Frame):
         self.quizques_frame.rowconfigure(1, weight=1)
         self.quizques_frame.columnconfigure(0, weight=1)
         self.quizques_frame.columnconfigure(1, weight=1)
+
+        #radiobutton selected option variable definition
+        selected_option=StringVar()
         
 
         #quiz chapter title, 1 question, 4 options, previous, next btns
@@ -1201,17 +1204,17 @@ class QuizAdmin(tk.Frame):
         self.quiz_question=Label(self.quizques_frame, text=empty_text, font=f3, bg='white', wraplength=700)
         self.quiz_question.grid(row=1, column=0, pady=10, padx=10, columnspan=3)
 
-        self.quiz_option1=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white', cursor='hand2')
+        self.quiz_option1=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white', cursor='hand2', variable=selected_option, value='A', tristatevalue=0)
         self.quiz_option1.grid(row=2, column=1, pady=10, padx=10, sticky=W, columnspan=3)
 
-        self.quiz_option2=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white', cursor='hand2')
+        self.quiz_option2=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white', cursor='hand2', variable=selected_option, value='B', tristatevalue=0)
         self.quiz_option2.grid(row=3, column=1, pady=10, padx=10, sticky=W, columnspan=3)
 
 
-        self.quiz_option3=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white',  cursor='hand2')
+        self.quiz_option3=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white',  cursor='hand2', variable=selected_option, value='C', tristatevalue=0)
         self.quiz_option3.grid(row=4, column=1, pady=10, padx=10, sticky=W, columnspan=3)
 
-        self.quiz_option4=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white', cursor='hand2')
+        self.quiz_option4=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white', cursor='hand2', variable=selected_option, value='D', tristatevalue=0)
         self.quiz_option4.grid(row=5, column=1, pady=10, padx=10, sticky=W, columnspan=3)
 
 
@@ -1292,15 +1295,62 @@ class QuizAdmin(tk.Frame):
         #show quiz by default
         show_quizques(e=None)
 
+        self.quiz_score= 0
+        q_truefalse_set=[]
+        ##show quiz results to user, show score, true false and percentage in messagebox
+        def quiz_result():
+            self.user_ans= selected_option.get()
+            if self.user_ans==self.q_set[self.ques_num][5]:
+                self.quiz_score+=1
+                q_truefalse_set.append('Question '+str(self.ques_num)+': Correct')
+            else:
+                q_truefalse_set.append('Question '+str(self.ques_num)+': Incorrect')
+
+            score = str(self.quiz_score)+'/'+str(len(self.q_set))
+
+            #print each question is true or false in messagebox
+            ans_str=''
+            for i in range(len(q_truefalse_set)):
+                ans_str+= q_truefalse_set[i]+'\n'
+                
+            
+
+            tk.messagebox.showinfo('Quiz Result', 'Your score is: '+score+'\nResults: \n'+ ans_str)
+            #reset quiz
+            self.quiz_score=0
+            self.ques_num=0
+            self.quiz_chapter_title.config(text=self.values)
+            self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
+            self.quiz_option1.config(text=self.q_set[self.ques_num][1])
+            self.quiz_option2.config(text=self.q_set[self.ques_num][2])
+            self.quiz_option3.config(text=self.q_set[self.ques_num][3])
+            self.quiz_option4.config(text=self.q_set[self.ques_num][4])
+            self.quiz_next_btn.config(text='Next')
+            self.quiz_next_btn.config(command=next_ques)
+            self.quiz_prev_btn.config(state=DISABLED)
+            self.quiz_ques_num.config(text='Question '+str(self.ques_num+1)+'/'+str(len(self.q_set)))
+
         #next question
         def next_ques():
+            #count score first
+            self.user_ans= selected_option.get()
+            if self.user_ans==self.q_set[self.ques_num][5]:
+                self.quiz_score+=1
+                q_truefalse_set.append('Question '+str(self.ques_num)+': Correct')
+            else:
+                q_truefalse_set.append('Question '+str(self.ques_num)+': Incorrect')
+
+
             if self.ques_num < (len(self.q_set)-1):
                 self.ques_num+=1
             if self.ques_num == (len(self.q_set)-1):
-                self.quiz_next_btn.config(state=DISABLED)
+                # self.quiz_next_btn.config(state=DISABLED)
+                self.quiz_next_btn.config(text='Done')
+                self.quiz_next_btn.config(command=quiz_result)
             else:
                 self.quiz_next_btn.config(state=NORMAL)
                 self.quiz_prev_btn.config(state=NORMAL)
+            
 
             self.quiz_chapter_title.config(text=self.values)
             self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
@@ -1308,6 +1358,7 @@ class QuizAdmin(tk.Frame):
             self.quiz_option2.config(text=self.q_set[self.ques_num][2])
             self.quiz_option3.config(text=self.q_set[self.ques_num][3])
             self.quiz_option4.config(text=self.q_set[self.ques_num][4])
+            self.quiz_ques_num.config(text='Question '+str(self.ques_num+1)+'/'+str(len(self.q_set)))
 
 
         def prev_ques():
@@ -1318,6 +1369,8 @@ class QuizAdmin(tk.Frame):
             else:
                 self.quiz_prev_btn.config(state=NORMAL)
                 self.quiz_next_btn.config(state=NORMAL)
+                self.quiz_next_btn.config(text='Next')
+                self.quiz_next_btn.config(command=next_ques)
 
             self.quiz_chapter_title.config(text=self.values)
             self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
@@ -1325,18 +1378,18 @@ class QuizAdmin(tk.Frame):
             self.quiz_option2.config(text=self.q_set[self.ques_num][2])
             self.quiz_option3.config(text=self.q_set[self.ques_num][3])
             self.quiz_option4.config(text=self.q_set[self.ques_num][4])
+            self.quiz_ques_num.config(text='Question '+str(self.ques_num+1)+'/'+str(len(self.q_set)))
 
-        self.quiz_prev_btn=Button(self.quizques_frame, text='Previous', font=f3, relief=SOLID, cursor='hand2', width=10, command=prev_ques)
-        self.quiz_prev_btn.grid(row=6, column=0, pady=10, padx=10, sticky=W, columnspan=3)
+        self.quiz_prev_btn=Button(self.quizques_frame, text='Previous', font=f3, relief=SOLID, cursor='hand2', width=10, command=prev_ques, state=DISABLED)
+        self.quiz_prev_btn.grid(row=6, column=0, pady=10, padx=10, sticky=W)
 
         self.quiz_next_btn=Button(self.quizques_frame, text='Next', font=f3, relief=SOLID, cursor='hand2', width=10, command=next_ques)
-        self.quiz_next_btn.grid(row=6, column=2, pady=10, padx=10, sticky=E, columnspan=3)
+        self.quiz_next_btn.grid(row=6, column=2, pady=10, padx=10)
 
 
         #show current question 1/5
-        #show quiz results to user, show score and percentage
-
-        
+        self.quiz_ques_num=Label(self.quizques_frame, text='Question '+str(self.ques_num+1)+'/'+str(len(self.q_set)), font=f3, bg='white')
+        self.quiz_ques_num.grid(row=6, column=1, pady=10, padx=10, sticky=W)
 
 
         #add quiz popup
@@ -1583,7 +1636,6 @@ class QuizAdmin(tk.Frame):
             self.addquiz_btn=Button(self.addquiz_popup_frame, text='Add', font=f3, relief=SOLID, width=10,cursor='hand2', command=add_quiz)
             self.addquiz_btn.grid(row=10, column=1, pady=10, padx=10, sticky=W)
 
-
         #delete quiz popup
 
         #quiz add, delete btns
@@ -1595,8 +1647,6 @@ class QuizAdmin(tk.Frame):
 
         self.deletequiz_btn=Button(self.quiz_btn_frame, text='Delete Quiz', font=f3, relief=SOLID, cursor='hand2')
         self.deletequiz_btn.grid(row=0, column=1, sticky=W, pady=10, padx=10)
-
-        
 
 
 
@@ -2540,7 +2590,7 @@ class Quiz(tk.Frame):
             self.quiz_option3.config(text=self.q_set[self.ques_num][3])
             self.quiz_option4.config(text=self.q_set[self.ques_num][4])
 
-        self.quiz_prev_btn=Button(self.quizques_frame, text='Previous', font=f3, relief=SOLID, cursor='hand2', width=10, command=prev_ques)
+        self.quiz_prev_btn=Button(self.quizques_frame, text='Previous', font=f3, relief=SOLID, cursor='hand2', width=10, command=prev_ques, state=DISABLED)
         self.quiz_prev_btn.grid(row=6, column=0, pady=10, padx=10, sticky=W, columnspan=3)
 
         self.quiz_next_btn=Button(self.quizques_frame, text='Next', font=f3, relief=SOLID, cursor='hand2', width=10, command=next_ques)
