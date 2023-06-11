@@ -100,6 +100,19 @@ def collapse_tv(tree):
     for node in tree.get_children():
         tree.item(node, open=False)
 
+#appointments page btn
+def view_appt(self, frame, controller):
+    image=Image.open('images\\notification.png')
+    img=image.resize((50,50))
+    my_img=ImageTk.PhotoImage(img)
+    noti_icon=Label(image=my_img)
+    noti_icon.image=my_img
+
+    appt_btn=tk.Button(self,image=my_img, cursor='hand2', command=lambda:controller.show_frame(frame))
+    appt_btn.place(x=1150, y=5)
+    ToolTip(appt_btn, msg='Appointments & Notifications')
+
+
 #view as student button
 def view_user(self, frame, controller):
     image=Image.open('images\\student.png')
@@ -111,6 +124,8 @@ def view_user(self, frame, controller):
     viewuser_btn=tk.Button(self,image=my_img, cursor='hand2', command=lambda:controller.show_frame(frame))
     viewuser_btn.place(x=1225, y=5)
     ToolTip(viewuser_btn, msg='View as Student')
+
+
 
 #logout button 
 def log_out_btn(self, frame, controller):
