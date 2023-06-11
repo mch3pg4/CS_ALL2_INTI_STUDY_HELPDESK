@@ -21,6 +21,6 @@ Built with:
 - [ ] There must have a **function for students to fix an appointment with the lecturer**.
 - [ ] There must be a **chatbot function**.
 - [ ] The application should have a **function for students to do activities, quizzes and simple game**.
-- [ ] The application should have a **search button for the users to search words**.
+- [x] The application should have a **search button for the users to search words**.
 - [ ] **Include a form for the users to key in their problem** if they could not find the solution from the application. User should also must be **able to upload an image.**
 - [ ] You may add any other attractive functions such as **discussion platform, upload image/forms, interactive videos**
