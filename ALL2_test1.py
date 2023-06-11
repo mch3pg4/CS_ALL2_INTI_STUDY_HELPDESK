@@ -1,6 +1,6 @@
 import bcrypt, re, random, textwrap
 import datetime
-from tkcalendar import Calendar
+from tkcalendar import Calendar, DateEntry
 from tkinter import *
 from PIL import Image,ImageTk
 from tkinter import messagebox, ttk, filedialog,  Label, Entry, Button, END, scrolledtext
@@ -8,18 +8,20 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from time import strftime
 from datetime import date
+from dateutil.relativedelta import relativedelta
 import mysql.connector
 from mysql.connector import Error
 from captcha.image import ImageCaptcha
 from tktooltip import ToolTip
 from tkPDFViewer import tkPDFViewer as pdf
-from buttons import clockdate, ui_bg, log_out_btn, toggle_password, admin_btns, view_user, back_btn, expand_tv, collapse_tv
+from buttons import clockdate, ui_bg, log_out_btn, toggle_password, admin_btns, view_user, back_btn, expand_tv, collapse_tv, view_appt
 
 
 
 f=('Arial', 14)
 f2=('Arial', 12)
 f3=('Arial', 16)
+f4=('Arial', 18)
 bgc='#F9D3B9'
 empty_text='                                                                                             '
 
@@ -35,6 +37,8 @@ subjects=['Select','Computer Architecture & Networks', 'Objected Oriented Progra
 weeks=['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15']
 questions=['5', '10', '15']
 options=['A', 'B', 'C', 'D']
+hours=['09', '10', '11', '12', '13', '14', '15', '16']
+minutes=['00', '15', '30', '45']
 
 
 #top buttons
@@ -120,7 +124,7 @@ class App(tk.Tk):
         #create dictionary of frames
         self.frames={}
 
-        for F in (Loginpage, RegisterPage, RegisterCourses,Homepage, Subject1, Books, Quiz, Calculator, Chat, Profile, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments):
+        for F in (Loginpage, RegisterPage, RegisterCourses,Homepage, Subject1, Books, Quiz, Calculator, Chat,Appointments, Profile, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments):
             frame= F(container, self)
             #windows class act as root window for frames
             self.frames[F] = frame
@@ -875,18 +879,16 @@ class BooksView(tk.Frame):
         
         #upload book pdf file path
         def upload_bookfile():
-            global bookfile_path
-            bookfile_path=filedialog.askopenfilename(title='Select Book File', filetypes=(('PDF Files', '*.pdf'), ('All Files', '*.*')))
+            self.bookfile_path=filedialog.askopenfilename(title='Select Book File', filetypes=(('PDF Files', '*.pdf'), ('All Files', '*.*')))
             #change btn name to uploaded
-            if bookfile_path != "":
+            if self.bookfile_path != "":
                 self.bookfile_entry.config(text='Uploaded')
 
         #upload book cover image
         def upload_bookcover():
-            global bookcover_path
-            bookcover_path=filedialog.askopenfilename( title='Select Book Cover', filetypes=(('PNG Files', '*.png'), ('All Files', '*.*')))
+            self.bookcover_path=filedialog.askopenfilename( title='Select Book Cover', filetypes=(('PNG Files', '*.png'), ('All Files', '*.*')))
             #change btn name to uploaded
-            if bookcover_path != "":
+            if self.bookcover_path != "":
                 self.bookcover_entry.config(text='Uploaded')
 
         #book view label
@@ -1026,7 +1028,6 @@ class BooksView(tk.Frame):
         con.commit()
         #Add books
         def insert_books():
-            global bookfile_path, bookcover_path
             check_counter=0
             warn=" "
             #check if entries are empty
@@ -1046,8 +1047,8 @@ class BooksView(tk.Frame):
                     book_id= self.bookid_entry.get()
                     book_name= self.bookname_entry.get()
                     book_cat= self.bookcat_entry.get()
-                    book_file= bookfile_path
-                    book_cover= bookcover_path
+                    book_file= self.bookfile_path
+                    book_cover= self.bookcover_path
 
                     insert_bookrecord = ("INSERT INTO books(idbooks, bookname, bookcategory, bookfile, bookcover) VALUES (%s,%s,%s,%s,%s);")
                     data= (book_id, book_name, book_cat, book_file, book_cover)
@@ -1225,7 +1226,6 @@ class QuizAdmin(tk.Frame):
         #radiobutton selected option variable definition
         selected_option=StringVar()
         
-
         #quiz chapter title, 1 question, 4 options, previous, next btns
         self.quiz_chapter_title=Label(self.quizques_frame, text=empty_text, font=('Arial', 19,'bold'), bg='white')   
         self.quiz_chapter_title.grid(row=0, column=0, pady=10, padx=10, columnspan=3)
@@ -1763,17 +1763,16 @@ class CourseMaterials(tk.Frame):
             con.commit()
 
             def upload_materialfile():
-                global file_path
                 self.upload_file_btn.config(text='Upload File')
-                file_path = filedialog.askopenfilename(title="Select Course Material", filetypes=(("PDF Files", "*.pdf"), ("All Files", "*.*")))
+                self.file_path = filedialog.askopenfilename(title="Select Course Material", filetypes=(("PDF Files", "*.pdf"), ("All Files", "*.*")))
                 #change btn name to uploaded
-                if file_path != '' and not re.match(r'.*\.pdf', file_path):
+                if self.file_path != '' and not re.match(r'.*\.pdf', self.file_path):
                     self.upload_file_btn.config(text='Upload File')
                     self.file_entry.delete('1.0', END)
                     messagebox.showerror('Error', 'Please select a pdf file')
-                elif file_path != '' and re.match(r'.*\.pdf', file_path):
+                elif self.file_path != '' and re.match(r'.*\.pdf', self.file_path):
                     self.upload_file_btn.config(text='Uploaded')
-                    self.file_entry.insert(END, file_path)
+                    self.file_entry.insert(END, self.file_path)
 
             def add_material():
                 check_counter =0
@@ -1911,6 +1910,15 @@ class AdminAppointments(tk.Frame):
         course_materials_label=Label(self, text='Appointments', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
         course_materials_label.place(x=40, y=155)
 
+        #appointments treeview
+
+        #accept or reject appointment, leave a note if rejected
+
+        #reply to questions from students
+
+
+
+
 
 
 
@@ -1926,6 +1934,8 @@ class Homepage(tk.Frame):
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
+        #appointments page btn
+        view_appt(self, Appointments, controller)
         #logout btn
         log_out_btn(self, Loginpage, controller)
 
@@ -2100,6 +2110,8 @@ class Subject1(tk.Frame):
         clockdate(self)
         #back btn
         back_btn(self, Homepage, controller)
+        #appointments page btn
+        view_appt(self, Appointments, controller)
         #logout btn
         log_out_btn(self,Loginpage, controller)
 
@@ -2187,8 +2199,6 @@ class Subject1(tk.Frame):
         subj_tree.bind('<ButtonRelease-1>', show_material)
         
 
-
-
 class Books(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -2200,6 +2210,8 @@ class Books(tk.Frame):
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
+        #appointments page btn
+        view_appt(self, Appointments, controller)
         #logout btn
         log_out_btn(self, Loginpage, controller)
 
@@ -2350,10 +2362,6 @@ class Books(tk.Frame):
         self.searchbk_btn=Button(self.searchbtn_frame, image=self.search_icon , cursor='hand2', command=search_book)
         self.searchbk_btn.grid(row=0, column=2)
 
-                
-        
-
-
 
 class Quiz(tk.Frame):
     def __init__(self, parent, controller):
@@ -2365,6 +2373,8 @@ class Quiz(tk.Frame):
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
+        #appointments page btn
+        view_appt(self, Appointments, controller)
         #logout btn
         log_out_btn(self, Loginpage, controller)
 
@@ -2558,7 +2568,6 @@ class Quiz(tk.Frame):
         self.quiz_next_btn.grid(row=6, column=2, pady=10, padx=10, sticky=E, columnspan=3)
 
 
-
 class Calculator(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -2569,13 +2578,15 @@ class Calculator(tk.Frame):
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
+        #appointments page btn
+        view_appt(self, Appointments, controller)
         #logout btn
         log_out_btn(self, Loginpage, controller)
 
         #Calculator title
         w = Label(self, text ='Calculator', font = ('Arial', 28) , bg=bgc)
         w.pack()
-        w.place(x=585, y=100)
+        w.place(x=585, y=90)
 
         #calculator webview
 
@@ -2591,6 +2602,8 @@ class Chat(tk.Frame):
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
+        #appointments page btn
+        view_appt(self, Appointments, controller)
         #logout btn
         log_out_btn(self, Loginpage, controller)
 
@@ -2635,6 +2648,131 @@ class Chat(tk.Frame):
         self.send_btn.grid(row=0, column=1, padx=10, pady=5)
 
 
+class Appointments(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+
+        # ui_bg
+        ui_bg(self, img_file)
+        #top buttons
+        top_buttons(self,controller)
+        #show date and clock
+        clockdate(self)
+        #appointments page btn
+        view_appt(self, Appointments, controller)
+        #logout btn
+        log_out_btn(self, Loginpage, controller)
+
+        #Appointments Title
+        self.appt_lbl = Label(self, text ='Appointments', font = ('Arial', 28), bg=bgc)
+        self.appt_lbl.place(x=600, y=100)
+
+        #make an appointment frame
+        #name, email, student id, date, time, lecturer, description
+        self.make_appt_frame=Frame(self, width=500, height=500, bg=bgc, relief=SOLID, bd=2)
+        self.make_appt_frame.place(x=125, y=200)
+
+        self.make_appt_lbl=Label(self.make_appt_frame, text='Create Appointment', font=('Arial', 20), bg=bgc)
+        self.make_appt_lbl.grid(row=0, column=1, pady=10, padx=10, sticky=W, columnspan=5)
+
+        self.name_lbl=Label(self.make_appt_frame, text='Name', font=f, bg=bgc)
+        self.name_lbl.grid(row=1, column=0, pady=10, padx=10, sticky=W)
+
+        self.name_entry=Entry(self.make_appt_frame, font=f,  width=22)
+        self.name_entry.grid(row=1, column=1, pady=10, padx=10, sticky=W, columnspan=4)
+
+        self.email_lbl=Label(self.make_appt_frame, text='Email', font=f, bg=bgc)
+        self.email_lbl.grid(row=2, column=0, pady=10, padx=10, sticky=W)
+
+        self.email_entry=Entry(self.make_appt_frame, font=f,  width=22)
+        self.email_entry.grid(row=2, column=1, pady=10, padx=10, sticky=W, columnspan=4)
+
+        self.student_id_lbl=Label(self.make_appt_frame, text='Student ID', font=f, bg=bgc)
+        self.student_id_lbl.grid(row=3, column=0, pady=10, padx=10, sticky=W)
+
+        self.student_id_entry=Entry(self.make_appt_frame, font=f, width=22)
+        self.student_id_entry.grid(row=3, column=1, pady=10, padx=10, sticky=W, columnspan=4)
+
+        self.date_lbl=Label(self.make_appt_frame, text='Date', font=f, bg=bgc)
+        self.date_lbl.grid(row=4, column=0, pady=10, padx=10, sticky=W)
+
+        self.date_entry=DateEntry(self.make_appt_frame, font=f, relief=SOLID, bd=2,state='readonly', background='darkblue', foreground='white', mindate=date.today(), maxdate=date.today()+relativedelta(months=6), date_pattern='dd/mm/yyyy')
+        self.date_entry.grid(row=4, column=1, pady=10, padx=10, sticky=W, columnspan=4)
+
+        self.time_lbl=Label(self.make_appt_frame, text='Time', font=f, bg=bgc)
+        self.time_lbl.grid(row=5, column=0, pady=10, padx=10, sticky=W)
+
+        self.hr_entry=ttk.Combobox(self.make_appt_frame, font=f,width=5, state='readonly', values=hours)
+        self.hr_entry.grid(row=5, column=1, pady=10, padx=5)
+
+        self.hr_lbl=Label(self.make_appt_frame, text='Hours', font=f, bg=bgc)
+        self.hr_lbl.grid(row=5, column=2, pady=10, padx=5,sticky=W)
+
+        self.min_entry=ttk.Combobox(self.make_appt_frame, font=f,width=5, state='readonly', values=minutes)
+        self.min_entry.grid(row=5, column=3, pady=10, padx=5,sticky=W)
+
+        self.min_lbl=Label(self.make_appt_frame, text='Minutes', font=f, bg=bgc)
+        self.min_lbl.grid(row=5, column=4, pady=10, padx=5,sticky=W)
+
+        self.lecturer_lbl=Label(self.make_appt_frame, text='Lecturer', font=f, bg=bgc)
+        self.lecturer_lbl.grid(row=6, column=0, pady=10, padx=10, sticky=W)
+
+        self.lecturer_entry=ttk.Combobox(self.make_appt_frame, font=f, width=22, values=['Lect1', 'Lect2'], state='readonly')
+        self.lecturer_entry.grid(row=6, column=1, pady=10, padx=10, sticky=W, columnspan=4)
+
+        self.description_lbl=Label(self.make_appt_frame, text='Description', font=f, bg=bgc)
+        self.description_lbl.grid(row=7, column=0, pady=10, padx=10, sticky=W)
+
+        self.description_entry=Text(self.make_appt_frame, font=f, width=22, height=4, wrap=WORD)
+        self.description_entry.grid(row=7, column=1, pady=10, padx=10, sticky=W, columnspan=4)
+
+        self.submit_btn=Button(self.make_appt_frame, text='Submit', font=f, relief=SOLID, bd=2, cursor='hand2')
+        self.submit_btn.grid(row=8, column=2, pady=10, padx=10, columnspan=3, sticky=W)
+
+        #view appointments status frame, treeview
+        self.apptstat_lbl=Label(self, text='Appointment Status', font=('Arial', 20), bg=bgc)
+        self.apptstat_lbl.place(x=823, y=200)
+        
+        self.apptstat_frame=Frame(self, bg=bgc)
+        self.apptstat_frame.place(x=655, y=250)
+
+        #scrollbar
+        self.apptstat_scroll=Scrollbar(self.apptstat_frame)
+        self.apptstat_scroll.pack(side=RIGHT, fill=Y)
+
+        self.apptstat_tree=ttk.Treeview(self.apptstat_frame, yscrollcommand=self.apptstat_scroll.set, height=4)
+        self.apptstat_tree.pack()
+
+        self.apptstat_scroll.config(command=self.apptstat_tree.yview)
+
+        self.apptstat_tree['columns']= ('Date', 'Time', 'Lecturer', 'Status')
+
+        #format columns
+        self.apptstat_tree.column('#0', width=0, stretch=NO)
+        self.apptstat_tree.column('Date', anchor=CENTER, width=150, stretch=NO, minwidth=150)
+        self.apptstat_tree.column('Time', anchor=CENTER, width=100, stretch=NO, minwidth=100)
+        self.apptstat_tree.column('Lecturer', anchor=CENTER, width=200, stretch=NO, minwidth=200)
+        self.apptstat_tree.column('Status', anchor=CENTER, width=150, stretch=NO, minwidth=150)
+
+        #column headings
+        self.apptstat_tree.heading('#0', text='', anchor=CENTER)
+        self.apptstat_tree.heading('Date', text='Date', anchor=CENTER)
+        self.apptstat_tree.heading('Time', text='Time', anchor=CENTER)
+        self.apptstat_tree.heading('Lecturer', text='Lecturer', anchor=CENTER)
+        self.apptstat_tree.heading('Status', text='Status', anchor=CENTER)
+
+
+        #view lecturer response from post a question in homepage
+        self.lec_res_frame=Frame(self, bg=bgc, relief=SOLID, bd=2)
+        self.lec_res_frame.place(x=655, y=450)
+
+        self.lec_res_lbl=Label(self.lec_res_frame, text='Lecturer Response', font=('Arial', 20), bg=bgc)
+        self.lec_res_lbl.grid(row=0, column=0, pady=10, padx=10, sticky=W)
+
+       
+
+
+
 class Profile(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -2646,6 +2784,8 @@ class Profile(tk.Frame):
         top_buttons(self,controller)
         #show date and clock
         clockdate(self)
+        #appointments page btn
+        view_appt(self, Appointments, controller)
         #logout btn
         log_out_btn(self, Loginpage, controller)
 
@@ -2653,13 +2793,67 @@ class Profile(tk.Frame):
         self.profile_lbl = Label(self, text ='Profile', font = ('Arial', 28), bg=bgc)
         self.profile_lbl.place(x=600, y=100)
 
-        #edit profile details
+        
         #view profile details
+        self.profile_frame=Frame(self, width=500, height=500, bg=bgc, relief=SOLID, bd=2)
+        self.profile_frame.place(x=300, y=200)
+
+        #user details: name, id, email
+        self.userdetails_lbl = Label(self.profile_frame, text ='User Details', font = ('Arial', 25), bg=bgc)
+        self.userdetails_lbl.grid(row=0, column=1, padx=10, pady=10, sticky=W, columnspan=3)
+
+        self.profile_name_lbl=Label(self.profile_frame, text='Name: Gark Jun Feng', font=f4, bg=bgc)
+        self.profile_name_lbl.grid(row=1, column=0, padx=20, pady=10, sticky=W)
+
+        self.profile_id_lbl=Label(self.profile_frame, text='ID: P22014268', font=f4, bg=bgc)
+        self.profile_id_lbl.grid(row=1, column=1, padx=20, pady=10, sticky=W)
+
+
+        self.profile_email_lbl=Label(self.profile_frame, text='Email: test@gmail.com', font=f4, bg=bgc)
+        self.profile_email_lbl.grid(row=1, column=2, padx=20, pady=10, sticky=W)
+
+
+        #change password btn
+        self.change_pass_btn=Button(self.profile_frame, text='Change Password', font=f, relief=SOLID, bd=2, cursor='hand2')
+        self.change_pass_btn.grid(row=2, column=1, padx=10, pady=10, sticky=W, columnspan=3)
+
 
         #view subjects
+        self.subjects_frame=Frame(self, width=500, height=500, bg=bgc, relief=SOLID, bd=2)
+        self.subjects_frame.place(x=215, y=400)
+
+        self.subjects_lbl=Label(self.subjects_frame, text='Subjects', font=('Arial', 25), bg=bgc)
+        self.subjects_lbl.grid(row=0, column=0, padx=10, pady=10,columnspan=2)
+
+        self.year_lbl=Label(self.subjects_frame, text='Year: Diploma Year 1', font=f4, bg=bgc)
+        self.year_lbl.grid(row=1, column=0, padx=10, pady=10, sticky=W)
+
+        self.sem_lbl=Label(self.subjects_frame, text='Semester: 1', font=f4, bg=bgc)
+        self.sem_lbl.grid(row=1, column=1, padx=10, pady=10, sticky=W)
+
+        self.sch_lbl = Label(self.subjects_frame, text='School: School of Computing', font=f4, bg=bgc)
+        self.sch_lbl.grid(row=2, column=0, padx=10, pady=10, sticky=W)
+
+        self.programme_lbl = Label(self.subjects_frame, text='Programme: BCSCUN', font=f4, bg=bgc)
+        self.programme_lbl.grid(row=2, column=1, padx=10, pady=10, sticky=W)
+
+        self.subj1_lbl = Label(self.subjects_frame, text='Subject 1: Computer Architecture & Networks', font=f4, bg=bgc)
+        self.subj1_lbl.grid(row=3, column=0, padx=10, pady=10, sticky=W)
+
+        self.subj2_lbl = Label(self.subjects_frame, text='Subject 2: Programming Fundamentals', font=f4, bg=bgc)
+        self.subj2_lbl.grid(row=3, column=1, padx=10, pady=10, sticky=W)
+
+        self.subj3_lbl = Label(self.subjects_frame, text='Subject 3: Web Programming', font=f4, bg=bgc)
+        self.subj3_lbl.grid(row=4, column=0, padx=10, pady=10, sticky=W)
+
+        self.subj4_lbl = Label(self.subjects_frame, text='Subject 4: Discrete Mathematics', font=f4, bg=bgc)
+        self.subj4_lbl.grid(row=4, column=1, padx=10, pady=10, sticky=W)
+
 
 
         #change password????
+        def chg_pw():
+            pass
 
 
 
