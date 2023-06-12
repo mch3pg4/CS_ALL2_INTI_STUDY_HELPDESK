@@ -1651,6 +1651,44 @@ class ChatAdmin(tk.Frame):
         chat_admin_label=Label(self, text='Chat Admin', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
         chat_admin_label.place(x=40, y=155)
 
+        #discussions server treeview scroll
+        self.discussions_frame=Frame(self, width=300, height=500, bg=bgc)
+        self.discussions_frame.place(x=125, y=225)
+
+
+        self.discussions_tv_frame=Frame(self.discussions_frame, bg=bgc)
+        self.discussions_tv_frame.grid(row=1, column=0)
+
+        self.discussions_tv_scroll=Scrollbar(self.discussions_tv_frame)
+        self.discussions_tv_scroll.pack(side=RIGHT, fill=Y)
+
+        self.discussions_tv=ttk.Treeview(self.discussions_tv_frame, yscrollcommand=self.discussions_tv_scroll.set, height=13)
+        self.discussions_tv.pack()
+
+        self.discussions_tv_scroll.config(command=self.discussions_tv.yview)
+
+        self.discussions_tv.column('#0', width=435, minwidth=435)
+        self.discussions_tv.heading('#0', text='Discussion Servers', anchor=W)
+
+        #insert server name
+        self.discussions_tv.insert(parent='', index='end', iid=0, text='Computer Architecture & Networks')
+
+        #chat msg screen
+        self.chat_scrolledtxt=scrolledtext.ScrolledText(self,width=58,height=15,bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
+        self.chat_scrolledtxt.place(x=650, y=225)
+
+        #chat msg input entry
+        #frame
+        self.chat_entry_frame=Frame(self, width=675, height=50, bg=bgc)
+        self.chat_entry_frame.place(x=641, y=600)
+
+        self.chat_entry=Text(self.chat_entry_frame, height=5,width=52, font=f, wrap=WORD,relief=SOLID, bd=2)
+        self.chat_entry.grid(row=0, column=0, padx=10, pady=5)
+
+        #send btn
+        self.send_btn=Button(self.chat_entry_frame, text='Send', font=f, relief=SOLID, bd=2, cursor='hand2')
+        self.send_btn.grid(row=0, column=1, padx=10, pady=5)
+
         
 
 class CourseMaterials(tk.Frame):
@@ -1927,15 +1965,113 @@ class AdminAppointments(tk.Frame):
         log_out_btn(self, Loginpage, controller)
         admin_btns(self, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments,controller)
 
-        #course materials label
-        course_materials_label=Label(self, text='Appointments', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
-        course_materials_label.place(x=40, y=155)
 
         #appointments treeview
+        self.appt_frame=Frame(self, bg=bgc)
+        self.appt_frame.place(x=45, y=150)
 
-        #accept or reject appointment, leave a note if rejected
+        self.appointments_lbl=Label(self.appt_frame, text='Appointments', font=('Arial', 20, 'bold'), bg=bgc)
+        self.appointments_lbl.grid(row=0, column=0, padx=10)
+
+        self.appt_tvframe=Frame(self.appt_frame, bg=bgc)
+        self.appt_tvframe.grid(row=1, column=0, pady=10)
+
+        self.appt_tv_scroll=Scrollbar(self.appt_tvframe)
+        self.appt_tv_scroll.pack(side=RIGHT, fill=Y)
+
+        self.appt_tv=ttk.Treeview(self.appt_tvframe,yscrollcommand=self.appt_tv_scroll.set, height=7)
+        self.appt_tv.pack()
+
+        self.appt_tv_scroll.config(command=self.appt_tv.yview)
+
+        self.appt_tv['columns']=('Student', 'Date', 'Time', 'Topic', 'Status')
+
+        self.appt_tv.column('#0', width=0, stretch=NO)
+        self.appt_tv.column('Student', anchor=W, width=200, minwidth=200, stretch=NO)
+        self.appt_tv.column('Date', anchor=W, width=100, minwidth=100, stretch=NO)
+        self.appt_tv.column('Time', anchor=W, width=100, minwidth=100, stretch=NO)
+        self.appt_tv.column('Topic', anchor=W, width=200, minwidth=200, stretch=NO)
+        self.appt_tv.column('Status', anchor=W, width=100, minwidth=100, stretch=NO)
+
+        self.appt_tv.heading('#0', text='', anchor=CENTER)
+        self.appt_tv.heading('Student', text='Student', anchor=CENTER)
+        self.appt_tv.heading('Date', text='Date', anchor=CENTER)
+        self.appt_tv.heading('Time', text='Time', anchor=CENTER)
+        self.appt_tv.heading('Topic', text='Topic', anchor=CENTER)
+        self.appt_tv.heading('Status', text='Status', anchor=CENTER)
+
+
+        #accept or reject appointment, leave a note if rejected, frame
+        self.admin_response_frame=Frame(self, bg=bgc, bd=2, relief=SOLID)
+        self.admin_response_frame.place(x=163, y=490)
+
+        self.admin_response_lbl=Label(self.admin_response_frame, text='Appointment Response', font=('Arial', 20,'bold'), bg=bgc)
+        self.admin_response_lbl.grid(row=0, column=0, padx=10, columnspan=3)
+
+        #accept btn, reject btn
+        self.accept_btn=Button(self.admin_response_frame, text='Accept', font=f3, relief=SOLID, cursor='hand2', width=10)
+        self.accept_btn.grid(row=1, column=1, padx=10, pady=10)
+
+        self.reject_btn=Button(self.admin_response_frame, text='Reject', font=f3, relief=SOLID, cursor='hand2', width=10)
+        self.reject_btn.grid(row=1, column=2, padx=10, pady=10)
+
+        #note if rejected
+        self.note_lbl=Label(self.admin_response_frame, text='Note:', font=f3, bg=bgc)
+        self.note_lbl.grid(row=2, column=0, padx=10, pady=10)
+
+        self.note_entry=Text(self.admin_response_frame, font=f3, width=30, height=3)
+        self.note_entry.grid(row=2, column=1, padx=10, pady=10, columnspan=2)
+
+        #send btn
+        self.send_btn=Button(self.admin_response_frame, text='Send', font=f3, relief=SOLID, cursor='hand2')
+        self.send_btn.grid(row=3, column=1, padx=10, pady=10, columnspan=3)
+
+
+
+        
+        #show questions from students treeview (another side to show images from students if any)
+        self.stud_ques_frame=Frame(self, bg=bgc)
+        self.stud_ques_frame.place(x=785, y=150)
+
+        self.stud_ques_lbl=Label(self.stud_ques_frame, text='Questions from Students', font=('Arial', 20, 'bold'), bg=bgc)
+        self.stud_ques_lbl.grid(row=0, column=0,  padx=10)
+
+        self.stud_ques_tvframe=Frame(self.stud_ques_frame, bg=bgc)
+        self.stud_ques_tvframe.grid(row=1, column=0, pady=10)
+
+        self.stud_ques_tv_scroll=Scrollbar(self.stud_ques_tvframe)
+        self.stud_ques_tv_scroll.pack(side=RIGHT, fill=Y)
+
+        self.stud_ques_tv=ttk.Treeview(self.stud_ques_tvframe,yscrollcommand=self.stud_ques_tv_scroll.set, height=7)
+        self.stud_ques_tv.pack()
+
+        self.stud_ques_tv_scroll.config(command=self.stud_ques_tv.yview)
+
+        self.stud_ques_tv['columns']=('Student', 'Question')
+
+        self.stud_ques_tv.column('#0', width=0, stretch=NO)
+        self.stud_ques_tv.column('Student', anchor=W, width=200, minwidth=200, stretch=NO)
+        self.stud_ques_tv.column('Question', anchor=W, width=300, minwidth=300, stretch=NO)
+
+        self.stud_ques_tv.heading('#0', text='', anchor=CENTER)
+        self.stud_ques_tv.heading('Student', text='Student', anchor=CENTER)
+        self.stud_ques_tv.heading('Question', text='Question', anchor=CENTER)
 
         #reply to questions from students
+    
+        self.reply_frame=Frame(self, bg=bgc, bd=2, relief=SOLID)
+        self.reply_frame.place(x=835, y=490)
+
+        self.reply_lbl=Label(self.reply_frame, text='Reply', font=('Arial', 20,'bold'), bg=bgc)
+        self.reply_lbl.grid(row=0, column=0, padx=10, pady=10)
+
+        self.reply_tv=Text(self.reply_frame, width=30, height=4, padx=10, pady=10, wrap=WORD, font=f3)
+        self.reply_tv.grid(row=1, column=0, padx=10, pady=10)
+
+        self.reply_btn=Button(self.reply_frame, text='Reply', font=f3, relief=SOLID, cursor='hand2', width=10)
+        self.reply_btn.grid(row=2, column=0, padx=10, pady=10)
+
+
 
 
 
