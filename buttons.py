@@ -25,7 +25,7 @@ def clockdate(self):
 
     
     l1=tk.Label(self,font=('Arial', 19, 'bold'),bg=bgc, foreground='black')
-    l1.place(x=750, y=12)
+    l1.place(x=605, y=12)
     my_time()
 
 #ui background with inti logo
