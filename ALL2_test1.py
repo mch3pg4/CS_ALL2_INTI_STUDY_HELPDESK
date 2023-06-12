@@ -2861,9 +2861,29 @@ class Games(tk.Frame):
         self.games_lbl.place(x=600, y=100)
         
         #game gif
-        self.game_gif=PhotoImage(file='images\games.gif', format="gif -index 5")
-        self.game_gif_lbl=Label(self, image=self.game_gif, bg=bgc)
-        self.game_gif_lbl.place(x=150, y=200)
+        gif_file = 'images\games.gif'
+        openImage= Image.open(gif_file)
+
+        frames = openImage.n_frames
+        imageObj = [PhotoImage(file=gif_file,format=f"gif -index {i}") for i in range(frames)]
+        count = 0
+        self.showAnimation = None
+
+        def animation(count):
+            new_image = imageObj[count]
+
+            self.game_gif_lbl.config(image=new_image)
+            count +=1
+            if count == frames:
+                count = 0
+            self.showAnimation = self.after(100,lambda :animation(count))
+
+        self.game_gif_lbl=Label(self, image="")
+        self.game_gif_lbl.place(x=150, y=204)
+
+        #start animation for gif
+        animation(count)
+
 
         #snake game
         # Constants
@@ -2969,7 +2989,6 @@ class Games(tk.Frame):
 
             self.start_btn.config(state=NORMAL)
 
-
         
         # Create and pack the canvas
         canvas = tk.Canvas(self, width=WIDTH, height=HEIGHT, bg="white")
@@ -2987,17 +3006,6 @@ class Games(tk.Frame):
         generate_food()
         self.start_btn=Button(self, text='Start Game', font=f3, bg='white', command=move_snake)
         self.start_btn.place(x=929, y=635)
-
-
-
-
-
-
-        
-
-
-
-       
 
 
 
