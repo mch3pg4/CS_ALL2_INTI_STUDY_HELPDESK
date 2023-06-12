@@ -1,12 +1,8 @@
-import textwrap
-import datetime
-from tkcalendar import Calendar
 from tkinter import *
 from PIL import Image,ImageTk
-from tkinter import messagebox, ttk, filedialog, Tk, Label, Entry, Button, END
+from tkinter import messagebox, Label
 import tkinter as tk
 from time import strftime
-from datetime import date
 from tktooltip import ToolTip
 
 
