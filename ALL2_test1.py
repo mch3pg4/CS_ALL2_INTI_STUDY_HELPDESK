@@ -73,35 +73,56 @@ def top_buttons(self, controller):
     chat_icon=Label(image=my_img6)
     chat_icon.image=my_img6
 
-    image7=Image.open('images\\user.png')
-    img7=image7.resize((50,50))
+    image7=Image.open('images\\chatbot.png')
+    img7=image7.resize((65,65))
     my_img7=ImageTk.PhotoImage(img7)
-    profile_icon=Label(image=my_img7)
-    profile_icon.image=my_img7
+    chatbot_icon=Label(image=my_img7)
+    chatbot_icon.image=my_img7
+
+    image8=Image.open('images\\user.png')
+    img8=image8.resize((50,50))
+    my_img8=ImageTk.PhotoImage(img8)
+    profile_icon=Label(image=my_img8)
+    profile_icon.image=my_img8
+
+    image9=Image.open('images\\game.png')
+    img9=image9.resize((50,50))
+    my_img9=ImageTk.PhotoImage(img9)
+    game_icon=Label(image=my_img9)
+    game_icon.image=my_img9
 
     button1=tk.Button(self, image=my_img2,cursor='hand2',command= lambda:controller.show_frame(Homepage))
-    button1.place(x=3, y=100)
+    button1.place(x=3, y=90)
     ToolTip(button1, msg='Homepage')
 
     button2=tk.Button(self, image=my_img3, cursor='hand2',command= lambda:controller.show_frame(Books))
-    button2.place(x=3, y=242)
+    button2.place(x=3, y=210)
     ToolTip(button2, msg='Books')
 
     button3=tk.Button(self, image=my_img4,cursor='hand2', command= lambda:controller.show_frame(Quiz))
-    button3.place(x=3, y=384)
+    button3.place(x=3, y=330)
     ToolTip(button3, msg='Quiz')
 
     button4=tk.Button(self, image=my_img5,cursor='hand2',command= lambda:controller.show_frame(Calculator))
-    button4.place(x=3, y=384+142)
+    button4.place(x=3, y=450)
     ToolTip(button4, msg='Calculator')
 
     button4=tk.Button(self, image=my_img6,cursor='hand2',command= lambda:controller.show_frame(Chat))
-    button4.place(x=3, y=384+284)
+    button4.place(x=3, y=570)
     ToolTip(button4, msg='Discussions')
 
-    button5=tk.Button(self, image=my_img7, cursor='hand2',command=lambda: controller.show_frame(Profile))
-    button5.place(x=1225, y=5)
-    ToolTip(button5, msg='Profile')
+    button5=tk.Button(self, image=my_img7,cursor='hand2',command= lambda:controller.show_frame(Chatbot))
+    button5.place(x=3, y=690)
+    ToolTip(button5, msg='Chatbot')
+
+    button6=tk.Button(self, image=my_img8, cursor='hand2',command=lambda: controller.show_frame(Profile))
+    button6.place(x=1225, y=5)
+    ToolTip(button6, msg='Profile')
+
+    button7=tk.Button(self, image=my_img9, cursor='hand2',command=lambda: controller.show_frame(Games))
+    button7.place(x=1075, y=5)
+    ToolTip(button7, msg='Games')
+
 
 
 class App(tk.Tk):
@@ -124,7 +145,7 @@ class App(tk.Tk):
         #create dictionary of frames
         self.frames={}
 
-        for F in (Loginpage, RegisterPage, RegisterCourses,Homepage, Subject1, Books, Quiz, Calculator, Chat,Appointments, Profile, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments):
+        for F in (Loginpage, RegisterPage, RegisterCourses,Homepage, Subject1, Books, Quiz, Calculator, Chat,Chatbot, Appointments, Games, Profile, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments):
             frame= F(container, self)
             #windows class act as root window for frames
             self.frames[F] = frame
@@ -2648,6 +2669,27 @@ class Chat(tk.Frame):
         self.send_btn.grid(row=0, column=1, padx=10, pady=5)
 
 
+class Chatbot(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+
+        # ui_bg
+        ui_bg(self, img_file)
+        #top buttons
+        top_buttons(self,controller)
+        #show date and clock
+        clockdate(self)
+        #appointments page btn
+        view_appt(self, Appointments, controller)
+        #logout btn
+        log_out_btn(self, Loginpage, controller)
+
+        #chatbot title
+        self.chtbot_lbl = Label(self, text ='Chatbot', font = ('Arial', 28), bg=bgc)
+        self.chtbot_lbl.place(x=600, y=90)
+
+
+
 class Appointments(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -2670,7 +2712,7 @@ class Appointments(tk.Frame):
         #make an appointment frame
         #name, email, student id, date, time, lecturer, description
         self.make_appt_frame=Frame(self, width=500, height=500, bg=bgc, relief=SOLID, bd=2)
-        self.make_appt_frame.place(x=125, y=200)
+        self.make_appt_frame.place(x=175, y=180)
 
         self.make_appt_lbl=Label(self.make_appt_frame, text='Create Appointment', font=('Arial', 20), bg=bgc)
         self.make_appt_lbl.grid(row=0, column=1, pady=10, padx=10, sticky=W, columnspan=5)
@@ -2731,10 +2773,10 @@ class Appointments(tk.Frame):
 
         #view appointments status frame, treeview
         self.apptstat_lbl=Label(self, text='Appointment Status', font=('Arial', 20), bg=bgc)
-        self.apptstat_lbl.place(x=823, y=200)
+        self.apptstat_lbl.place(x=823, y=185)
         
         self.apptstat_frame=Frame(self, bg=bgc)
-        self.apptstat_frame.place(x=655, y=250)
+        self.apptstat_frame.place(x=655, y=235)
 
         #scrollbar
         self.apptstat_scroll=Scrollbar(self.apptstat_frame)
@@ -2749,10 +2791,10 @@ class Appointments(tk.Frame):
 
         #format columns
         self.apptstat_tree.column('#0', width=0, stretch=NO)
-        self.apptstat_tree.column('Date', anchor=CENTER, width=150, stretch=NO, minwidth=150)
+        self.apptstat_tree.column('Date', anchor=CENTER, width=150, stretch=NO, minwidth=100)
         self.apptstat_tree.column('Time', anchor=CENTER, width=100, stretch=NO, minwidth=100)
         self.apptstat_tree.column('Lecturer', anchor=CENTER, width=200, stretch=NO, minwidth=200)
-        self.apptstat_tree.column('Status', anchor=CENTER, width=150, stretch=NO, minwidth=150)
+        self.apptstat_tree.column('Status', anchor=CENTER, width=150, stretch=NO, minwidth=235)
 
         #column headings
         self.apptstat_tree.heading('#0', text='', anchor=CENTER)
@@ -2763,11 +2805,197 @@ class Appointments(tk.Frame):
 
 
         #view lecturer response from post a question in homepage
-        self.lec_res_frame=Frame(self, bg=bgc, relief=SOLID, bd=2)
-        self.lec_res_frame.place(x=655, y=450)
+        self.lec_res_lbl=Label(self, text='Lecturer Response', font=('Arial', 20), bg=bgc)
+        self.lec_res_lbl.place(x=823, y=425)
 
-        self.lec_res_lbl=Label(self.lec_res_frame, text='Lecturer Response', font=('Arial', 20), bg=bgc)
-        self.lec_res_lbl.grid(row=0, column=0, pady=10, padx=10, sticky=W)
+        self.lec_res_frame=Frame(self, bg=bgc)
+        self.lec_res_frame.place(x=655, y=471)
+
+        #edit style of treeview
+        style=ttk.Style()
+        style.theme_use('clam')
+        style.configure('Response.Treeview', rowheight=65)
+        style.configure('Response.Treeview', font=f)
+
+        #treeview
+        self.lec_res_scroll=Scrollbar(self.lec_res_frame)
+        self.lec_res_scroll.pack(side=RIGHT, fill=Y)
+
+        self.lec_res_tree=ttk.Treeview(self.lec_res_frame, yscrollcommand=self.lec_res_scroll.set, height=3, style='Response.Treeview')
+        self.lec_res_tree.pack()
+
+        self.lec_res_scroll.config(command=self.lec_res_tree.yview)
+
+        self.lec_res_tree['columns']= ('Question', 'Response from Lecturer')
+
+        #format columns
+        self.lec_res_tree.column('#0', width=0, stretch=NO)
+        self.lec_res_tree.column('Question', anchor=CENTER, width=250, stretch=NO, minwidth=250)
+        self.lec_res_tree.column('Response from Lecturer', anchor=CENTER, width=350, stretch=NO, minwidth=350)
+
+        #column headings
+        self.lec_res_tree.heading('#0', text='', anchor=CENTER)
+        self.lec_res_tree.heading('Question', text='Question', anchor=CENTER)
+        self.lec_res_tree.heading('Response from Lecturer', text='Response from Lecturer', anchor=CENTER)
+
+        
+
+
+class Games(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+
+        # ui_bg
+        ui_bg(self, img_file)
+        #top buttons
+        top_buttons(self,controller)
+        #show date and clock
+        clockdate(self)
+        #appointments page btn
+        view_appt(self, Appointments, controller)
+        #logout btn
+        log_out_btn(self, Loginpage, controller)
+
+        #games title
+        self.games_lbl=Label(self, text='Games', font=('Arial', 28), bg=bgc)
+        self.games_lbl.place(x=600, y=100)
+        
+        #game gif
+        self.game_gif=PhotoImage(file='images\games.gif', format="gif -index 5")
+        self.game_gif_lbl=Label(self, image=self.game_gif, bg=bgc)
+        self.game_gif_lbl.place(x=150, y=200)
+
+        #snake game
+        # Constants
+        WIDTH = 600
+        HEIGHT = 400
+        DELAY = 100
+        SIZE = 20
+        DIRECTIONS = {
+            "Up": (-1, 0),
+            "Down": (1, 0),
+            "Left": (0, -1),
+            "Right": (0, 1)
+        }
+
+        # Game variables
+        self.score = 0
+        self.direction = "Right"
+        self.snake = [(HEIGHT // 2, WIDTH // 2)]
+        self.food = ()
+
+        # Function to generate new food
+        def generate_food():
+            while True:
+                x = random.randint(0, HEIGHT // SIZE - 1) * SIZE
+                y = random.randint(0, WIDTH // SIZE - 1) * SIZE
+                if (x, y) not in self.snake:
+                    self.food = (x, y)
+                    break
+
+        # Function to update the snake's position
+        def move_snake():
+            self.start_btn.config(state=DISABLED)
+            head_x, head_y = self.snake[0]
+            dx, dy = DIRECTIONS[self.direction]
+            new_head = ((head_x + dx * SIZE) % HEIGHT, (head_y + dy * SIZE) % WIDTH)
+
+            if new_head in self.snake[1:]:
+                game_over()
+                return
+
+            self.snake.insert(0, new_head)
+
+            if new_head == self.food:
+                self.score += 1
+                generate_food()
+            else:
+                self.snake.pop()
+
+            draw_snake()
+            draw_food()
+            draw_score()
+
+            self.after(DELAY, move_snake)
+
+        # Function to handle keypress events
+        def handle_keypress(event):
+            new_direction = event.keysym
+            opposites = {
+                "Up": "Down",
+                "Down": "Up",
+                "Left": "Right",
+                "Right": "Left"
+            }
+            if new_direction != opposites[self.direction]:
+                self.direction = new_direction
+
+        # Function to draw the snake
+        def draw_snake():
+            canvas.delete("snake")
+            for segment in self.snake:
+                x, y = segment
+                canvas.create_rectangle(
+                    y, x, y + SIZE, x + SIZE, fill="blue", tags="snake"
+                )
+
+        # Function to draw the food
+        def draw_food():
+            canvas.delete("food")
+            x, y = self.food
+            canvas.create_oval(
+                y, x, y + SIZE, x + SIZE, fill="red", tags="food"
+            )
+
+        # Function to draw the score
+        def draw_score():
+            score_label.config(text="Score: " + str(self.score))
+
+        # Function to handle game over
+        def game_over(event=None):
+            
+            # Reset game variables
+            self.score = 0
+            self.direction = "Right"
+            self.snake = [(HEIGHT // 2, WIDTH // 2)]
+            generate_food()
+
+            # Clear canvas
+            canvas.delete("all")
+
+            # Bind keypress events to handle_keypress function
+            canvas.bind("<Key>", handle_keypress)
+            canvas.focus_set()
+
+            self.start_btn.config(state=NORMAL)
+
+
+        
+        # Create and pack the canvas
+        canvas = tk.Canvas(self, width=WIDTH, height=HEIGHT, bg="white")
+        canvas.place(x=685, y=200)
+
+        # Create and pack the score label
+        score_label = tk.Label(self, text="Score: 0", font=f3, fg="white", bg="black")
+        score_label.place(x=950, y=604)
+
+        # Bind keypress events to handle_keypress function
+        canvas.bind("<Key>", handle_keypress)
+        canvas.focus_set()
+
+        # button to start game or stop game
+        generate_food()
+        self.start_btn=Button(self, text='Start Game', font=f3, bg='white', command=move_snake)
+        self.start_btn.place(x=929, y=635)
+
+
+
+
+
+
+        
+
+
 
        
 
