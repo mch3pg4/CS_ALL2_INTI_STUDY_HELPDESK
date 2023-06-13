@@ -160,14 +160,12 @@ class App(tk.Tk):
         frame.tkraise()
 
 
-    # def updateProfile(self, login_details):
-    #     frame = self.frames[Profile]
-    #     frame.lbl_welcome.config(text='Welcome, '+ login_details[0])
-    #     frame.lbl_name.config(text=login_details[0])
-    #     frame.lbl_email.config(text=login_details[2])
-    #     frame.lbl_contact.config(text=str(login_details[3]))
-    #     frame.lbl_gender.config(text=login_details[5])
-    #     frame.tkraise()
+    def updateProfile(self, login_details):
+        frame = self.frames[Profile]
+        frame.profile_name_lbl.config(text='Name: '+login_details[1])
+        frame.profile_id_lbl.config(text='ID: '+login_details[2])
+        frame.profile_email_lbl.config(text='Email: '+login_details[3])
+        frame.tkraise()
 
 
 class Loginpage(tk.Frame):
@@ -217,14 +215,14 @@ class Loginpage(tk.Frame):
             if check_counter == 2:
                 login_details=c.fetchone()
                 if login_details is not None:
+                    controller.updateProfile(login_details)
                     if bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Student'):
                         controller.show_frame(Homepage)
-                    # messagebox.showinfo('Login Status', 'Logged in Successfully!')
-                    # controller.updateProfile( login_details)
                     # controller.updateHomepage(login_details)
                     # controller.updateAdmin(login_details)
                     elif bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Lecturer'):
                         controller.show_frame(StudentsView)
+                        
                     else:
                         messagebox.showerror('Login Status', 'invalid username or password')
             else:
@@ -255,7 +253,6 @@ class Loginpage(tk.Frame):
 class RegisterPage(tk.Frame):
     def __init__(self,parent, controller):
         tk.Frame.__init__(self, parent)
-        global image_display, image_label
         # registerpage bg
         self.raw_image=Image.open("images\Slide2.png")
         self.background_image=ImageTk.PhotoImage(self.raw_image)
@@ -297,9 +294,7 @@ class RegisterPage(tk.Frame):
 
 
 
-        def createImage(flag=0): 
-            global image_display, image_label
-            
+        def createImage(flag=0):             
             # Generate new random string for captcha
             # self.random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
             self.random_string = ''.join(random.choices('a', k=6))  #default value for testing, to be changed later
@@ -3174,14 +3169,14 @@ class Profile(tk.Frame):
         self.userdetails_lbl = Label(self.profile_frame, text ='User Details', font = ('Arial', 25), bg=bgc)
         self.userdetails_lbl.grid(row=0, column=1, padx=10, pady=10, sticky=W, columnspan=3)
 
-        self.profile_name_lbl=Label(self.profile_frame, text='Name: Gark Jun Feng', font=f4, bg=bgc)
+        self.profile_name_lbl=Label(self.profile_frame, text='Name: ', font=f4, bg=bgc)
         self.profile_name_lbl.grid(row=1, column=0, padx=20, pady=10, sticky=W)
 
-        self.profile_id_lbl=Label(self.profile_frame, text='ID: P22014268', font=f4, bg=bgc)
+        self.profile_id_lbl=Label(self.profile_frame, text='ID: ', font=f4, bg=bgc)
         self.profile_id_lbl.grid(row=1, column=1, padx=20, pady=10, sticky=W)
 
 
-        self.profile_email_lbl=Label(self.profile_frame, text='Email: test@gmail.com', font=f4, bg=bgc)
+        self.profile_email_lbl=Label(self.profile_frame, text='Email: ', font=f4, bg=bgc)
         self.profile_email_lbl.grid(row=1, column=2, padx=20, pady=10, sticky=W)
 
 
