@@ -1,7 +1,7 @@
 import socket
 from threading import *
 
-host='192.168.0.142'
+host='192.168.0.143'
 port=5000
 
 server=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -32,7 +32,7 @@ def handle_client(client):
 
 def accept_msg():
     while True:
-        client,address=server.accept()
+        client,address=server.accept()  
         print(f"Connected with {str(address)}")
 
         # client.send("Enter name".encode('utf-8'))
@@ -43,7 +43,8 @@ def accept_msg():
 
         print(f"Nickname of the client is {name}")
         broadcast(f"{name} has connected to the server!\n".encode('utf-8'))
-        client.send("You have connected to the server".encode('utf-8'))
+        client.send("You have connected to the server\n".encode('utf-8'))
+        client.send(f"Number of users in the server currently: {len(names)}".encode('utf-8'))
 
         thread=Thread(target=handle_client,args=(client,))
         thread.start()
