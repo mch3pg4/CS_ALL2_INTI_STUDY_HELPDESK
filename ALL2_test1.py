@@ -2531,15 +2531,15 @@ class Quiz(tk.Frame):
         log_out_btn(self, Loginpage, controller)
 
         #Quiz title
-        w = Label(self, text ='Quiz', font = ('Arial', 28) , bg=bgc)
-        w.pack()
-        w.place(x=610, y=90)
+        self.quiz_lbl = Label(self, text ='Quiz', font = ('Arial', 28) , bg=bgc)
+        self.quiz_lbl.pack()
+        self.quiz_lbl.place(x=610, y=90)
 
         #view quiz
         #list down all 
-         #quiz subject selection frame
+        #quiz subject selection frame
         self.quiz_subjsel_frame=Frame(self, bg=bgc, width=800, height=100)
-        self.quiz_subjsel_frame.place(x=115, y=150)
+        self.quiz_subjsel_frame.place(x=100, y=200)
 
         self.quiz_subjsel_lbl=Label(self.quiz_subjsel_frame, text='Subject', font=f3, bg=bgc)
         self.quiz_subjsel_lbl.grid(row=0, column=0, pady=10, padx=10)
@@ -2550,7 +2550,7 @@ class Quiz(tk.Frame):
 
         #quiz treeview list
         self.quiztv_frame=Frame(self, bg=bgc)
-        self.quiztv_frame.place(x=115, y=200)
+        self.quiztv_frame.place(x=100, y=255)
 
         #quiz treeview
         self.quiz_tv_scroll=Scrollbar(self.quiztv_frame)
@@ -2559,47 +2559,13 @@ class Quiz(tk.Frame):
         style=ttk.Style()
         style.configure('Quiz.Treeview', font=f)
 
-        self.quiz_tv=ttk.Treeview(self.quiztv_frame, yscrollcommand=self.quiz_tv_scroll.set, style='Quiz.Treeview',height=14)
+        self.quiz_tv=ttk.Treeview(self.quiztv_frame, yscrollcommand=self.quiz_tv_scroll.set, style='Quiz.Treeview',height=10)
         self.quiz_tv.pack()
 
         self.quiz_tv_scroll.config(command=self.quiz_tv.yview)
 
         self.quiz_tv.column('#0', width=435, minwidth=435)
         self.quiz_tv.heading('#0', text='Quiz Chapters', anchor=W)
-
-        
-        #quiz questions frame
-        self.quizques_frame=Frame(self, bg='white',  width=695, height=420, relief=SOLID, bd=2)
-        self.quizques_frame.place(x=625, y=220)
-        self.quizques_frame.grid_propagate(False)
-
-        #fix frame row and column size
-        self.quizques_frame.rowconfigure(1, weight=1)
-        self.quizques_frame.columnconfigure(0, weight=1)
-        self.quizques_frame.columnconfigure(1, weight=1)
-        
-
-        #quiz chapter title, 1 question, 4 options, previous, next btns
-        self.quiz_chapter_title=Label(self.quizques_frame, text=empty_text, font=('Arial', 19,'bold'), bg='white')   
-        self.quiz_chapter_title.grid(row=0, column=0, pady=10, padx=10, columnspan=3)
-
-        self.quiz_question=Label(self.quizques_frame, text=empty_text, font=f3, bg='white', wraplength=700)
-        self.quiz_question.grid(row=1, column=0, pady=10, padx=10, columnspan=3)
-
-        self.quiz_option1=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white', cursor='hand2')
-        self.quiz_option1.grid(row=2, column=1, pady=10, padx=10, sticky=W, columnspan=3)
-
-        self.quiz_option2=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white', cursor='hand2')
-        self.quiz_option2.grid(row=3, column=1, pady=10, padx=10, sticky=W, columnspan=3)
-
-
-        self.quiz_option3=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white',  cursor='hand2')
-        self.quiz_option3.grid(row=4, column=1, pady=10, padx=10, sticky=W, columnspan=3)
-
-        self.quiz_option4=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white', cursor='hand2')
-        self.quiz_option4.grid(row=5, column=1, pady=10, padx=10, sticky=W, columnspan=3)
-
-
 
         #show distinct chapters in treeview
         def show_quizchp(e):
@@ -2610,9 +2576,9 @@ class Quiz(tk.Frame):
             else:
                 #connect to db
                 con = mysql.connector.connect(host='localhost', 
-                                              user='root', 
-                                              password='rootpass', 
-                                              database='all2')
+                                            user='root', 
+                                            password='rootpass', 
+                                            database='all2')
                 cur = con.cursor()
                 s_set=cur.execute('''SELECT DISTINCT chap_name FROM quiz WHERE subj_name=%s''', (self.quiz_subjsel.get(),))
                 s_set=cur.fetchall()
@@ -2624,6 +2590,86 @@ class Quiz(tk.Frame):
         #show quiz chapters in treeview first
         show_quizchp(e=None)
         self.quiz_subjsel.bind('<<ComboboxSelected>>', show_quizchp)
+        
+        #quiz questions frame and add quiz frame func prototypes
+        self.quizques_frame=Frame(self, bg='white',  width=720, height=420, relief=SOLID, bd=2)
+        self.addquiz_frame=Frame(self, bg=bgc, width=450, height=300, relief=SOLID, bd=2)
+
+
+        #fix frame row and column size
+        self.quizques_frame.rowconfigure(1, weight=1)
+        self.quizques_frame.columnconfigure(0, weight=1)
+        self.quizques_frame.columnconfigure(1, weight=1)
+
+        #radiobutton selected option variable definition
+        selected_option=StringVar()
+        
+        #quiz chapter title, 1 question, 4 options, previous, next btns
+        self.quiz_chapter_title=Label(self.quizques_frame, text=empty_text, font=('Arial', 19,'bold'), bg='white')   
+        self.quiz_chapter_title.grid(row=0, column=0, pady=10, padx=10, columnspan=3)
+
+        self.quiz_question=Label(self.quizques_frame, text=empty_text, font=f3, bg='white', wraplength=655)
+        self.quiz_question.grid(row=1, column=0, pady=10, padx=10, columnspan=3)
+
+        self.quiz_option1=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white', cursor='hand2', variable=selected_option, value='A', tristatevalue=0)
+        self.quiz_option1.grid(row=2, column=1, pady=10, padx=10, sticky=W, columnspan=3)
+
+        self.quiz_option2=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white', cursor='hand2', variable=selected_option, value='B', tristatevalue=0)
+        self.quiz_option2.grid(row=3, column=1, pady=10, padx=10, sticky=W, columnspan=3)
+
+
+        self.quiz_option3=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white',  cursor='hand2', variable=selected_option, value='C', tristatevalue=0)
+        self.quiz_option3.grid(row=4, column=1, pady=10, padx=10, sticky=W, columnspan=3)
+
+        self.quiz_option4=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white', cursor='hand2', variable=selected_option, value='D', tristatevalue=0)
+        self.quiz_option4.grid(row=5, column=1, pady=10, padx=10, sticky=W, columnspan=3)
+
+
+        #next question
+        def next_ques():
+            #count score first
+            self.user_ans= selected_option.get()
+            selected_option.set(None)
+
+            if self.ques_num < (len(self.q_set)-1):
+                self.ques_num+=1
+            if self.ques_num == (len(self.q_set)-1):
+                # self.quiz_next_btn.config(state=DISABLED)
+                self.quiz_next_btn.config(text='Done')
+                self.quiz_next_btn.config(command=quiz_result)
+            else:
+                self.quiz_next_btn.config(state=NORMAL)
+                self.quiz_prev_btn.config(state=NORMAL)
+            
+
+            self.quiz_chapter_title.config(text=self.values)
+            self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
+            self.quiz_option1.config(text=self.q_set[self.ques_num][1])
+            self.quiz_option2.config(text=self.q_set[self.ques_num][2])
+            self.quiz_option3.config(text=self.q_set[self.ques_num][3])
+            self.quiz_option4.config(text=self.q_set[self.ques_num][4])
+            self.quiz_ques_num.config(text='Question '+str(self.ques_num+1)+'/'+str(len(self.q_set)))
+
+
+        def prev_ques():
+            selected_option.set(None)
+            if self.ques_num > 0:
+                    self.ques_num -= 1
+            if self.ques_num == 0:
+                self.quiz_prev_btn.config(state=DISABLED)
+            else:
+                self.quiz_prev_btn.config(state=NORMAL)
+                self.quiz_next_btn.config(state=NORMAL)
+                self.quiz_next_btn.config(text='Next')
+                self.quiz_next_btn.config(command=next_ques)
+
+            self.quiz_chapter_title.config(text=self.values)
+            self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
+            self.quiz_option1.config(text=self.q_set[self.ques_num][1])
+            self.quiz_option2.config(text=self.q_set[self.ques_num][2])
+            self.quiz_option3.config(text=self.q_set[self.ques_num][3])
+            self.quiz_option4.config(text=self.q_set[self.ques_num][4])
+            self.quiz_ques_num.config(text='Question '+str(self.ques_num+1)+'/'+str(len(self.q_set)))
 
 
         #bind event: user selects from treeview the quiz chapter, then quiz is shown in quiz frame, for loop  quiz questions from db, prev next btn
@@ -2632,6 +2678,9 @@ class Quiz(tk.Frame):
             selected=self.quiz_tv.focus()
             if selected:
                 self.values=self.quiz_tv.item(selected, 'text')
+                self.quizques_frame.place(x=583, y=240)
+                self.quizques_frame.grid_propagate(False)
+                self.addquiz_frame.place_forget()
                 #connect to db
                 con = mysql.connector.connect(host='localhost', 
                                             user='root', 
@@ -2650,10 +2699,11 @@ class Quiz(tk.Frame):
                 self.quiz_option3.config(text=self.q_set[self.ques_num][3])
                 self.quiz_option4.config(text=self.q_set[self.ques_num][4])
                 con.commit()
-                con.close()
             
             else: #show default
                 self.values=self.quiz_tv.item(self.quiz_tv.get_children()[0], 'text')
+                self.quizques_frame.place(x=583, y=240)
+                self.quizques_frame.grid_propagate(False)
 
                 con = mysql.connector.connect(host='localhost', 
                                             user='root', 
@@ -2672,52 +2722,48 @@ class Quiz(tk.Frame):
                 self.quiz_option3.config(text=self.q_set[self.ques_num][3])
                 self.quiz_option4.config(text=self.q_set[self.ques_num][4])
                 con.commit()
-                con.close()
 
-        self.quiz_tv.bind('<ButtonRelease-1>', show_quizques)
+            self.quiz_prev_btn=Button(self.quizques_frame, text='Previous', font=f3, relief=SOLID, cursor='hand2', width=10, command=prev_ques, state=DISABLED)
+            self.quiz_prev_btn.grid(row=6, column=0, pady=10, padx=10, sticky=W)
+
+            self.quiz_next_btn=Button(self.quizques_frame, text='Next', font=f3, relief=SOLID, cursor='hand2', width=10, command=next_ques)
+            self.quiz_next_btn.grid(row=6, column=2, pady=10, padx=10)
+
+            #show current question 1/5
+            self.quiz_ques_num=Label(self.quizques_frame, text='Question '+str(self.ques_num+1)+'/'+str(len(self.q_set)), font=f3, bg='white')
+            self.quiz_ques_num.grid(row=6, column=1, pady=10, padx=10, sticky=W)
 
         #show quiz by default
         show_quizques(e=None)
+        self.quiz_tv.bind('<ButtonRelease-1>', show_quizques)
 
-        #next question
-        def next_ques():
-            if self.ques_num < (len(self.q_set)-1):
-                self.ques_num+=1
-            if self.ques_num == (len(self.q_set)-1):
-                self.quiz_next_btn.config(state=DISABLED)
-            else:
-                self.quiz_next_btn.config(state=NORMAL)
-                self.quiz_prev_btn.config(state=NORMAL)
+         
 
+        self.quiz_score= 0
+        ##show quiz results to user, show score, true false and percentage in messagebox
+        def quiz_result():
+            self.user_ans= selected_option.get()
+
+            score = str(self.quiz_score)+'/'+str(len(self.q_set))
+
+            tk.messagebox.showinfo('Quiz Result', 'Your score is: '+score+'\n')
+            #reset quiz
+            self.quiz_score=0
+            self.ques_num=0
             self.quiz_chapter_title.config(text=self.values)
             self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
             self.quiz_option1.config(text=self.q_set[self.ques_num][1])
             self.quiz_option2.config(text=self.q_set[self.ques_num][2])
             self.quiz_option3.config(text=self.q_set[self.ques_num][3])
             self.quiz_option4.config(text=self.q_set[self.ques_num][4])
+            self.quiz_next_btn.config(text='Next')
+            self.quiz_next_btn.config(command=next_ques)
+            self.quiz_prev_btn.config(state=DISABLED)
+            self.quiz_ques_num.config(text='Question '+str(self.ques_num+1)+'/'+str(len(self.q_set)))
 
 
-        def prev_ques():
-            if self.ques_num > 0:
-                    self.ques_num -= 1
-            if self.ques_num == 0:
-                self.quiz_prev_btn.config(state=DISABLED)
-            else:
-                self.quiz_prev_btn.config(state=NORMAL)
-                self.quiz_next_btn.config(state=NORMAL)
-
-            self.quiz_chapter_title.config(text=self.values)
-            self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
-            self.quiz_option1.config(text=self.q_set[self.ques_num][1])
-            self.quiz_option2.config(text=self.q_set[self.ques_num][2])
-            self.quiz_option3.config(text=self.q_set[self.ques_num][3])
-            self.quiz_option4.config(text=self.q_set[self.ques_num][4])
-
-        self.quiz_prev_btn=Button(self.quizques_frame, text='Previous', font=f3, relief=SOLID, cursor='hand2', width=10, command=prev_ques, state=DISABLED)
-        self.quiz_prev_btn.grid(row=6, column=0, pady=10, padx=10, sticky=W, columnspan=3)
-
-        self.quiz_next_btn=Button(self.quizques_frame, text='Next', font=f3, relief=SOLID, cursor='hand2', width=10, command=next_ques)
-        self.quiz_next_btn.grid(row=6, column=2, pady=10, padx=10, sticky=E, columnspan=3)
+       
+        
 
 
 class Calculator(tk.Frame):
