@@ -1,5 +1,4 @@
-import bcrypt, re, random, textwrap
-import datetime
+import bcrypt, re, random, textwrap, datetime
 from tkcalendar import Calendar, DateEntry
 from tkinter import *
 from PIL import Image,ImageTk
@@ -23,7 +22,7 @@ f2=('Arial', 12)
 f3=('Arial', 16)
 f4=('Arial', 18)
 bgc='#F9D3B9'
-empty_text='                                                                                             '
+empty_text='  '
 
 img_file='images\Slide4.png'
 
@@ -756,6 +755,9 @@ class StudentsView(tk.Frame):
         self.subj4_entry.grid(row=0, column=7, pady=10, padx=10)
 
         def show_stud_record(e):
+            self.delete_btn.config(state='normal')
+            self.update_btn.config(state='normal')
+
             #clear entries
             self.name_entry.delete(0, END)
             self.id_entry.config(state='normal')
@@ -804,7 +806,7 @@ class StudentsView(tk.Frame):
             self.subj4_entry.delete(0, END)
         
         #Update student record btn
-        self.update_btn=Button(self.edit_frame, text='Update Record', font=f, width=15, relief=SOLID, cursor='hand2', command=update_stud_record)
+        self.update_btn=Button(self.edit_frame, text='Update Record', font=f, width=15, relief=SOLID, cursor='hand2', command=update_stud_record, state=DISABLED)
         self.update_btn.grid(row=1, column=6, pady=10, padx=10, columnspan=2)
 
         #delete student record
@@ -831,7 +833,7 @@ class StudentsView(tk.Frame):
             self.subj4_entry.delete(0, END)
 
         #delete student record btn
-        self.delete_btn=Button(self.edit_frame, text='Delete Record', font=f, width=15, relief=SOLID, cursor='hand2', command=delete_stud_record)
+        self.delete_btn=Button(self.edit_frame, text='Delete Record', font=f, width=15, relief=SOLID, cursor='hand2', command=delete_stud_record, state=DISABLED)
         self.delete_btn.grid(row=2, column=6, pady=10, padx=10, columnspan=2)
 
         my_tree.bind('<ButtonRelease-1>', show_stud_record)
@@ -952,12 +954,6 @@ class BooksView(tk.Frame):
         my_tree.heading('Category', text='Category', anchor=CENTER)
         my_tree.heading('File', text='File', anchor=CENTER)
 
-        # #pdf viewer label
-        # self.pdf_viewer_label=Label(self, text='PDF Viewer', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
-        # self.pdf_viewer_label.place(x=1035, y=155)
-
-        # self.clickpdf_lbl = Label(self, text='Click on a book to view', font=('Arial', 14), bg=bgc, fg='black')
-        # self.clickpdf_lbl.place(x=1015, y=185)
 
         #pdf viewer for books
         self.pdfview_frame=Frame(self, bg=bgc, width=485, height=565, bd=2, relief=SOLID)
@@ -974,6 +970,7 @@ class BooksView(tk.Frame):
 
         #show records and view book pdf when pressing row
         def show_book_record(e):
+            self.deletebook_btn.config(state=NORMAL)
             #clear entries
             self.bookid_entry.delete(0, END)
             self.bookname_entry.delete(0, END)
@@ -1151,7 +1148,7 @@ class BooksView(tk.Frame):
         self.addbook_btn= Button(self.booksrec_frame, text='Add Book', font=f3, relief=SOLID, cursor='hand2', command=insert_books)
         self.addbook_btn.grid(row=4, column=1, sticky=W, pady=10, padx=65)
 
-        self.deletebook_btn= Button(self.booksrec_frame, text='Delete Book', font=f3, relief=SOLID ,cursor='hand2',command=del_book_record)
+        self.deletebook_btn= Button(self.booksrec_frame, text='Delete Book', font=f3, relief=SOLID ,cursor='hand2',command=del_book_record, state=DISABLED)
         self.deletebook_btn.grid(row=4, column=2, sticky=W, pady=10, padx=10)
 
         
@@ -1644,7 +1641,7 @@ class ChatAdmin(tk.Frame):
 
         #chat admin label
         chat_admin_label=Label(self, text='Chat Admin', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
-        chat_admin_label.place(x=40, y=155)
+        chat_admin_label.place(x=585, y=155)
 
         #discussions server treeview scroll
         self.discussions_frame=Frame(self, width=300, height=500, bg=bgc)
@@ -1905,6 +1902,8 @@ class CourseMaterials(tk.Frame):
         
 
         def show_material(e):
+            self.delete_btn.config(state=NORMAL)
+
             #forget upload frame place
             self.view_materials_frame.place(x=535, y=200)    
             self.upload_material_frame.place_forget()     
@@ -1934,7 +1933,7 @@ class CourseMaterials(tk.Frame):
         self.upload_btn.place(x=70, y=600)
 
         #remove files, images, documents
-        self.delete_btn=Button(self, text='Remove Materials', font=f3, relief=SOLID, cursor='hand2', command=deletematerial)
+        self.delete_btn=Button(self, text='Remove Materials', font=f3, relief=SOLID, cursor='hand2', command=deletematerial, state=DISABLED)
         self.delete_btn.place(x=250, y=600)
 
         #expand all nodes btn
