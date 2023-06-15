@@ -2947,7 +2947,7 @@ class Appointments(tk.Frame):
                                         password="rootpass",
                                         database="all2")
         cur = con.cursor()
-        cur.execute('''CREATE TABLE IF NOT EXISTS appointments(idappointments INT AUTO_INCREMENT PRIMARY KEY,
+        cur.execute('''CREATE TABLE IF NOT EXISTS apppointments(idapppointments INT AUTO_INCREMENT PRIMARY KEY,
                                                                 stud_name varchar(85) NOT NULL,
                                                                 email varchar(85) NOT NULL,
                                                                 user_id varchar(45) NOT NULL,
@@ -3079,7 +3079,7 @@ class Appointments(tk.Frame):
                     lecturer = self.lecturer_entry.get()
                     description = self.description_entry.get(1.0, END)
 
-                    insert_appointment = ("INSERT INTO appointments (idappointments, stud_name, email, user_id, app_date, hour, minute, lecturer, description, status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);")
+                    insert_appointment = ("INSERT INTO apppointments (idapppointments, stud_name, email, user_id, app_date, hour, minute, lecturer, description, status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);")
                     appointment_data = (idappointments, name, email, student_id, app_date, hour, minute, lecturer, description, 'Pending')
                     cur.execute(insert_appointment, appointment_data)
                     con.commit()
