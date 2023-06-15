@@ -1,4 +1,7 @@
-import bcrypt, re, random, textwrap, datetime
+from socket import *
+from threading import *
+from tkinter import simpledialog
+import bcrypt, re, random, textwrap, datetime, chat_server
 from tkcalendar import Calendar, DateEntry
 from tkinter import *
 from PIL import Image,ImageTk
@@ -38,6 +41,12 @@ questions=['5', '10', '15']
 options=['A', 'B', 'C', 'D']
 hours=['09', '10', '11', '12', '13', '14', '15', '16']
 minutes=['00', '15', '30', '45']
+
+ #host, port
+host='192.168.0.143'
+port=5000
+address=(host, port)
+
 
 
 #top buttons
@@ -166,6 +175,11 @@ class App(tk.Tk):
         frame.profile_email_lbl.config(text='Email: '+login_details[3])
         frame.tkraise()
 
+    def updateChatAdmin(self, login_details):
+        frame = self.frames[ChatAdmin]
+        frame.name.config(login_details[1])
+        frame.tkraise()
+
 
 class Loginpage(tk.Frame):
     def __init__(self, parent, controller):
@@ -215,6 +229,7 @@ class Loginpage(tk.Frame):
                 login_details=c.fetchone()
                 if login_details is not None:
                     controller.updateProfile(login_details)
+                    controller.updateChatAdmin(login_details)
                     if bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Student'):
                         controller.show_frame(Homepage)
                     # controller.updateHomepage(login_details)
@@ -1643,10 +1658,26 @@ class ChatAdmin(tk.Frame):
         chat_admin_label=Label(self, text='Chat Admin', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
         chat_admin_label.place(x=585, y=155)
 
+
+        self.client_socket = socket(AF_INET, SOCK_STREAM)
+        self.client_socket.connect(address)
+
+        # self.interface_done = False
+        self.running=True
+
+        self.name = simpledialog.askstring("Name", "Please enter your name", parent=self)
+
+        self.client_socket.send(self.name.encode('utf-8'))
+
+        # interface_thread= Thread(target=self.interface)
+        receive_thread = Thread(target=receive_msg)
+        
+        # interface_thread.start()
+        receive_thread.start()
+
         #discussions server treeview scroll
         self.discussions_frame=Frame(self, width=300, height=500, bg=bgc)
         self.discussions_frame.place(x=125, y=225)
-
 
         self.discussions_tv_frame=Frame(self.discussions_frame, bg=bgc)
         self.discussions_tv_frame.grid(row=1, column=0)
@@ -1678,8 +1709,33 @@ class ChatAdmin(tk.Frame):
         self.chat_entry.grid(row=0, column=0, padx=10, pady=5)
 
         #send btn
-        self.send_btn=Button(self.chat_entry_frame, text='Send', font=f, relief=SOLID, bd=2, cursor='hand2')
+        self.send_btn=Button(self.chat_entry_frame, text='Send', font=f, relief=SOLID, bd=2, cursor='hand2', command=send_msg)
         self.send_btn.grid(row=0, column=1, padx=10, pady=5)
+
+        self.interface_done=True
+
+        def send_msg():
+            message = f"{self.name}: {self.chat_entry.get('1.0', 'end-1c')}"
+            self.chat_entry.delete('1.0', 'end')
+            self.client_socket.send(bytes(message,('utf-8')))
+
+            # Get the message from the entry field
+            # Implement the logic to send the message to the server or other clients
+            # You can use a WebSocket connection or any other communication mechanism
+
+        def receive_msg():
+            self.chat_scrolledtxt = scrolledtext.ScrolledText(self, width=58, height=21, bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
+            self.chat_scrolledtxt.place(x=650, y=115)
+            while self.running:
+                try:
+                    # Display the received message in the chat message area
+                    message = self.client_socket.recv(1024).decode('utf-8')
+                    self.chat_scrolledtxt.config(state='normal')
+                    self.chat_scrolledtxt.insert(tk.END, message + '\n')
+                    self.chat_scrolledtxt.config(state='disabled')
+                    self.chat_scrolledtxt.see(tk.END)  # Scroll to the end of the text area
+                except OSError:
+                    break
 
         
 
