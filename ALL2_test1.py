@@ -175,10 +175,15 @@ class App(tk.Tk):
         frame.profile_email_lbl.config(text='Email: '+login_details[3])
         frame.tkraise()
 
-    def updateChatAdmin(self, login_details):
-        frame = self.frames[ChatAdmin]
-        # frame.name.config(login_details[1])
-        frame.tkraise()
+    # def updateChatAdmin(self, login_details):
+    #     frame = self.frames[ChatAdmin]
+    #     # frame.name.config(login_details[1])
+    #     frame.tkraise()
+
+    # def updateAppointments(self, login_details):
+    #     frame = self.frames[Appointments]
+    #     frame.user_id_lbl.config(login_details[2])
+    #     frame.tkraise()
 
 
 class Loginpage(tk.Frame):
@@ -229,9 +234,12 @@ class Loginpage(tk.Frame):
                 login_details=c.fetchone()
                 if login_details is not None:
                     controller.updateProfile(login_details)
-                    controller.updateChatAdmin(login_details)
                     if bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Student'):
                         controller.show_frame(Homepage)
+                        
+                        # controller.updateAppointments(login_details)
+                        
+                        # controller.updateChatAdmin(login_details)
                     # controller.updateHomepage(login_details)
                     # controller.updateAdmin(login_details)
                     elif bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Lecturer'):
@@ -2037,11 +2045,11 @@ class AdminAppointments(tk.Frame):
         self.appt_tv['columns']=('Student', 'Date', 'Time', 'Topic', 'Status')
 
         self.appt_tv.column('#0', width=0, stretch=NO)
-        self.appt_tv.column('Student', anchor=W, width=200, minwidth=200, stretch=NO)
-        self.appt_tv.column('Date', anchor=W, width=100, minwidth=100, stretch=NO)
-        self.appt_tv.column('Time', anchor=W, width=100, minwidth=100, stretch=NO)
-        self.appt_tv.column('Topic', anchor=W, width=200, minwidth=200, stretch=NO)
-        self.appt_tv.column('Status', anchor=W, width=100, minwidth=100, stretch=NO)
+        self.appt_tv.column('Student', anchor=CENTER, width=200, minwidth=200, stretch=NO)
+        self.appt_tv.column('Date', anchor=CENTER, width=100, minwidth=100, stretch=NO)
+        self.appt_tv.column('Time', anchor=CENTER, width=100, minwidth=100, stretch=NO)
+        self.appt_tv.column('Topic', anchor=CENTER, width=200, minwidth=200, stretch=NO)
+        self.appt_tv.column('Status', anchor=CENTER, width=100, minwidth=100, stretch=NO)
 
         self.appt_tv.heading('#0', text='', anchor=CENTER)
         self.appt_tv.heading('Student', text='Student', anchor=CENTER)
@@ -2049,6 +2057,18 @@ class AdminAppointments(tk.Frame):
         self.appt_tv.heading('Time', text='Time', anchor=CENTER)
         self.appt_tv.heading('Topic', text='Topic', anchor=CENTER)
         self.appt_tv.heading('Status', text='Status', anchor=CENTER)
+
+        #connect to db, show appointments in treeview
+        con = mysql.connector.connect(host="localhost",
+                                    user="root",
+                                    password="rootpass",
+                                    database="all2")
+        cur = con.cursor()
+        aa_set = cur.execute('''SELECT stud_name, app_date, hour, minute, description, status FROM apppointments;''')
+        aa_set=cur.fetchall()
+        for row in aa_set:
+            self.appt_tv.insert('', 'end', text='', values=(row[0], row[1], row[2]+':'+ row[3], row[4], row[5]))
+
 
 
         #accept or reject appointment, leave a note if rejected, frame
@@ -3072,8 +3092,6 @@ class Appointments(tk.Frame):
                     email = self.email_entry.get()
                     student_id = self.student_id_entry.get()
                     app_date = self.date_entry.get()
-                    print(app_date)
-                    print(type(app_date))
                     hour = self.hr_entry.get() 
                     minute = self.min_entry.get()
                     lecturer = self.lecturer_entry.get()
@@ -3136,6 +3154,17 @@ class Appointments(tk.Frame):
         self.apptstat_tree.heading('Lecturer', text='Lecturer', anchor=CENTER)
         self.apptstat_tree.heading('Status', text='Status', anchor=CENTER)
 
+        # self.user_id_lbl = ''
+        #connect to db and insert information into treeview
+        con = mysql.connector.connect(host="localhost",
+                                    user="root",
+                                    password="rootpass",
+                                    database="all2")
+        cur = con.cursor()
+        a_set = cur.execute('''SELECT app_date, hour, minute, lecturer, status FROM apppointments WHERE user_id = %s''', ('P12345679',))
+        a_set = cur.fetchall()
+        for row in a_set:
+            self.apptstat_tree.insert('', tk.END,  values=(row[0], row[1]+':'+row[2], row[3], row[4]))
 
         #view lecturer response from post a question in homepage
         self.lec_res_lbl=Label(self, text='Lecturer Response', font=('Arial', 20), bg=bgc)
