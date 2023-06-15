@@ -71,27 +71,6 @@ class App(tk.Tk):
         self.send_btn = Button(self.chat_entry_frame, text='Send', font=f, relief=SOLID, bd=2, cursor='hand2', command=self.send_msg)
         self.send_btn.grid(row=0, column=1, padx=10, pady=5)
 
-        # #show users list
-        # self.users_frame = tk.Frame(self, width=300, height=500, bg=bgc)
-        # self.users_frame.place(x=125, y=450)
-
-        # self.users_txt = tk.Label(self.users_frame, text='Users', font=('Arial', 29), bg=bgc)
-        # self.users_txt.grid(row=0, column=0, pady=10)
-
-        # self.users_tv_frame = tk.Frame(self.users_frame, bg=bgc)
-        # self.users_tv_frame.grid(row=1, column=0)
-
-        # self.users_tv_scroll = tk.Scrollbar(self.users_tv_frame)
-        # self.users_tv_scroll.pack(side=tk.RIGHT, fill=Y)
-
-        # self.users_tv = ttk.Treeview(self.users_tv_frame, yscrollcommand=self.users_tv_scroll.set, height=15)
-        # self.users_tv.pack()
-
-        # self.users_tv_scroll.config(command=self.users_tv.yview)
-        
-        # self.users_tv.column('#0', width=435, minwidth=435)
-
-        
 
         self.interface_done = True
 
@@ -118,15 +97,6 @@ class App(tk.Tk):
                     self.chat_scrolledtxt.see(tk.END)  # Scroll to the end of the text area
                 except OSError:
                     break
-            # # Insert user names
-            # names=self.client_socket.recv(1024).decode('utf-8')
-            # for n in names:
-            #     self.users_tv.insert(parent='', index='end', iid=0, text=n) 
-    
-
-
-
-    
 
 app = App()
 app.geometry('1280x720+80+5')
