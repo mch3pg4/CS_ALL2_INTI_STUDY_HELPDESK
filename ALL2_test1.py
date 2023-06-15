@@ -1,7 +1,7 @@
 from socket import *
 from threading import *
 from tkinter import simpledialog
-import bcrypt, re, random, textwrap, datetime, chat_server
+import bcrypt, re, random, textwrap, datetime
 from tkcalendar import Calendar, DateEntry
 from tkinter import *
 from PIL import Image,ImageTk
@@ -9,7 +9,7 @@ from tkinter import messagebox, ttk, filedialog,  Label, Entry, Button, END, scr
 import tkinter as tk
 import tkinter.ttk as ttk
 from time import strftime
-from datetime import date
+from datetime import date 
 from dateutil.relativedelta import relativedelta
 import mysql.connector
 from mysql.connector import Error
@@ -177,7 +177,7 @@ class App(tk.Tk):
 
     def updateChatAdmin(self, login_details):
         frame = self.frames[ChatAdmin]
-        frame.name.config(login_details[1])
+        # frame.name.config(login_details[1])
         frame.tkraise()
 
 
@@ -1659,21 +1659,21 @@ class ChatAdmin(tk.Frame):
         chat_admin_label.place(x=585, y=155)
 
 
-        self.client_socket = socket(AF_INET, SOCK_STREAM)
-        self.client_socket.connect(address)
+        # self.client_socket = socket(AF_INET, SOCK_STREAM)
+        # self.client_socket.connect(address)
 
-        # self.interface_done = False
-        self.running=True
+        # # self.interface_done = False
+        # self.running=True
 
-        self.name = simpledialog.askstring("Name", "Please enter your name", parent=self)
+        # self.name = simpledialog.askstring("Name", "Please enter your name", parent=self)
 
-        self.client_socket.send(self.name.encode('utf-8'))
+        # self.client_socket.send(self.name.encode('utf-8'))
 
-        # interface_thread= Thread(target=self.interface)
-        receive_thread = Thread(target=receive_msg)
+        # # interface_thread= Thread(target=self.interface)
+        # receive_thread = Thread(target=receive_msg)
         
-        # interface_thread.start()
-        receive_thread.start()
+        # # interface_thread.start()
+        # receive_thread.start()
 
         #discussions server treeview scroll
         self.discussions_frame=Frame(self, width=300, height=500, bg=bgc)
@@ -1709,33 +1709,33 @@ class ChatAdmin(tk.Frame):
         self.chat_entry.grid(row=0, column=0, padx=10, pady=5)
 
         #send btn
-        self.send_btn=Button(self.chat_entry_frame, text='Send', font=f, relief=SOLID, bd=2, cursor='hand2', command=send_msg)
+        self.send_btn=Button(self.chat_entry_frame, text='Send', font=f, relief=SOLID, bd=2, cursor='hand2')
         self.send_btn.grid(row=0, column=1, padx=10, pady=5)
 
-        self.interface_done=True
+        # self.interface_done=True
 
-        def send_msg():
-            message = f"{self.name}: {self.chat_entry.get('1.0', 'end-1c')}"
-            self.chat_entry.delete('1.0', 'end')
-            self.client_socket.send(bytes(message,('utf-8')))
+        # def send_msg():
+        #     message = f"{self.name}: {self.chat_entry.get('1.0', 'end-1c')}"
+        #     self.chat_entry.delete('1.0', 'end')
+        #     self.client_socket.send(bytes(message,('utf-8')))
 
-            # Get the message from the entry field
-            # Implement the logic to send the message to the server or other clients
-            # You can use a WebSocket connection or any other communication mechanism
+        #     # Get the message from the entry field
+        #     # Implement the logic to send the message to the server or other clients
+        #     # You can use a WebSocket connection or any other communication mechanism
 
-        def receive_msg():
-            self.chat_scrolledtxt = scrolledtext.ScrolledText(self, width=58, height=21, bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
-            self.chat_scrolledtxt.place(x=650, y=115)
-            while self.running:
-                try:
-                    # Display the received message in the chat message area
-                    message = self.client_socket.recv(1024).decode('utf-8')
-                    self.chat_scrolledtxt.config(state='normal')
-                    self.chat_scrolledtxt.insert(tk.END, message + '\n')
-                    self.chat_scrolledtxt.config(state='disabled')
-                    self.chat_scrolledtxt.see(tk.END)  # Scroll to the end of the text area
-                except OSError:
-                    break
+        # def receive_msg():
+        #     self.chat_scrolledtxt = scrolledtext.ScrolledText(self, width=58, height=21, bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
+        #     self.chat_scrolledtxt.place(x=650, y=115)
+        #     while self.running:
+        #         try:
+        #             # Display the received message in the chat message area
+        #             message = self.client_socket.recv(1024).decode('utf-8')
+        #             self.chat_scrolledtxt.config(state='normal')
+        #             self.chat_scrolledtxt.insert(tk.END, message + '\n')
+        #             self.chat_scrolledtxt.config(state='disabled')
+        #             self.chat_scrolledtxt.see(tk.END)  # Scroll to the end of the text area
+        #         except OSError:
+        #             break
 
         
 
@@ -2941,6 +2941,26 @@ class Appointments(tk.Frame):
         self.appt_lbl = Label(self, text ='Appointments', font = ('Arial', 28), bg=bgc)
         self.appt_lbl.place(x=600, y=100)
 
+        #connect to db
+        con = mysql.connector.connect(host="localhost",
+                                        user="root",
+                                        password="rootpass",
+                                        database="all2")
+        cur = con.cursor()
+        cur.execute('''CREATE TABLE IF NOT EXISTS appointments(idappointments INT AUTO_INCREMENT PRIMARY KEY,
+                                                                stud_name varchar(85) NOT NULL,
+                                                                email varchar(85) NOT NULL,
+                                                                user_id varchar(45) NOT NULL,
+                                                                app_date varchar(105) NOT NULL,
+                                                                hour varchar(45) NOT NULL,
+                                                                minute varchar(45) NOT NULL,
+                                                                lecturer varchar(45) NOT NULL,
+                                                                description varchar(255) NOT NULL,
+                                                                status varchar(45) DEFAULT 'Pending',
+                                                                reason varchar(255) DEFAULT NULL,
+                                                                FOREIGN KEY (user_id) REFERENCES usersubjects(user_id))''')
+        con.commit()
+
         #make an appointment frame
         #name, email, student id, date, time, lecturer, description
         self.make_appt_frame=Frame(self, width=500, height=500, bg=bgc, relief=SOLID, bd=2)
@@ -3000,7 +3020,88 @@ class Appointments(tk.Frame):
         self.description_entry=Text(self.make_appt_frame, font=f, width=22, height=4, wrap=WORD)
         self.description_entry.grid(row=7, column=1, pady=10, padx=10, sticky=W, columnspan=4)
 
-        self.submit_btn=Button(self.make_appt_frame, text='Submit', font=f, relief=SOLID, bd=2, cursor='hand2')
+        def make_appointment():
+            check_counter=0
+            warn=''
+            if self.name_entry.get()=='':
+                warn = 'Please enter name'
+            else: 
+                check_counter+=1
+
+            if self.email_entry.get()=='':
+                warn = 'Please enter email'
+            else:
+                check_counter+=1
+
+            if self.student_id_entry.get()=='':
+                warn = 'Please enter student ID'
+            else:
+                check_counter+=1
+            
+            if self.hr_entry.get()=='' :
+                warn = 'Please enter hour'
+            else:
+                check_counter+=1
+
+            if self.min_entry.get()=='':
+                warn = 'Please enter minute'
+            else:
+                check_counter+=1
+            
+            if self.lecturer_entry.get()=='':
+                warn = 'Please choose lecturer'
+            else:
+                check_counter+=1
+
+            if self.description_entry.get('1.0', 'end-1c')=='':
+                warn = 'Please enter description'
+            else:
+                check_counter+=1
+
+            if check_counter==7:
+                try:
+                    con = mysql.connector.connect(host="localhost",
+                                                  user="root",
+                                                  password="rootpass",
+                                                  database="all2")
+                    cur=con.cursor()
+
+                    #get user entry
+                    idappointments = None
+                    name = self.name_entry.get()
+                    email = self.email_entry.get()
+                    student_id = self.student_id_entry.get()
+                    app_date = self.date_entry.get()
+                    print(app_date)
+                    print(type(app_date))
+                    hour = self.hr_entry.get() 
+                    minute = self.min_entry.get()
+                    lecturer = self.lecturer_entry.get()
+                    description = self.description_entry.get(1.0, END)
+
+                    insert_appointment = ("INSERT INTO appointments (idappointments, stud_name, email, user_id, app_date, hour, minute, lecturer, description, status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);")
+                    appointment_data = (idappointments, name, email, student_id, app_date, hour, minute, lecturer, description, 'Pending')
+                    cur.execute(insert_appointment, appointment_data)
+                    con.commit()
+                    messagebox.showinfo('Success', 'Appointment created successfully')
+
+                    #clear user entry
+                    self.name_entry.delete(0, END)
+                    self.email_entry.delete(0, END)
+                    self.student_id_entry.delete(0, END)
+                    self.hr_entry.set('')
+                    self.min_entry.set('')
+                    self.lecturer_entry.set('')
+                    self.description_entry.delete('1.0', 'end-1c')
+
+
+                except Exception as ep:
+                    messagebox.showerror('Error',ep)
+            else:
+                messagebox.showerror('Error', warn)
+
+
+        self.submit_btn=Button(self.make_appt_frame, text='Submit', font=f, relief=SOLID, bd=2, cursor='hand2', command=make_appointment)
         self.submit_btn.grid(row=8, column=2, pady=10, padx=10, columnspan=3, sticky=W)
 
         #view appointments status frame, treeview
