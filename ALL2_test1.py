@@ -180,11 +180,10 @@ class App(tk.Tk):
     #     # frame.name.config(login_details[1])
     #     frame.tkraise()
 
-    # def updateAppointments(self, login_details):
-    #     frame = self.frames[Appointments]
-    #     frame.user_id_lbl.config(login_details[2])
-    #     frame.tkraise()
-
+    def updateAppointments(self, login_details):
+        frame = self.frames[Appointments]
+        frame.user_id_lbl.config(text=login_details[2])
+        frame.tkraise()
 
 class Loginpage(tk.Frame):
     def __init__(self, parent, controller):
@@ -234,18 +233,13 @@ class Loginpage(tk.Frame):
                 login_details=c.fetchone()
                 if login_details is not None:
                     controller.updateProfile(login_details)
+                    controller.updateAppointments(login_details)
                     if bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Student'):
                         controller.show_frame(Homepage)
-                        
-                        # controller.updateAppointments(login_details)
-                        
-                        # controller.updateChatAdmin(login_details)
                     # controller.updateHomepage(login_details)
-                    # controller.updateAdmin(login_details)
                     elif bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Lecturer'):
-                        controller.show_frame(StudentsView)
-                        
-                    else:
+                        controller.show_frame(StudentsView) 
+                else:
                         messagebox.showerror('Login Status', 'invalid username or password')
             else:
                 messagebox.showerror('Error', warn)
@@ -1937,7 +1931,7 @@ class CourseMaterials(tk.Frame):
                     except Exception as ep:
                         messagebox.showerror('', ep)
                 else:
-                    messagebox.showerror('', warn)
+                    messagebox.showerror('Add Materials Error', warn)
 
             #upload file buttom
             self.upload_file_btn=Button(self.upload_material_frame, text='Upload File', font=f3, cursor='hand2', command=upload_materialfile)
@@ -2288,7 +2282,7 @@ class Homepage(tk.Frame):
         
 
 
-        #calendar for appointment
+        #calendar for appointment (might change to appontment treeview)
         
         #calendar title
         self.calendar_lbl = Label(self, text ='Calendar', font = ('Arial', 28), bg=bgc)
@@ -2315,13 +2309,78 @@ class Homepage(tk.Frame):
         self.post_frame.place(x=934, y=465)
 
         #question textbox
-        self.question_txt = Text(self.post_frame, width=35, height=10, wrap='word',font=f)
+        self.question_txt = Text(self.post_frame, width=35, height=8, wrap='word',font=f)
         self.question_txt.insert(INSERT, 'Type your question here...')
         self.question_txt.grid(row=0, column=0,columnspan=3, padx=10, pady=10)
 
+        #send to which lecturer checkbox
+        self.lecturer_lbl = Label(self.post_frame, text='Send to:', font=f, bg=bgc)
+        self.lecturer_lbl.grid(row=1, column=0, padx=10, pady=3)
+
+        #lecturer combobox
+        self.lecturer_cb = ttk.Combobox(self.post_frame, width=13, font=f, values=['Lect1', 'Lect2'], state='readonly')
+        self.lecturer_cb.grid(row=1, column=1, padx=10, pady=3, columnspan=2)
+
+        #connect to db
+        con = mysql.connector.connect(host="localhost",
+                                    user="root",
+                                    password="rootpass",
+                                    database="all2")
+        cur = con.cursor()
+        cur.execute('''CREATE TABLE IF NOT EXISTS questions(idquestions INT AUTO_INCREMENT PRIMARY KEY,
+                                                            stud_name VARCHAR(85) NOT NULL,
+                                                            stud_ques LONGTEXT NOT NULL,
+                                                            stud_img LONGTEXT DEFAULT NULL,
+                                                            lec_name VARCHAR(85) NOT NULL,
+                                                            lec_reply LONGTEXT DEFAULT NULL)''')
+        con.commit()
+
+        #attach image function
+        def attach_img():
+            self.img_path = filedialog.askopenfilename(title='Attach Question Image', filetypes=(('PNG Files', '*png'), ('All Files', '*.*')))
+            if self.img_path != '':
+                self.upload_btn.config(text='Image Attached')
+
+
+        #upload image btn
+        self.upload_btn = Button(self.post_frame, width=13, text='Attach Image', font=f, relief=SOLID,cursor='hand2', command=attach_img)
+        self.upload_btn.grid(row=2, column=0, padx=10, pady=10)
+
+
+        def post_ques():
+            try:
+                con = mysql.connector.connect(host="localhost",
+                                                        user="root",
+                                                        password="rootpass",
+                                                        database="all2")
+                cur=con.cursor()
+                idquestions=None
+                #stud_name = self.stud_name.get()
+                ques = self.question_txt.get('1.0', 'end-1c')
+                stud_img = self.img_path if hasattr(self, 'img_path') else ''  # Use the image path if available, otherwise use an empty string
+                lec_name = self.lecturer_cb.get()
+                
+                #insert into db
+                insert_question = ('''INSERT INTO questions(idquestions, stud_name, stud_ques,stud_img, lec_name) VALUES(%s, %s, %s, %s, %s);''')
+                data_question = (idquestions,'Tom', ques, stud_img, lec_name)
+                cur.execute(insert_question, data_question)
+                con.commit()
+
+                #clear entries
+                self.question_txt.delete('1.0', END)
+                self.lecturer_cb.set('')
+                self.upload_btn.config(text='Attach Image')
+                self.question_txt.insert(INSERT, 'Type your question here...')
+                messagebox.showinfo('Success', 'Question Posted')
+            
+            except Exception as e:
+                messagebox.showerror('Error', f'Error due to {str(e)}')
+
+
+    
         #post question btn
-        self.post_btn = Button(self.post_frame, width=15, text='Post', font=f, relief=SOLID,cursor='hand2')
-        self.post_btn.grid(row=1, column=1, padx=10, pady=10)
+        self.post_btn = Button(self.post_frame, width=13, text='Post', font=f, relief=SOLID,cursor='hand2', command=post_ques)
+        self.post_btn.grid(row=2, column=1, padx=10, pady=10)
 
 
 class Subject1(tk.Frame):
@@ -3154,7 +3213,8 @@ class Appointments(tk.Frame):
         self.apptstat_tree.heading('Lecturer', text='Lecturer', anchor=CENTER)
         self.apptstat_tree.heading('Status', text='Status', anchor=CENTER)
 
-        # self.user_id_lbl = ''
+        self.user_id_lbl = Label(self, text='')
+
         #connect to db and insert information into treeview
         con = mysql.connector.connect(host="localhost",
                                     user="root",
