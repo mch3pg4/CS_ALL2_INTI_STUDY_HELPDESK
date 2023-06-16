@@ -2068,6 +2068,51 @@ class AdminAppointments(tk.Frame):
             self.appt_tv.insert('', 'end', text='', values=(row[0], row[1], row[2], row[3]+':'+ row[4], row[5], row[6]))
 
 
+        self.app_var = StringVar()
+        self.app_var.set(None)
+
+
+        def accept_reject_app(e):
+            selected= self.appt_tv.focus()     
+            values=self.appt_tv.item(selected, 'values')
+
+            self.accept_btn.config(state=NORMAL)
+            self.reject_btn.config(state=NORMAL)
+            self.send_btn.config(state=NORMAL)
+
+            
+
+        self.appt_tv.bind('<ButtonRelease-1>', accept_reject_app)
+
+        def send_response():
+            selected= self.appt_tv.focus()     
+            values=self.appt_tv.item(selected, 'values')
+
+            con = mysql.connector.connect(host="localhost",
+                                          user="root",
+                                          password="rootpass",
+                                          database="all2")
+            cur = con.cursor()
+            update_app = ('''UPDATE apppointments SET status = %s, reason = %s WHERE idapppointments = %s;''')
+            app_data = (self.app_var.get(), self.note_entry.get('1.0', END), int(values[0]))
+            cur.execute(update_app, app_data)
+            con.commit()
+            messagebox.showinfo('Success', 'Appointment response sent to Student')
+
+            # Update the Treeview with the modified data
+            self.appt_tv.set(selected, column='Status', value=self.app_var.get())
+
+            #clear entry
+            self.note_entry.delete('1.0', END)
+            self.app_var.set(None)
+
+            #disable buttons
+            self.accept_btn.config(state=DISABLED)
+            self.reject_btn.config(state=DISABLED)
+            self.send_btn.config(state=DISABLED)
+
+
+ 
 
         #accept or reject appointment, leave a note if rejected, frame
         self.admin_response_frame=Frame(self, bg=bgc, bd=2, relief=SOLID)
@@ -2077,10 +2122,10 @@ class AdminAppointments(tk.Frame):
         self.admin_response_lbl.grid(row=0, column=0, padx=10, columnspan=3)
 
         #accept btn, reject btn
-        self.accept_btn=Button(self.admin_response_frame, text='Accept', font=f3, relief=SOLID, cursor='hand2', width=10)
+        self.accept_btn=Radiobutton(self.admin_response_frame, text='Accept', font=f3,bg=bgc, fg='black', cursor='hand2', width=10, state=DISABLED, variable=self.app_var, value='Accepted')
         self.accept_btn.grid(row=1, column=1, padx=10, pady=10)
 
-        self.reject_btn=Button(self.admin_response_frame, text='Reject', font=f3, relief=SOLID, cursor='hand2', width=10)
+        self.reject_btn=Radiobutton(self.admin_response_frame, text='Reject', font=f3, bg=bgc, fg='black', cursor='hand2', width=10, state=DISABLED, variable=self.app_var, value='Rejected')
         self.reject_btn.grid(row=1, column=2, padx=10, pady=10)
 
         #note if rejected
@@ -2091,7 +2136,7 @@ class AdminAppointments(tk.Frame):
         self.note_entry.grid(row=2, column=1, padx=10, pady=10, columnspan=2)
 
         #send btn
-        self.send_btn=Button(self.admin_response_frame, text='Send', font=f3, relief=SOLID, cursor='hand2')
+        self.send_btn=Button(self.admin_response_frame, text='Send', font=f3, relief=SOLID, cursor='hand2', state=DISABLED, command=send_response)
         self.send_btn.grid(row=3, column=1, padx=10, pady=10, columnspan=3)
 
 
@@ -2118,17 +2163,19 @@ class AdminAppointments(tk.Frame):
 
         self.stud_ques_tv_scroll.config(command=self.stud_ques_tv.yview)
 
-        self.stud_ques_tv['columns']=('ID', 'Student', 'Question')
+        self.stud_ques_tv['columns']=('ID', 'Student', 'Question', 'Reply')
 
         self.stud_ques_tv.column('#0', width=0, stretch=NO)
         self.stud_ques_tv.column('ID', anchor=CENTER, width=30, minwidth=30, stretch=NO)
-        self.stud_ques_tv.column('Student', anchor=CENTER, width=200, minwidth=200, stretch=NO)
-        self.stud_ques_tv.column('Question', anchor=CENTER, width=300, minwidth=300, stretch=NO)
+        self.stud_ques_tv.column('Student', anchor=CENTER, width=150, minwidth=150, stretch=NO)
+        self.stud_ques_tv.column('Question', anchor=CENTER, width=180, minwidth=180, stretch=NO)
+        self.stud_ques_tv.column('Reply', anchor=CENTER, width=175, minwidth=175, stretch=NO)
 
         self.stud_ques_tv.heading('#0', text='', anchor=CENTER)
         self.stud_ques_tv.heading('ID', text='ID', anchor=CENTER)
         self.stud_ques_tv.heading('Student', text='Student', anchor=CENTER)
         self.stud_ques_tv.heading('Question', text='Question', anchor=CENTER)
+        self.stud_ques_tv.heading('Reply', text='Reply', anchor=CENTER)
 
         #connect to db to retrieve questions from students
         con = mysql.connector.connect(host="localhost",
@@ -2136,13 +2183,40 @@ class AdminAppointments(tk.Frame):
                                         password="rootpass",
                                         database="all2")
         cur = con.cursor()
-        sq_set = cur.execute('''SELECT idquestions, stud_name, stud_ques FROM questions;''')
+        sq_set = cur.execute('''SELECT idquestions, stud_name, stud_ques, stud_img, COALESCE(lec_reply, 'No reply from lecturer') FROM questions;''')
         sq_set=cur.fetchall()
         for row in sq_set:
             wraptxt = textwrap.fill(row[2], width=30)
-            self.stud_ques_tv.insert('', 'end', text='', values=(row[0], row[1], wraptxt))
+            wraptxt2= textwrap.fill(row[4], width=30)
+            self.stud_ques_tv.insert('', tk.END, values=(row[0], row[1], wraptxt, wraptxt2))
 
-                                    
+        def select_stud_ques(e):
+            selected=self.stud_ques_tv.focus()
+            values=self.stud_ques_tv.item(selected, 'values')
+
+            self.reply_btn.config(state=NORMAL)
+            self.reply_tv.delete('1.0', END)
+        
+        self.stud_ques_tv.bind('<ButtonRelease-1>', select_stud_ques)
+
+        def reply_student():
+            selected=self.stud_ques_tv.focus()
+            values=self.stud_ques_tv.item(selected, 'values')
+
+            con = mysql.connector.connect(host="localhost",
+                                          user="root",
+                                            password="rootpass",
+                                            database="all2")
+            cur = con.cursor()
+            cur.execute('''UPDATE questions SET lec_reply=%s WHERE idquestions=%s;''', (self.reply_tv.get('1.0', END), int(values[0])))
+            con.commit()
+            messagebox.showinfo('Success', 'Reply sent successfully')
+
+            #update treeview
+            self.stud_ques_tv.set(selected, column='Reply', value=self.reply_tv.get('1.0', END))
+
+            self.reply_btn.config(state=DISABLED)
+            self.reply_tv.delete('1.0', END)
 
         #reply to questions from students
     
@@ -2155,12 +2229,8 @@ class AdminAppointments(tk.Frame):
         self.reply_tv=Text(self.reply_frame, width=30, height=4, padx=10, pady=10, wrap=WORD, font=f3)
         self.reply_tv.grid(row=1, column=0, padx=10, pady=10)
 
-        self.reply_btn=Button(self.reply_frame, text='Reply', font=f3, relief=SOLID, cursor='hand2', width=10)
+        self.reply_btn=Button(self.reply_frame, text='Reply', font=f3, relief=SOLID, cursor='hand2', width=10, state=DISABLED, command=reply_student)
         self.reply_btn.grid(row=2, column=0, padx=10, pady=10)
-
-
-
-
 
 
 
@@ -3207,6 +3277,9 @@ class Appointments(tk.Frame):
         #view appointments status frame, treeview
         self.apptstat_lbl=Label(self, text='Appointment Status', font=('Arial', 20), bg=bgc)
         self.apptstat_lbl.place(x=823, y=185)
+
+        style=ttk.Style()
+        style.configure('Appointment.Treeview', rowheight = 30)
         
         self.apptstat_frame=Frame(self, bg=bgc)
         self.apptstat_frame.place(x=655, y=235)
@@ -3215,19 +3288,20 @@ class Appointments(tk.Frame):
         self.apptstat_scroll=Scrollbar(self.apptstat_frame)
         self.apptstat_scroll.pack(side=RIGHT, fill=Y)
 
-        self.apptstat_tree=ttk.Treeview(self.apptstat_frame, yscrollcommand=self.apptstat_scroll.set, height=4)
+        self.apptstat_tree=ttk.Treeview(self.apptstat_frame, yscrollcommand=self.apptstat_scroll.set, height=4, style='Appointment.Treeview', selectmode='none')
         self.apptstat_tree.pack()
 
         self.apptstat_scroll.config(command=self.apptstat_tree.yview)
 
-        self.apptstat_tree['columns']= ('Date', 'Time', 'Lecturer', 'Status')
+        self.apptstat_tree['columns']= ('Date', 'Time', 'Lecturer', 'Status', 'Reason')
 
         #format columns
         self.apptstat_tree.column('#0', width=0, stretch=NO)
-        self.apptstat_tree.column('Date', anchor=CENTER, width=150, stretch=NO, minwidth=100)
+        self.apptstat_tree.column('Date', anchor=CENTER, width=100, stretch=NO, minwidth=100)
         self.apptstat_tree.column('Time', anchor=CENTER, width=100, stretch=NO, minwidth=100)
         self.apptstat_tree.column('Lecturer', anchor=CENTER, width=200, stretch=NO, minwidth=200)
-        self.apptstat_tree.column('Status', anchor=CENTER, width=150, stretch=NO, minwidth=235)
+        self.apptstat_tree.column('Status', anchor=CENTER, width=115, stretch=NO, minwidth=115)
+        self.apptstat_tree.column('Reason', anchor=CENTER, width=150, stretch=NO, minwidth=150)
 
         #column headings
         self.apptstat_tree.heading('#0', text='', anchor=CENTER)
@@ -3235,6 +3309,7 @@ class Appointments(tk.Frame):
         self.apptstat_tree.heading('Time', text='Time', anchor=CENTER)
         self.apptstat_tree.heading('Lecturer', text='Lecturer', anchor=CENTER)
         self.apptstat_tree.heading('Status', text='Status', anchor=CENTER)
+        self.apptstat_tree.heading('Reason', text='Reason', anchor=CENTER)
 
         self.user_id_lbl = Label(self, text='')
 
@@ -3244,10 +3319,11 @@ class Appointments(tk.Frame):
                                     password="rootpass",
                                     database="all2")
         cur = con.cursor()
-        a_set = cur.execute('''SELECT app_date, hour, minute, lecturer, status FROM apppointments WHERE user_id = %s''', ('P12345679',))
+        a_set = cur.execute('''SELECT app_date, hour, minute, lecturer, status, reason FROM apppointments WHERE user_id = %s''', ('P12345679',))
         a_set = cur.fetchall()
         for row in a_set:
-            self.apptstat_tree.insert('', tk.END,  values=(row[0], row[1]+':'+row[2], row[3], row[4]))
+            wraptxt= textwrap.fill(row[5], width=20)
+            self.apptstat_tree.insert('', tk.END,  values=(row[0], row[1]+':'+row[2], row[3], row[4], wraptxt))
 
         #view lecturer response from post a question in homepage
         self.lec_res_lbl=Label(self, text='Lecturer Response', font=('Arial', 20), bg=bgc)
@@ -3266,7 +3342,7 @@ class Appointments(tk.Frame):
         self.lec_res_scroll=Scrollbar(self.lec_res_frame)
         self.lec_res_scroll.pack(side=RIGHT, fill=Y)
 
-        self.lec_res_tree=ttk.Treeview(self.lec_res_frame, yscrollcommand=self.lec_res_scroll.set, height=3, style='Response.Treeview')
+        self.lec_res_tree=ttk.Treeview(self.lec_res_frame, yscrollcommand=self.lec_res_scroll.set, height=3, style='Response.Treeview', selectmode='none')
         self.lec_res_tree.pack()
 
         self.lec_res_scroll.config(command=self.lec_res_tree.yview)
@@ -3276,12 +3352,26 @@ class Appointments(tk.Frame):
         #format columns
         self.lec_res_tree.column('#0', width=0, stretch=NO)
         self.lec_res_tree.column('Question', anchor=CENTER, width=250, stretch=NO, minwidth=250)
-        self.lec_res_tree.column('Response from Lecturer', anchor=CENTER, width=350, stretch=NO, minwidth=350)
+        self.lec_res_tree.column('Response from Lecturer', anchor=CENTER, width=400, stretch=NO, minwidth=400)
 
         #column headings
         self.lec_res_tree.heading('#0', text='', anchor=CENTER)
         self.lec_res_tree.heading('Question', text='Question', anchor=CENTER)
         self.lec_res_tree.heading('Response from Lecturer', text='Response from Lecturer', anchor=CENTER)
+
+        #connect to db and insert information into treeview
+        con = mysql.connector.connect(host="localhost",
+                                      user="root",
+                                      password="rootpass",
+                                      database="all2")
+        cur = con.cursor()
+        qa_set = cur.execute('''SELECT stud_ques, COALESCE(lec_reply, 'No reply from lecturer') FROM questions;''')
+        qa_set = cur.fetchall()
+        for row in qa_set:
+            wraptxt= textwrap.fill(row[0], width=20)
+            wraptxt2= textwrap.fill(row[1], width=22)
+            self.lec_res_tree.insert('', tk.END,  values=(wraptxt, wraptxt2))
+
 
         
 
