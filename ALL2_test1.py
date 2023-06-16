@@ -173,17 +173,17 @@ class App(tk.Tk):
         frame.profile_name_lbl.config(text='Name: '+login_details[1])
         frame.profile_id_lbl.config(text='ID: '+login_details[2])
         frame.profile_email_lbl.config(text='Email: '+login_details[3])
-        frame.tkraise()
+        # frame.tkraise()
 
     # def updateChatAdmin(self, login_details):
     #     frame = self.frames[ChatAdmin]
     #     # frame.name.config(login_details[1])
     #     frame.tkraise()
 
-    def updateAppointments(self, login_details):
-        frame = self.frames[Appointments]
-        frame.user_id_lbl.config(text=login_details[2])
-        frame.tkraise()
+    # def updateAppointments(self, login_details):
+    #     frame = self.frames[Appointments]
+    #     frame.user_id_lbl.config(text=login_details[2])
+    #     frame.tkraise()
 
 class Loginpage(tk.Frame):
     def __init__(self, parent, controller):
@@ -233,14 +233,16 @@ class Loginpage(tk.Frame):
                 login_details=c.fetchone()
                 if login_details is not None:
                     controller.updateProfile(login_details)
-                    controller.updateAppointments(login_details)
+                    # controller.updateAppointments(login_details)
                     if bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Student'):
                         controller.show_frame(Homepage)
                     # controller.updateHomepage(login_details)
                     elif bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Lecturer'):
                         controller.show_frame(StudentsView) 
-                else:
+                    else:
                         messagebox.showerror('Login Status', 'invalid username or password')
+                else:
+                    messagebox.showerror('Login Status', 'invalid username or password')
             else:
                 messagebox.showerror('Error', warn)
 
@@ -2036,16 +2038,18 @@ class AdminAppointments(tk.Frame):
 
         self.appt_tv_scroll.config(command=self.appt_tv.yview)
 
-        self.appt_tv['columns']=('Student', 'Date', 'Time', 'Topic', 'Status')
+        self.appt_tv['columns']=('ID','Student', 'Date', 'Time', 'Topic', 'Status')
 
         self.appt_tv.column('#0', width=0, stretch=NO)
+        self.appt_tv.column('ID', anchor=CENTER, width=30, minwidth=30, stretch=NO)
         self.appt_tv.column('Student', anchor=CENTER, width=200, minwidth=200, stretch=NO)
         self.appt_tv.column('Date', anchor=CENTER, width=100, minwidth=100, stretch=NO)
-        self.appt_tv.column('Time', anchor=CENTER, width=100, minwidth=100, stretch=NO)
+        self.appt_tv.column('Time', anchor=CENTER, width=60, minwidth=60, stretch=NO)
         self.appt_tv.column('Topic', anchor=CENTER, width=200, minwidth=200, stretch=NO)
         self.appt_tv.column('Status', anchor=CENTER, width=100, minwidth=100, stretch=NO)
 
         self.appt_tv.heading('#0', text='', anchor=CENTER)
+        self.appt_tv.heading('ID', text='ID', anchor=CENTER)
         self.appt_tv.heading('Student', text='Student', anchor=CENTER)
         self.appt_tv.heading('Date', text='Date', anchor=CENTER)
         self.appt_tv.heading('Time', text='Time', anchor=CENTER)
@@ -2058,10 +2062,10 @@ class AdminAppointments(tk.Frame):
                                     password="rootpass",
                                     database="all2")
         cur = con.cursor()
-        aa_set = cur.execute('''SELECT stud_name, app_date, hour, minute, description, status FROM apppointments;''')
+        aa_set = cur.execute('''SELECT idapppointments, stud_name, app_date, hour, minute, description, status FROM apppointments;''')
         aa_set=cur.fetchall()
         for row in aa_set:
-            self.appt_tv.insert('', 'end', text='', values=(row[0], row[1], row[2]+':'+ row[3], row[4], row[5]))
+            self.appt_tv.insert('', 'end', text='', values=(row[0], row[1], row[2], row[3]+':'+ row[4], row[5], row[6]))
 
 
 
@@ -2100,26 +2104,45 @@ class AdminAppointments(tk.Frame):
         self.stud_ques_lbl=Label(self.stud_ques_frame, text='Questions from Students', font=('Arial', 20, 'bold'), bg=bgc)
         self.stud_ques_lbl.grid(row=0, column=0,  padx=10)
 
+        style=ttk.Style()
+        style.configure('StudQues.Treeview', rowheight=60)
+
         self.stud_ques_tvframe=Frame(self.stud_ques_frame, bg=bgc)
         self.stud_ques_tvframe.grid(row=1, column=0, pady=10)
 
         self.stud_ques_tv_scroll=Scrollbar(self.stud_ques_tvframe)
         self.stud_ques_tv_scroll.pack(side=RIGHT, fill=Y)
 
-        self.stud_ques_tv=ttk.Treeview(self.stud_ques_tvframe,yscrollcommand=self.stud_ques_tv_scroll.set, height=7)
+        self.stud_ques_tv=ttk.Treeview(self.stud_ques_tvframe,yscrollcommand=self.stud_ques_tv_scroll.set, height=4, style='StudQues.Treeview')
         self.stud_ques_tv.pack()
 
         self.stud_ques_tv_scroll.config(command=self.stud_ques_tv.yview)
 
-        self.stud_ques_tv['columns']=('Student', 'Question')
+        self.stud_ques_tv['columns']=('ID', 'Student', 'Question')
 
         self.stud_ques_tv.column('#0', width=0, stretch=NO)
-        self.stud_ques_tv.column('Student', anchor=W, width=200, minwidth=200, stretch=NO)
-        self.stud_ques_tv.column('Question', anchor=W, width=300, minwidth=300, stretch=NO)
+        self.stud_ques_tv.column('ID', anchor=CENTER, width=30, minwidth=30, stretch=NO)
+        self.stud_ques_tv.column('Student', anchor=CENTER, width=200, minwidth=200, stretch=NO)
+        self.stud_ques_tv.column('Question', anchor=CENTER, width=300, minwidth=300, stretch=NO)
 
         self.stud_ques_tv.heading('#0', text='', anchor=CENTER)
+        self.stud_ques_tv.heading('ID', text='ID', anchor=CENTER)
         self.stud_ques_tv.heading('Student', text='Student', anchor=CENTER)
         self.stud_ques_tv.heading('Question', text='Question', anchor=CENTER)
+
+        #connect to db to retrieve questions from students
+        con = mysql.connector.connect(host="localhost",
+                                      user="root",
+                                        password="rootpass",
+                                        database="all2")
+        cur = con.cursor()
+        sq_set = cur.execute('''SELECT idquestions, stud_name, stud_ques FROM questions;''')
+        sq_set=cur.fetchall()
+        for row in sq_set:
+            wraptxt = textwrap.fill(row[2], width=30)
+            self.stud_ques_tv.insert('', 'end', text='', values=(row[0], row[1], wraptxt))
+
+                                    
 
         #reply to questions from students
     
