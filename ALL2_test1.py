@@ -2042,10 +2042,10 @@ class AdminAppointments(tk.Frame):
 
         self.appt_tv.column('#0', width=0, stretch=NO)
         self.appt_tv.column('ID', anchor=CENTER, width=30, minwidth=30, stretch=NO)
-        self.appt_tv.column('Student', anchor=CENTER, width=200, minwidth=200, stretch=NO)
+        self.appt_tv.column('Student', anchor=CENTER, width=180, minwidth=180, stretch=NO)
         self.appt_tv.column('Date', anchor=CENTER, width=100, minwidth=100, stretch=NO)
         self.appt_tv.column('Time', anchor=CENTER, width=60, minwidth=60, stretch=NO)
-        self.appt_tv.column('Topic', anchor=CENTER, width=200, minwidth=200, stretch=NO)
+        self.appt_tv.column('Topic', anchor=CENTER, width=220, minwidth=220, stretch=NO)
         self.appt_tv.column('Status', anchor=CENTER, width=100, minwidth=100, stretch=NO)
 
         self.appt_tv.heading('#0', text='', anchor=CENTER)
@@ -2150,7 +2150,7 @@ class AdminAppointments(tk.Frame):
         self.stud_ques_lbl.grid(row=0, column=0,  padx=10)
 
         style=ttk.Style()
-        style.configure('StudQues.Treeview', rowheight=60)
+        style.configure('StudQues.Treeview', rowheight=62)
 
         self.stud_ques_tvframe=Frame(self.stud_ques_frame, bg=bgc)
         self.stud_ques_tvframe.grid(row=1, column=0, pady=10)
@@ -2168,7 +2168,7 @@ class AdminAppointments(tk.Frame):
         self.stud_ques_tv.column('#0', width=0, stretch=NO)
         self.stud_ques_tv.column('ID', anchor=CENTER, width=30, minwidth=30, stretch=NO)
         self.stud_ques_tv.column('Student', anchor=CENTER, width=150, minwidth=150, stretch=NO)
-        self.stud_ques_tv.column('Question', anchor=CENTER, width=180, minwidth=180, stretch=NO)
+        self.stud_ques_tv.column('Question', anchor=CENTER, width=200, minwidth=200, stretch=NO)
         self.stud_ques_tv.column('Reply', anchor=CENTER, width=175, minwidth=175, stretch=NO)
 
         self.stud_ques_tv.heading('#0', text='', anchor=CENTER)
@@ -2186,13 +2186,54 @@ class AdminAppointments(tk.Frame):
         sq_set = cur.execute('''SELECT idquestions, stud_name, stud_ques, stud_img, COALESCE(lec_reply, 'No reply from lecturer') FROM questions;''')
         sq_set=cur.fetchall()
         for row in sq_set:
-            wraptxt = textwrap.fill(row[2], width=30)
+            wraptxt = textwrap.fill(row[2], width=23)
             wraptxt2= textwrap.fill(row[4], width=30)
             self.stud_ques_tv.insert('', tk.END, values=(row[0], row[1], wraptxt, wraptxt2))
 
         def select_stud_ques(e):
             selected=self.stud_ques_tv.focus()
             values=self.stud_ques_tv.item(selected, 'values')
+
+            #get data from database
+            con = mysql.connector.connect(host="localhost",
+                                        user="root",
+                                        password="rootpass",
+                                        database="all2")
+            cur = con.cursor()
+            img = cur.execute('''SELECT stud_img FROM questions WHERE idquestions=%s;''', (int(values[0]),))
+            img=cur.fetchone()
+
+            # if img[0] != '':
+            #     self.ques_img = Image.open(img[0])
+            #     self.ques_img = self.ques_img.resize((275, 235))
+            #     self.ques_img = ImageTk.PhotoImage(self.ques_img)
+            #     self.ques_img_lbl = Label(self, image=self.ques_img, bg=bgc)
+            #     self.ques_img_lbl.place(x=1095, y=505)
+            #     self.ques_noimg_lbl = Label(self, text='No image', bg=bgc, font=f)
+            #     self.ques_noimg_lbl.forget()
+            
+            # else:
+            #     self.ques_noimg_lbl = Label(self, text='No image', bg=bgc, font=f)
+            #     self.ques_noimg_lbl.place(x=1185, y=585)
+            #     self.ques_img_lbl.forget()
+
+            if img[0] != '':
+                self.ques_img = Image.open(img[0])
+                self.ques_img = self.ques_img.resize((275, 235))
+                self.ques_img = ImageTk.PhotoImage(self.ques_img)
+                self.ques_img_lbl = Label(self, image=self.ques_img, bg=bgc)
+                self.ques_img_lbl.place(x=1095, y=505)
+                
+                if hasattr(self, 'ques_noimg_lbl'):
+                    self.ques_noimg_lbl.place_forget()
+            else:
+                if hasattr(self, 'ques_img_lbl'):
+                    self.ques_img_lbl.place_forget()
+                
+                self.ques_noimg_lbl = Label(self, text='No image', bg=bgc, font=f)
+                self.ques_noimg_lbl.place(x=1185, y=585)
+
+
 
             self.reply_btn.config(state=NORMAL)
             self.reply_tv.delete('1.0', END)
@@ -2221,15 +2262,15 @@ class AdminAppointments(tk.Frame):
         #reply to questions from students
     
         self.reply_frame=Frame(self, bg=bgc, bd=2, relief=SOLID)
-        self.reply_frame.place(x=835, y=490)
+        self.reply_frame.place(x=785, y=490)
 
         self.reply_lbl=Label(self.reply_frame, text='Reply', font=('Arial', 20,'bold'), bg=bgc)
         self.reply_lbl.grid(row=0, column=0, padx=10, pady=10)
 
-        self.reply_tv=Text(self.reply_frame, width=30, height=4, padx=10, pady=10, wrap=WORD, font=f3)
+        self.reply_tv=Text(self.reply_frame, width=21, height=4, padx=10, pady=10, wrap=WORD, font=f3)
         self.reply_tv.grid(row=1, column=0, padx=10, pady=10)
 
-        self.reply_btn=Button(self.reply_frame, text='Reply', font=f3, relief=SOLID, cursor='hand2', width=10, state=DISABLED, command=reply_student)
+        self.reply_btn=Button(self.reply_frame, text='Send', font=f3, relief=SOLID, cursor='hand2', width=10, state=DISABLED, command=reply_student)
         self.reply_btn.grid(row=2, column=0, padx=10, pady=10)
 
 
@@ -3584,9 +3625,9 @@ class Profile(tk.Frame):
         self.profile_email_lbl.grid(row=1, column=2, padx=20, pady=10, sticky=W)
 
 
-        #change password btn
-        self.change_pass_btn=Button(self.profile_frame, text='Change Password', font=f, relief=SOLID, bd=2, cursor='hand2')
-        self.change_pass_btn.grid(row=2, column=1, padx=10, pady=10, sticky=W, columnspan=3)
+        # #change password btn
+        # self.change_pass_btn=Button(self.profile_frame, text='Change Password', font=f, relief=SOLID, bd=2, cursor='hand2')
+        # self.change_pass_btn.grid(row=2, column=1, padx=10, pady=10, sticky=W, columnspan=3)
 
 
         #view subjects
