@@ -18,9 +18,9 @@ Built with:
 - [x] The **Python programming language** should be used to develop this application.
 - [x] Every user must register and log in to the system. **Captcha should be included during registration**.
 - [x] Student must apply **class constructor** in the code.
-- [ ] There must have a **function for students to fix an appointment with the lecturer**.
-- [ ] There must be a **chatbot function**.
-- [ ] The application should have a **function for students to do activities, quizzes and simple game**.
+- [x] There must have a **function for students to fix an appointment with the lecturer**.
+- [x] There must be a **chatbot function**.
+- [x] The application should have a **function for students to do activities, quizzes and simple game**.
 - [x] The application should have a **search button for the users to search words**.
-- [ ] **Include a form for the users to key in their problem** if they could not find the solution from the application. User should also must be **able to upload an image.**
-- [ ] You may add any other attractive functions such as **discussion platform, upload image/forms, interactive videos**
+- [x] **Include a form for the users to key in their problem** if they could not find the solution from the application. User should also must be **able to upload an image.**
+- [x] You may add any other attractive functions such as **discussion platform, upload image/forms, interactive videos**
