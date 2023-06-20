@@ -67,7 +67,7 @@ def admin_btns(self, frame1, frame2, frame3, frame4, frame5, frame6, controller)
 
     #chat discussions
     #chat button
-    self.chat_btn=tk.Button(self, text='Chat', font=f3, width=14,  cursor='hand2', command=lambda:controller.show_frame(frame4))
+    self.chat_btn=tk.Button(self, text='Discussions', font=f3, width=14,  cursor='hand2', command=lambda:controller.show_frame(frame4))
     self.chat_btn.place(x=47*14.5, y=100)
 
     #add/delete/view course materials

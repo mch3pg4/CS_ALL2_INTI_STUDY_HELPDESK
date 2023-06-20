@@ -1659,7 +1659,7 @@ class ChatAdmin(tk.Frame):
         admin_btns(self, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments,controller)
 
         #chat admin label
-        chat_admin_label=Label(self, text='Chat Admin', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
+        chat_admin_label=Label(self, text='Discussions', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
         chat_admin_label.place(x=585, y=155)
 
 
