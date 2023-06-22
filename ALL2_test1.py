@@ -180,10 +180,23 @@ class App(tk.Tk):
     #     # frame.name.config(login_details[1])
     #     frame.tkraise()
 
-    # def updateAppointments(self, login_details):
-    #     frame = self.frames[Appointments]
-    #     frame.user_id_lbl.config(text=login_details[2])
-    #     frame.tkraise()
+    def updateAppointments(self, login_details):
+        frame = self.frames[Appointments]
+        # frame.user_id_lbl.config(text=login_details[2])
+        #connect to db and insert information into treeview
+        con = mysql.connector.connect(host="localhost",
+                                    user="root",
+                                    password="rootpass",
+                                    database="all2")
+        cur = con.cursor()
+        a_set = cur.execute('''SELECT app_date, hour, minute, lecturer, status, reason FROM apppointments WHERE user_id = %s''', (login_details[2],))
+        a_set = cur.fetchall()
+        #clear treeview first
+        
+        for row in a_set:
+            wraptxt= textwrap.fill(row[5], width=20)
+            frame.apptstat_tree.insert('', tk.END,  values=(row[0], row[1]+':'+row[2], row[3], row[4], wraptxt))
+        # frame.tkraise()
 
 class Loginpage(tk.Frame):
     def __init__(self, parent, controller):
@@ -233,7 +246,7 @@ class Loginpage(tk.Frame):
                 login_details=c.fetchone()
                 if login_details is not None:
                     controller.updateProfile(login_details)
-                    # controller.updateAppointments(login_details)
+                    controller.updateAppointments(login_details)
                     if bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Student'):
                         controller.show_frame(Homepage)
                     # controller.updateHomepage(login_details)
@@ -3352,19 +3365,19 @@ class Appointments(tk.Frame):
         self.apptstat_tree.heading('Status', text='Status', anchor=CENTER)
         self.apptstat_tree.heading('Reason', text='Reason', anchor=CENTER)
 
-        self.user_id_lbl = Label(self, text='')
+        # self.user_id_lbl = Label(self, text='')
 
-        #connect to db and insert information into treeview
-        con = mysql.connector.connect(host="localhost",
-                                    user="root",
-                                    password="rootpass",
-                                    database="all2")
-        cur = con.cursor()
-        a_set = cur.execute('''SELECT app_date, hour, minute, lecturer, status, reason FROM apppointments WHERE user_id = %s''', ('P12345679',))
-        a_set = cur.fetchall()
-        for row in a_set:
-            wraptxt= textwrap.fill(row[5], width=20)
-            self.apptstat_tree.insert('', tk.END,  values=(row[0], row[1]+':'+row[2], row[3], row[4], wraptxt))
+        # #connect to db and insert information into treeview
+        # con = mysql.connector.connect(host="localhost",
+        #                             user="root",
+        #                             password="rootpass",
+        #                             database="all2")
+        # cur = con.cursor()
+        # a_set = cur.execute('''SELECT app_date, hour, minute, lecturer, status, reason FROM apppointments WHERE user_id = %s''', ('P12345679',))
+        # a_set = cur.fetchall()
+        # for row in a_set:
+        #     wraptxt= textwrap.fill(row[5], width=20)
+        #     self.apptstat_tree.insert('', tk.END,  values=(row[0], row[1]+':'+row[2], row[3], row[4], wraptxt))
 
         #view lecturer response from post a question in homepage
         self.lec_res_lbl=Label(self, text='Lecturer Response', font=('Arial', 20), bg=bgc)
