@@ -42,7 +42,7 @@ options=['A', 'B', 'C', 'D']
 hours=['09', '10', '11', '12', '13', '14', '15', '16']
 minutes=['00', '15', '30', '45']
 
- #host, port
+#host, port
 host='192.168.0.143'
 port=5000
 address=(host, port)
