@@ -3059,8 +3059,7 @@ class Quiz(tk.Frame):
         #show quiz by default
         show_quizques(e=None)
         self.quiz_tv.bind('<ButtonRelease-1>', show_quizques)
-
-         
+       
 
         self.quiz_score= 0
         ##show quiz results to user, show score, true false and percentage in messagebox
@@ -3083,10 +3082,6 @@ class Quiz(tk.Frame):
             self.quiz_next_btn.config(command=next_ques)
             self.quiz_prev_btn.config(state=DISABLED)
             self.quiz_ques_num.config(text='Question '+str(self.ques_num+1)+'/'+str(len(self.q_set)))
-
-
-       
-        
 
 
 class Calculator(tk.Frame):
@@ -3577,7 +3572,6 @@ class Games(tk.Frame):
 
         # Function to handle game over
         def game_over(event=None):
-            
             # Reset game variables
             self.score = 0
             self.direction = "Right"
@@ -3592,7 +3586,6 @@ class Games(tk.Frame):
             self.canvas.focus_set()
 
             self.start_btn.config(state=NORMAL)
-
         
         # Create and pack the canvas
         self.canvas = tk.Canvas(self, width=WIDTH, height=HEIGHT, bg="white")
@@ -3617,7 +3610,6 @@ class Games(tk.Frame):
 class Profile(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        global login_details
 
         # ui_bg
         ui_bg(self, img_file)
@@ -3684,9 +3676,6 @@ class Profile(tk.Frame):
 
         self.subj4_lbl = Label(self.subjects_frame, text='Subject 4: Discrete Mathematics', font=f4, bg=bgc)
         self.subj4_lbl.grid(row=4, column=1, padx=10, pady=10, sticky=W)
-
-
-
 
 
 
