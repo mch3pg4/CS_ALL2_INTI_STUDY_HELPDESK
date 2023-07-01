@@ -2431,7 +2431,7 @@ class Homepage(tk.Frame):
         book1_img=Label(image=my_img13)
         book1_img.image=my_img13
 
-        self.book1_btn = Button(self.books_frame,image= my_img13, cursor='hand2')
+        self.book1_btn = Button(self.books_frame,image= my_img13, cursor='hand2',command= lambda:controller.show_frame(Books))
         self.book1_btn.grid(row=0, column=0, padx=10, pady=10)
 
         self.book1_lbl=Label(self.books_frame, text='Computer Organization & Architecture', wraplength=195, font=f, bg=bgc)
@@ -2443,7 +2443,7 @@ class Homepage(tk.Frame):
         book2_img=Label(image=my_img14)
         book2_img.image=my_img14
 
-        self.book2_btn = Button(self.books_frame, image=my_img14, cursor='hand2')
+        self.book2_btn = Button(self.books_frame, image=my_img14, cursor='hand2',command= lambda:controller.show_frame(Books))
         self.book2_btn.grid(row=0, column=1, padx=10, pady=10)
 
         self.book2_lbl = Label(self.books_frame, text ='Objected Oriented Programming', wraplength=195, font =f, bg=bgc)
@@ -2455,7 +2455,7 @@ class Homepage(tk.Frame):
         book3_img=Label(image=my_img15)
         book3_img.image=my_img15
 
-        self.book3_btn = Button(self.books_frame, image=my_img15, cursor='hand2')
+        self.book3_btn = Button(self.books_frame, image=my_img15, cursor='hand2',command= lambda:controller.show_frame(Books))
         self.book3_btn.grid(row=0, column=2, padx=10, pady=10)
 
         self.book3_lbl = Label(self.books_frame, text ='Discrete Mathematics and its Applications', wraplength=195, font =f, bg=bgc)
@@ -2467,18 +2467,12 @@ class Homepage(tk.Frame):
         book4_img=Label(image=my_img16)
         book4_img.image=my_img16
 
-        self.book4_btn = Button(self.books_frame,image=my_img16, cursor='hand2')
+        self.book4_btn = Button(self.books_frame,image=my_img16, cursor='hand2',command= lambda:controller.show_frame(Books))
         self.book4_btn.grid(row=0, column=3, padx=10, pady=10)
 
         self.book4_lbl = Label(self.books_frame, text ='Computer Architecture', wraplength=195, font =f, bg=bgc)
         self.book4_lbl.grid(row=1, column=3, padx=10)
-
-        #take books from database
-        
-
-
-        #calendar for appointment (might change to appontment treeview)
-        
+                
         #calendar title
         self.calendar_lbl = Label(self, text ='Calendar', font = ('Arial', 28), bg=bgc)
         self.calendar_lbl.pack()
@@ -3524,7 +3518,9 @@ class Games(tk.Frame):
 
         # Function to update the snake's position
         def move_snake():
+            self.canvas.focus_set()
             self.start_btn.config(state=DISABLED)
+            self.canvas.bind("<Key>", handle_keypress)
             head_x, head_y = self.snake[0]
             dx, dy = DIRECTIONS[self.direction]
             new_head = ((head_x + dx * SIZE) % HEIGHT, (head_y + dy * SIZE) % WIDTH)
@@ -3558,21 +3554,20 @@ class Games(tk.Frame):
             }
             if new_direction != opposites[self.direction]:
                 self.direction = new_direction
+            self.canvas.focus_set()
 
         # Function to draw the snake
         def draw_snake():
-            canvas.delete("snake")
+            self.canvas.delete("snake")
             for segment in self.snake:
                 x, y = segment
-                canvas.create_rectangle(
-                    y, x, y + SIZE, x + SIZE, fill="blue", tags="snake"
-                )
+                self.canvas.create_rectangle(y, x, y + SIZE, x + SIZE, fill="blue", tags="snake")
 
         # Function to draw the food
         def draw_food():
-            canvas.delete("food")
+            self.canvas.delete("food")
             x, y = self.food
-            canvas.create_oval(
+            self.canvas.create_oval(
                 y, x, y + SIZE, x + SIZE, fill="red", tags="food"
             )
 
@@ -3590,31 +3585,32 @@ class Games(tk.Frame):
             generate_food()
 
             # Clear canvas
-            canvas.delete("all")
+            self.canvas.delete("all")
 
             # Bind keypress events to handle_keypress function
-            canvas.bind("<Key>", handle_keypress)
-            canvas.focus_set()
+            self.canvas.bind("<Key>", handle_keypress)
+            self.canvas.focus_set()
 
             self.start_btn.config(state=NORMAL)
 
         
         # Create and pack the canvas
-        canvas = tk.Canvas(self, width=WIDTH, height=HEIGHT, bg="white")
-        canvas.place(x=685, y=200)
+        self.canvas = tk.Canvas(self, width=WIDTH, height=HEIGHT, bg="white")
+        self.canvas.place(x=685, y=200)
 
         # Create and pack the score label
         score_label = tk.Label(self, text="Score: 0", font=f3, fg="white", bg="black")
         score_label.place(x=950, y=604)
 
         # Bind keypress events to handle_keypress function
-        canvas.bind("<Key>", handle_keypress)
-        canvas.focus_set()
+        self.canvas.bind("<Key>", handle_keypress)
+        self.canvas.focus_set()
 
         # button to start game or stop game
         generate_food()
         self.start_btn=Button(self, text='Start Game', font=f3, bg='white', command=move_snake)
         self.start_btn.place(x=929, y=635)
+
 
 
 
