@@ -207,10 +207,9 @@ class App(tk.Tk):
             frame.subj4_lbl.config(text='Subject 4: '+subj_set[8])
 
 
-    # def updateChatAdmin(self, login_details):
-    #     frame = self.frames[ChatAdmin]
-    #     # frame.name.config(login_details[1])
-    #     frame.tkraise()
+    def updateChatAdmin(self, login_details):
+        frame = self.frames[ChatAdmin]
+        frame.name.config(text=login_details[1])
 
     def updateAppointments(self, login_details):
         frame = self.frames[Appointments]
@@ -337,9 +336,9 @@ class Loginpage(tk.Frame):
                     controller.updateProfile(login_details)
                     controller.updateAppointments(login_details)
                     controller.updateAdminAppt(login_details)
+                    controller.updateChatAdmin(login_details)
                     if bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Student'):
                         controller.show_frame(Homepage)
-                    # controller.updateHomepage(login_details)
                     elif bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Lecturer'):
                         controller.show_frame(StudentsView) 
                     else:
@@ -1770,13 +1769,27 @@ class ChatAdmin(tk.Frame):
         self.client_socket.connect(address)
 
         # self.interface_done = False
-        # self.running=True
+        self.running=True
 
-        self.name = simpledialog.askstring("Name", "Please enter your name", parent=self)
-
-        self.client_socket.send(self.name.encode('utf-8'))
+        #get client name for discussions chat
+        self.name = Label(text='')
+        self.client_socket.send(self.name.cget("text").encode('utf-8'))
 
         # interface_thread= Thread(target=self.interface)
+        def receive_msg():
+            self.chat_scrolledtxt = scrolledtext.ScrolledText(self, width=58, height=21, bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
+            self.chat_scrolledtxt.place(x=650, y=115)
+            while self.running:
+                try:
+                    # Display the received message in the chat message area
+                    message = self.client_socket.recv(1024).decode('utf-8')
+                    self.chat_scrolledtxt.config(state='normal')
+                    self.chat_scrolledtxt.insert(tk.END, message + '\n')
+                    self.chat_scrolledtxt.config(state='disabled')
+                    self.chat_scrolledtxt.see(tk.END)  # Scroll to the end of the text area
+                except OSError:
+                    break
+
         receive_thread = Thread(target=receive_msg)
         
         # interface_thread.start()
@@ -1830,19 +1843,7 @@ class ChatAdmin(tk.Frame):
             # Implement the logic to send the message to the server or other clients
             # You can use a WebSocket connection or any other communication mechanism
 
-        def receive_msg():
-            self.chat_scrolledtxt = scrolledtext.ScrolledText(self, width=58, height=21, bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
-            self.chat_scrolledtxt.place(x=650, y=115)
-            while self.running:
-                try:
-                    # Display the received message in the chat message area
-                    message = self.client_socket.recv(1024).decode('utf-8')
-                    self.chat_scrolledtxt.config(state='normal')
-                    self.chat_scrolledtxt.insert(tk.END, message + '\n')
-                    self.chat_scrolledtxt.config(state='disabled')
-                    self.chat_scrolledtxt.see(tk.END)  # Scroll to the end of the text area
-                except OSError:
-                    break
+        
 
         
 
