@@ -1,7 +1,9 @@
 import socket
 from threading import *
 
-host='192.168.0.143'
+#host, port
+hostname = socket.gethostname()
+host = socket.gethostbyname(hostname)
 port=5000
 
 server=socket.socket(socket.AF_INET,socket.SOCK_STREAM)

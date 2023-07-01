@@ -1,4 +1,4 @@
-from socket import *
+from socket import socket, AF_INET, SOCK_STREAM, gethostbyname, gethostname
 from threading import *
 from tkinter import simpledialog
 import bcrypt, re, random, textwrap, datetime
@@ -43,7 +43,8 @@ hours=['09', '10', '11', '12', '13', '14', '15', '16']
 minutes=['00', '15', '30', '45']
 
 #host, port
-host='192.168.0.143'
+hostname = gethostname()
+host = gethostbyname(hostname)
 port=5000
 address=(host, port)
 
@@ -1765,21 +1766,21 @@ class ChatAdmin(tk.Frame):
         chat_admin_label.place(x=585, y=155)
 
 
-        # self.client_socket = socket(AF_INET, SOCK_STREAM)
-        # self.client_socket.connect(address)
+        self.client_socket = socket(AF_INET, SOCK_STREAM)
+        self.client_socket.connect(address)
 
-        # # self.interface_done = False
+        # self.interface_done = False
         # self.running=True
 
-        # self.name = simpledialog.askstring("Name", "Please enter your name", parent=self)
+        self.name = simpledialog.askstring("Name", "Please enter your name", parent=self)
 
-        # self.client_socket.send(self.name.encode('utf-8'))
+        self.client_socket.send(self.name.encode('utf-8'))
 
-        # # interface_thread= Thread(target=self.interface)
-        # receive_thread = Thread(target=receive_msg)
+        # interface_thread= Thread(target=self.interface)
+        receive_thread = Thread(target=receive_msg)
         
-        # # interface_thread.start()
-        # receive_thread.start()
+        # interface_thread.start()
+        receive_thread.start()
 
         #discussions server treeview scroll
         self.discussions_frame=Frame(self, width=300, height=500, bg=bgc)
@@ -1820,28 +1821,28 @@ class ChatAdmin(tk.Frame):
 
         # self.interface_done=True
 
-        # def send_msg():
-        #     message = f"{self.name}: {self.chat_entry.get('1.0', 'end-1c')}"
-        #     self.chat_entry.delete('1.0', 'end')
-        #     self.client_socket.send(bytes(message,('utf-8')))
+        def send_msg():
+            message = f"{self.name}: {self.chat_entry.get('1.0', 'end-1c')}"
+            self.chat_entry.delete('1.0', 'end')
+            self.client_socket.send(bytes(message,('utf-8')))
 
-        #     # Get the message from the entry field
-        #     # Implement the logic to send the message to the server or other clients
-        #     # You can use a WebSocket connection or any other communication mechanism
+            # Get the message from the entry field
+            # Implement the logic to send the message to the server or other clients
+            # You can use a WebSocket connection or any other communication mechanism
 
-        # def receive_msg():
-        #     self.chat_scrolledtxt = scrolledtext.ScrolledText(self, width=58, height=21, bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
-        #     self.chat_scrolledtxt.place(x=650, y=115)
-        #     while self.running:
-        #         try:
-        #             # Display the received message in the chat message area
-        #             message = self.client_socket.recv(1024).decode('utf-8')
-        #             self.chat_scrolledtxt.config(state='normal')
-        #             self.chat_scrolledtxt.insert(tk.END, message + '\n')
-        #             self.chat_scrolledtxt.config(state='disabled')
-        #             self.chat_scrolledtxt.see(tk.END)  # Scroll to the end of the text area
-        #         except OSError:
-        #             break
+        def receive_msg():
+            self.chat_scrolledtxt = scrolledtext.ScrolledText(self, width=58, height=21, bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
+            self.chat_scrolledtxt.place(x=650, y=115)
+            while self.running:
+                try:
+                    # Display the received message in the chat message area
+                    message = self.client_socket.recv(1024).decode('utf-8')
+                    self.chat_scrolledtxt.config(state='normal')
+                    self.chat_scrolledtxt.insert(tk.END, message + '\n')
+                    self.chat_scrolledtxt.config(state='disabled')
+                    self.chat_scrolledtxt.see(tk.END)  # Scroll to the end of the text area
+                except OSError:
+                    break
 
         
 
