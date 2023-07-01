@@ -173,7 +173,38 @@ class App(tk.Tk):
         frame.profile_name_lbl.config(text='Name: '+login_details[1])
         frame.profile_id_lbl.config(text='ID: '+login_details[2])
         frame.profile_email_lbl.config(text='Email: '+login_details[3])
-        # frame.tkraise()
+
+        #connect to db for usersubjects
+        con = mysql.connector.connect(host="localhost",
+                                    user="root",
+                                    password="rootpass",
+                                    database="all2")
+        cur = con.cursor()
+        subj_set = cur.execute('''SELECT level, year, school, program, semester, subject1, subject2, subject3, subject4 FROM usersubjects WHERE user_id = %s''', (login_details[2],))
+        subj_set = cur.fetchone()
+
+        if subj_set is None:
+            frame.year_lbl.config(text='Year: None                                         ')
+            frame.sem_lbl.config(text='Semester: None                                      ')
+            frame.sch_lbl.config(text='School: None                                              ')
+            frame.programme_lbl.config(text='Programme: None                                           ')
+            frame.subj1_lbl.config(text='Subject 1: None                              ')
+            frame.subj2_lbl.config(text='Subject 2: None                                ')
+            frame.subj3_lbl.config(text='Subject 3: None                                ')
+            frame.subj4_lbl.config(text='Subject 4: None                                ')
+        
+        else:
+
+            #update subjects frame
+            frame.year_lbl.config(text='Year: '+subj_set[0]+' Year '+str(subj_set[1]))
+            frame.sem_lbl.config(text='Semester: '+subj_set[4])
+            frame.sch_lbl.config(text='School: '+subj_set[2])
+            frame.programme_lbl.config(text='Programme: '+subj_set[3])
+            frame.subj1_lbl.config(text='Subject 1: '+subj_set[5])
+            frame.subj2_lbl.config(text='Subject 2: '+subj_set[6])
+            frame.subj3_lbl.config(text='Subject 3: '+subj_set[7])
+            frame.subj4_lbl.config(text='Subject 4: '+subj_set[8])
+
 
     # def updateChatAdmin(self, login_details):
     #     frame = self.frames[ChatAdmin]
@@ -3610,7 +3641,7 @@ class Profile(tk.Frame):
         
         #view profile details
         self.profile_frame=Frame(self, width=500, height=500, bg=bgc, relief=SOLID, bd=2)
-        self.profile_frame.place(x=300, y=200)
+        self.profile_frame.place(x=400, y=200)
 
         #user details: name, id, email
         self.userdetails_lbl = Label(self.profile_frame, text ='User Details', font = ('Arial', 25), bg=bgc)
@@ -3625,11 +3656,6 @@ class Profile(tk.Frame):
 
         self.profile_email_lbl=Label(self.profile_frame, text='Email: ', font=f4, bg=bgc)
         self.profile_email_lbl.grid(row=1, column=2, padx=20, pady=10, sticky=W)
-
-
-        # #change password btn
-        # self.change_pass_btn=Button(self.profile_frame, text='Change Password', font=f, relief=SOLID, bd=2, cursor='hand2')
-        # self.change_pass_btn.grid(row=2, column=1, padx=10, pady=10, sticky=W, columnspan=3)
 
 
         #view subjects
@@ -3664,10 +3690,6 @@ class Profile(tk.Frame):
         self.subj4_lbl.grid(row=4, column=1, padx=10, pady=10, sticky=W)
 
 
-
-        #change password????
-        def chg_pw():
-            pass
 
 
 
