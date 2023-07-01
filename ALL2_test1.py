@@ -182,7 +182,8 @@ class App(tk.Tk):
 
     def updateAppointments(self, login_details):
         frame = self.frames[Appointments]
-        # frame.user_id_lbl.config(text=login_details[2])
+
+        #appointment status treeview
         #connect to db and insert information into treeview
         con = mysql.connector.connect(host="localhost",
                                     user="root",
@@ -191,12 +192,68 @@ class App(tk.Tk):
         cur = con.cursor()
         a_set = cur.execute('''SELECT app_date, hour, minute, lecturer, status, reason FROM apppointments WHERE user_id = %s''', (login_details[2],))
         a_set = cur.fetchall()
+
         #clear treeview first
-        
+        frame.apptstat_tree.delete(*frame.apptstat_tree.get_children())
+
         for row in a_set:
             wraptxt= textwrap.fill(row[5], width=20)
             frame.apptstat_tree.insert('', tk.END,  values=(row[0], row[1]+':'+row[2], row[3], row[4], wraptxt))
-        # frame.tkraise()
+
+        #lecturer response treeview update 
+        #connect to db and insert information into treeview
+        con = mysql.connector.connect(host="localhost",
+                                      user="root",
+                                      password="rootpass",
+                                      database="all2")
+        cur = con.cursor()
+        qa_set = cur.execute('''SELECT stud_ques, COALESCE(lec_reply, 'No reply from lecturer') FROM questions WHERE stud_name =%s;''', (login_details[1],))
+        qa_set = cur.fetchall()
+
+        #clear treeview first
+        frame.lec_res_tree.delete(*frame.lec_res_tree.get_children())
+
+        for row in qa_set:
+            wraptxt= textwrap.fill(row[0], width=20)
+            wraptxt2= textwrap.fill(row[1], width=22)
+            frame.lec_res_tree.insert('', tk.END,  values=(wraptxt, wraptxt2))
+            
+    def updateAdminAppt(self, login_details):
+        frame=self.frames[AdminAppointments]
+
+        #appointments treeview
+        #connect to db, show appointments in treeview
+        con = mysql.connector.connect(host="localhost",
+                                    user="root",
+                                    password="rootpass",
+                                    database="all2")
+        cur = con.cursor()
+        aa_set = cur.execute('''SELECT idapppointments, stud_name, app_date, hour, minute, description, status FROM apppointments WHERE lecturer=%s;''', (login_details[1],))
+        aa_set=cur.fetchall()
+
+        #clear treeview first
+        frame.appt_tv.delete(*frame.appt_tv.get_children())
+
+        for row in aa_set:
+            frame.appt_tv.insert('', 'end', text='', values=(row[0], row[1], row[2], row[3]+':'+ row[4], row[5], row[6]))
+
+        #questions from students treeview
+        #connect to db to retrieve questions from students
+        con = mysql.connector.connect(host="localhost",
+                                      user="root",
+                                        password="rootpass",
+                                        database="all2")
+        cur = con.cursor()
+        sq_set = cur.execute('''SELECT idquestions, stud_name, stud_ques, stud_img, COALESCE(lec_reply, 'No reply from lecturer') FROM questions WHERE lec_name=%s;''', (login_details[1],))
+        sq_set=cur.fetchall()
+
+        #clear treeview first
+        frame.stud_ques_tv.delete(*frame.stud_ques_tv.get_children())
+
+        for row in sq_set:
+            wraptxt = textwrap.fill(row[2], width=23)
+            wraptxt2= textwrap.fill(row[4], width=30)
+            frame.stud_ques_tv.insert('', tk.END, values=(row[0], row[1], wraptxt, wraptxt2))
 
 class Loginpage(tk.Frame):
     def __init__(self, parent, controller):
@@ -247,6 +304,7 @@ class Loginpage(tk.Frame):
                 if login_details is not None:
                     controller.updateProfile(login_details)
                     controller.updateAppointments(login_details)
+                    controller.updateAdminAppt(login_details)
                     if bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Student'):
                         controller.show_frame(Homepage)
                     # controller.updateHomepage(login_details)
@@ -2069,17 +2127,6 @@ class AdminAppointments(tk.Frame):
         self.appt_tv.heading('Topic', text='Topic', anchor=CENTER)
         self.appt_tv.heading('Status', text='Status', anchor=CENTER)
 
-        #connect to db, show appointments in treeview
-        con = mysql.connector.connect(host="localhost",
-                                    user="root",
-                                    password="rootpass",
-                                    database="all2")
-        cur = con.cursor()
-        aa_set = cur.execute('''SELECT idapppointments, stud_name, app_date, hour, minute, description, status FROM apppointments;''')
-        aa_set=cur.fetchall()
-        for row in aa_set:
-            self.appt_tv.insert('', 'end', text='', values=(row[0], row[1], row[2], row[3]+':'+ row[4], row[5], row[6]))
-
 
         self.app_var = StringVar()
         self.app_var.set(None)
@@ -2152,8 +2199,6 @@ class AdminAppointments(tk.Frame):
         self.send_btn=Button(self.admin_response_frame, text='Send', font=f3, relief=SOLID, cursor='hand2', state=DISABLED, command=send_response)
         self.send_btn.grid(row=3, column=1, padx=10, pady=10, columnspan=3)
 
-
-
         
         #show questions from students treeview (another side to show images from students if any)
         self.stud_ques_frame=Frame(self, bg=bgc)
@@ -2190,18 +2235,6 @@ class AdminAppointments(tk.Frame):
         self.stud_ques_tv.heading('Question', text='Question', anchor=CENTER)
         self.stud_ques_tv.heading('Reply', text='Reply', anchor=CENTER)
 
-        #connect to db to retrieve questions from students
-        con = mysql.connector.connect(host="localhost",
-                                      user="root",
-                                        password="rootpass",
-                                        database="all2")
-        cur = con.cursor()
-        sq_set = cur.execute('''SELECT idquestions, stud_name, stud_ques, stud_img, COALESCE(lec_reply, 'No reply from lecturer') FROM questions;''')
-        sq_set=cur.fetchall()
-        for row in sq_set:
-            wraptxt = textwrap.fill(row[2], width=23)
-            wraptxt2= textwrap.fill(row[4], width=30)
-            self.stud_ques_tv.insert('', tk.END, values=(row[0], row[1], wraptxt, wraptxt2))
 
         def select_stud_ques(e):
             selected=self.stud_ques_tv.focus()
@@ -2216,20 +2249,7 @@ class AdminAppointments(tk.Frame):
             img = cur.execute('''SELECT stud_img FROM questions WHERE idquestions=%s;''', (int(values[0]),))
             img=cur.fetchone()
 
-            # if img[0] != '':
-            #     self.ques_img = Image.open(img[0])
-            #     self.ques_img = self.ques_img.resize((275, 235))
-            #     self.ques_img = ImageTk.PhotoImage(self.ques_img)
-            #     self.ques_img_lbl = Label(self, image=self.ques_img, bg=bgc)
-            #     self.ques_img_lbl.place(x=1095, y=505)
-            #     self.ques_noimg_lbl = Label(self, text='No image', bg=bgc, font=f)
-            #     self.ques_noimg_lbl.forget()
-            
-            # else:
-            #     self.ques_noimg_lbl = Label(self, text='No image', bg=bgc, font=f)
-            #     self.ques_noimg_lbl.place(x=1185, y=585)
-            #     self.ques_img_lbl.forget()
-
+            # if there is image show it, else show 'no image' text
             if img[0] != '':
                 self.ques_img = Image.open(img[0])
                 self.ques_img = self.ques_img.resize((275, 235))
@@ -2245,7 +2265,6 @@ class AdminAppointments(tk.Frame):
                 
                 self.ques_noimg_lbl = Label(self, text='No image', bg=bgc, font=f)
                 self.ques_noimg_lbl.place(x=1185, y=585)
-
 
 
             self.reply_btn.config(state=NORMAL)
@@ -2285,8 +2304,6 @@ class AdminAppointments(tk.Frame):
 
         self.reply_btn=Button(self.reply_frame, text='Send', font=f3, relief=SOLID, cursor='hand2', width=10, state=DISABLED, command=reply_student)
         self.reply_btn.grid(row=2, column=0, padx=10, pady=10)
-
-
 
 
 
@@ -3365,19 +3382,6 @@ class Appointments(tk.Frame):
         self.apptstat_tree.heading('Status', text='Status', anchor=CENTER)
         self.apptstat_tree.heading('Reason', text='Reason', anchor=CENTER)
 
-        # self.user_id_lbl = Label(self, text='')
-
-        # #connect to db and insert information into treeview
-        # con = mysql.connector.connect(host="localhost",
-        #                             user="root",
-        #                             password="rootpass",
-        #                             database="all2")
-        # cur = con.cursor()
-        # a_set = cur.execute('''SELECT app_date, hour, minute, lecturer, status, reason FROM apppointments WHERE user_id = %s''', ('P12345679',))
-        # a_set = cur.fetchall()
-        # for row in a_set:
-        #     wraptxt= textwrap.fill(row[5], width=20)
-        #     self.apptstat_tree.insert('', tk.END,  values=(row[0], row[1]+':'+row[2], row[3], row[4], wraptxt))
 
         #view lecturer response from post a question in homepage
         self.lec_res_lbl=Label(self, text='Lecturer Response', font=('Arial', 20), bg=bgc)
@@ -3413,21 +3417,6 @@ class Appointments(tk.Frame):
         self.lec_res_tree.heading('Question', text='Question', anchor=CENTER)
         self.lec_res_tree.heading('Response from Lecturer', text='Response from Lecturer', anchor=CENTER)
 
-        #connect to db and insert information into treeview
-        con = mysql.connector.connect(host="localhost",
-                                      user="root",
-                                      password="rootpass",
-                                      database="all2")
-        cur = con.cursor()
-        qa_set = cur.execute('''SELECT stud_ques, COALESCE(lec_reply, 'No reply from lecturer') FROM questions;''')
-        qa_set = cur.fetchall()
-        for row in qa_set:
-            wraptxt= textwrap.fill(row[0], width=20)
-            wraptxt2= textwrap.fill(row[1], width=22)
-            self.lec_res_tree.insert('', tk.END,  values=(wraptxt, wraptxt2))
-
-
-        
 
 
 class Games(tk.Frame):
