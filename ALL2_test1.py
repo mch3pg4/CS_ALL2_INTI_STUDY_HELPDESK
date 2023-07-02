@@ -1,4 +1,5 @@
 from socket import socket, AF_INET, SOCK_STREAM, gethostbyname, gethostname
+import string
 from threading import *
 from tkinter import simpledialog
 import bcrypt, re, random, textwrap, datetime
@@ -154,7 +155,9 @@ class App(tk.Tk):
         #create dictionary of frames
         self.frames={}
 
-        for F in (Loginpage, RegisterPage, RegisterCourses,Homepage, Subject1, Books, Quiz, Calculator, Chat,Chatbot, Appointments, Games, Profile, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments):
+        for F in (Loginpage, RegisterPage, RegisterCourses,Homepage, Subject1, Books, Quiz, Calculator, 
+                  Chat,Chatbot, Appointments, Games, Profile, StudentsView, 
+                  BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments):
             frame= F(container, self)
             #windows class act as root window for frames
             self.frames[F] = frame
@@ -207,9 +210,9 @@ class App(tk.Tk):
             frame.subj4_lbl.config(text='Subject 4: '+subj_set[8])
 
 
-    def updateChatAdmin(self, login_details):
-        frame = self.frames[ChatAdmin]
-        frame.name.config(text=login_details[1])
+    # def updateChatAdmin(self, login_details):
+    #     frame = self.frames[ChatAdmin]
+    #     frame.name.config(text=login_details[1])
 
     def updateAppointments(self, login_details):
         frame = self.frames[Appointments]
@@ -336,7 +339,7 @@ class Loginpage(tk.Frame):
                     controller.updateProfile(login_details)
                     controller.updateAppointments(login_details)
                     controller.updateAdminAppt(login_details)
-                    controller.updateChatAdmin(login_details)
+                    # controller.updateChatAdmin(login_details)
                     if bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Student'):
                         controller.show_frame(Homepage)
                     elif bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Lecturer'):
@@ -386,13 +389,7 @@ class RegisterPage(tk.Frame):
 
         self.login_link_btn = Button(self, text= "Go to Login Page", cursor= "hand2", font= ('Arial', 14), command=go_to_login)
         self.login_link_btn.place(x=930,y=720)
-
-        #for testing
-        #direct to registercourses page for users
-        def go_to_registercourses():
-            controller.show_frame(RegisterCourses)
-        self.registercourses_link_btn = Button(self, text= "Go to Register Courses Page", cursor= "hand2", font= ('Arial', 14), command=go_to_registercourses)
-        self.registercourses_link_btn.place(x=400,y=720)    
+   
         
         #connect to database
         con = mysql.connector.connect(host="localhost",
@@ -416,8 +413,8 @@ class RegisterPage(tk.Frame):
 
         def createImage(flag=0):             
             # Generate new random string for captcha
-            # self.random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
-            self.random_string = ''.join(random.choices('a', k=6))  #default value for testing, to be changed later
+            self.random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+            # self.random_string = ''.join(random.choices('a', k=6))  #default value for testing, to be changed later
 
             # create captcha image
             self.image_captcha = ImageCaptcha(width=200, height=55)
@@ -562,13 +559,6 @@ class RegisterPage(tk.Frame):
         self.student_rb.pack(expand=True, side=LEFT)
         self.lect_rb.pack(expand=True, side=LEFT)
 
-        #default entry values for testing
-        self.register_name.insert(0, 'Tom')
-        self.register_userid.insert(0, 'P12345678')
-        self.register_email.insert(0, 'tom@gmail.com')
-        self.register_pwd.insert(0, 'Tom,1234')
-        self.pwd_again.insert(0, 'Tom,1234')
-        self.reg_captcha.insert(0, 'aaaaaa')
 
 
 class RegisterCourses(tk.Frame):
@@ -581,13 +571,6 @@ class RegisterCourses(tk.Frame):
         self.background_label = tk.Label(self, image=self.background_image)
         self.background_label.place(x=-443,y=-155)
         self.background_label.image = self.background_image
-
-        #for testing
-        #direct to register page for users
-        def go_to_registerpage():
-            controller.show_frame(RegisterPage)
-        self.registerpage_link_btn = Button(self, text= "Go to Register Page", cursor= "hand2", font= ('Arial', 14), command=go_to_registerpage)
-        self.registerpage_link_btn.place(x=700,y=660)
 
 
         #connect to database
@@ -1765,83 +1748,83 @@ class ChatAdmin(tk.Frame):
         chat_admin_label.place(x=585, y=155)
 
 
-        self.client_socket = socket(AF_INET, SOCK_STREAM)
-        self.client_socket.connect(address)
+        # self.client_socket = socket(AF_INET, SOCK_STREAM)
+        # self.client_socket.connect(address)
 
-        # self.interface_done = False
-        self.running=True
+        # # self.interface_done = False
+        # self.running=True
 
-        #get client name for discussions chat
-        self.name = Label(text='')
-        self.client_socket.send(self.name.cget("text").encode('utf-8'))
+        # #get client name for discussions chat
+        # self.name = Label(text='')
+        # self.client_socket.send(self.name.cget("text").encode('utf-8'))
 
-        # interface_thread= Thread(target=self.interface)
-        def receive_msg():
-            self.chat_scrolledtxt = scrolledtext.ScrolledText(self, width=58, height=21, bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
-            self.chat_scrolledtxt.place(x=650, y=115)
-            while self.running:
-                try:
-                    # Display the received message in the chat message area
-                    message = self.client_socket.recv(1024).decode('utf-8')
-                    self.chat_scrolledtxt.config(state='normal')
-                    self.chat_scrolledtxt.insert(tk.END, message + '\n')
-                    self.chat_scrolledtxt.config(state='disabled')
-                    self.chat_scrolledtxt.see(tk.END)  # Scroll to the end of the text area
-                except OSError:
-                    break
+        # # interface_thread= Thread(target=self.interface)
+        # def receive_msg():
+        #     self.chat_scrolledtxt = scrolledtext.ScrolledText(self, width=58, height=21, bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
+        #     self.chat_scrolledtxt.place(x=650, y=115)
+        #     while self.running:
+        #         try:
+        #             # Display the received message in the chat message area
+        #             message = self.client_socket.recv(1024).decode('utf-8')
+        #             self.chat_scrolledtxt.config(state='normal')
+        #             self.chat_scrolledtxt.insert(tk.END, message + '\n')
+        #             self.chat_scrolledtxt.config(state='disabled')
+        #             self.chat_scrolledtxt.see(tk.END)  # Scroll to the end of the text area
+        #         except OSError:
+        #             break
 
-        receive_thread = Thread(target=receive_msg)
+        # receive_thread = Thread(target=receive_msg)
         
-        # interface_thread.start()
-        receive_thread.start()
+        # # interface_thread.start()
+        # receive_thread.start()
 
-        #discussions server treeview scroll
-        self.discussions_frame=Frame(self, width=300, height=500, bg=bgc)
-        self.discussions_frame.place(x=125, y=225)
+        # #discussions server treeview scroll
+        # self.discussions_frame=Frame(self, width=300, height=500, bg=bgc)
+        # self.discussions_frame.place(x=125, y=225)
 
-        self.discussions_tv_frame=Frame(self.discussions_frame, bg=bgc)
-        self.discussions_tv_frame.grid(row=1, column=0)
+        # self.discussions_tv_frame=Frame(self.discussions_frame, bg=bgc)
+        # self.discussions_tv_frame.grid(row=1, column=0)
 
-        self.discussions_tv_scroll=Scrollbar(self.discussions_tv_frame)
-        self.discussions_tv_scroll.pack(side=RIGHT, fill=Y)
+        # self.discussions_tv_scroll=Scrollbar(self.discussions_tv_frame)
+        # self.discussions_tv_scroll.pack(side=RIGHT, fill=Y)
 
-        self.discussions_tv=ttk.Treeview(self.discussions_tv_frame, yscrollcommand=self.discussions_tv_scroll.set, height=13)
-        self.discussions_tv.pack()
+        # self.discussions_tv=ttk.Treeview(self.discussions_tv_frame, yscrollcommand=self.discussions_tv_scroll.set, height=13)
+        # self.discussions_tv.pack()
 
-        self.discussions_tv_scroll.config(command=self.discussions_tv.yview)
+        # self.discussions_tv_scroll.config(command=self.discussions_tv.yview)
 
-        self.discussions_tv.column('#0', width=435, minwidth=435)
-        self.discussions_tv.heading('#0', text='Discussion Servers', anchor=W)
+        # self.discussions_tv.column('#0', width=435, minwidth=435)
+        # self.discussions_tv.heading('#0', text='Discussion Servers', anchor=W)
 
-        #insert server name
-        self.discussions_tv.insert(parent='', index='end', iid=0, text='Computer Architecture & Networks')
+        # #insert server name
+        # self.discussions_tv.insert(parent='', index='end', iid=0, text='Computer Architecture & Networks')
 
-        #chat msg screen
-        self.chat_scrolledtxt=scrolledtext.ScrolledText(self,width=58,height=15,bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
-        self.chat_scrolledtxt.place(x=650, y=225)
+        # #chat msg screen
+        # self.chat_scrolledtxt=scrolledtext.ScrolledText(self,width=58,height=15,bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
+        # self.chat_scrolledtxt.place(x=650, y=225)
 
-        #chat msg input entry
-        #frame
-        self.chat_entry_frame=Frame(self, width=675, height=50, bg=bgc)
-        self.chat_entry_frame.place(x=641, y=600)
+        # #chat msg input entry
+        # #frame
+        # self.chat_entry_frame=Frame(self, width=675, height=50, bg=bgc)
+        # self.chat_entry_frame.place(x=641, y=600)
 
-        self.chat_entry=Text(self.chat_entry_frame, height=5,width=52, font=f, wrap=WORD,relief=SOLID, bd=2)
-        self.chat_entry.grid(row=0, column=0, padx=10, pady=5)
+        # self.chat_entry=Text(self.chat_entry_frame, height=5,width=52, font=f, wrap=WORD,relief=SOLID, bd=2)
+        # self.chat_entry.grid(row=0, column=0, padx=10, pady=5)
 
-        #send btn
-        self.send_btn=Button(self.chat_entry_frame, text='Send', font=f, relief=SOLID, bd=2, cursor='hand2')
-        self.send_btn.grid(row=0, column=1, padx=10, pady=5)
+        # #send btn
+        # self.send_btn=Button(self.chat_entry_frame, text='Send', font=f, relief=SOLID, bd=2, cursor='hand2')
+        # self.send_btn.grid(row=0, column=1, padx=10, pady=5)
 
-        # self.interface_done=True
+        # # self.interface_done=True
 
-        def send_msg():
-            message = f"{self.name}: {self.chat_entry.get('1.0', 'end-1c')}"
-            self.chat_entry.delete('1.0', 'end')
-            self.client_socket.send(bytes(message,('utf-8')))
+        # def send_msg():
+        #     message = f"{self.name}: {self.chat_entry.get('1.0', 'end-1c')}"
+        #     self.chat_entry.delete('1.0', 'end')
+        #     self.client_socket.send(bytes(message,('utf-8')))
 
-            # Get the message from the entry field
-            # Implement the logic to send the message to the server or other clients
-            # You can use a WebSocket connection or any other communication mechanism
+        #     # Get the message from the entry field
+        #     # Implement the logic to send the message to the server or other clients
+        #     # You can use a WebSocket connection or any other communication mechanism
 
         
 
