@@ -231,7 +231,10 @@ class App(tk.Tk):
         frame.apptstat_tree.delete(*frame.apptstat_tree.get_children())
 
         for row in a_set:
-            wraptxt= textwrap.fill(row[5], width=20)
+            if row[5] is not None:
+                wraptxt= textwrap.fill(row[5], width=20)
+            else: 
+                wraptxt= ''
             frame.apptstat_tree.insert('', tk.END,  values=(row[0], row[1]+':'+row[2], row[3], row[4], wraptxt))
 
         #lecturer response treeview update 
@@ -1183,6 +1186,9 @@ class BooksView(tk.Frame):
                     self.bookname_entry.delete(0, END)
                     self.bookcat_entry.delete(0, END)
         
+        
+
+
 
                 except Exception as ep:
                     messagebox.showerror('', ep)
@@ -2008,7 +2014,7 @@ class CourseMaterials(tk.Frame):
                         subject=self.subject_entry.get()
                         week=self.week_entry.get()
                         name=self.name_entry.get('1.0', END)
-                        file=self.file_entry.get('1.0', END)
+                        file=self.file_entry.get('1.0', 'end-1c')
 
                         insert_material = ("INSERT INTO  coursematerials(idcoursematerials, week, subj_name, material_name, material_file) VALUES (%s, %s, %s, %s, %s);")
                         data_material = (idcoursematerials, week, subject, name, file)
@@ -2016,6 +2022,16 @@ class CourseMaterials(tk.Frame):
                         con.commit()
                         con.close()
                         messagebox.showinfo('Success', 'Course Material Added Successfully!')
+
+                        #clear entry
+                        self.subject_entry.delete(0, END)
+                        self.week_entry.delete(0, END)
+                        self.name_entry.delete('1.0', END)
+                        self.file_entry.delete('1.0', END)
+                        self.upload_file_btn.config(text='Upload File')
+
+                        #update treeview
+                        tree.insert(parent='', index='end', text=name)
 
                     except Exception as ep:
                         messagebox.showerror('', ep)
@@ -2045,8 +2061,6 @@ class CourseMaterials(tk.Frame):
 
             # clear pdf
             self.view_mat_pdf.img_object_li.clear()
-
-        
 
         def show_material(e):
             self.delete_btn.config(state=NORMAL)
@@ -2090,6 +2104,7 @@ class CourseMaterials(tk.Frame):
         #colapse all nodes btn
         self.collapsetv_btn=Button(self, text='Collapse All', font=f3, relief=SOLID, cursor='hand2',command=lambda:collapse_tv(tree))
         self.collapsetv_btn.place(x=250, y=650)
+
 
 class AdminAppointments(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
@@ -3341,6 +3356,8 @@ class Appointments(tk.Frame):
                     self.lecturer_entry.set('')
                     self.description_entry.delete('1.0', 'end-1c')
 
+                    #insert into treeview
+                    self.apptstat_tree.insert('', 'end', values=(app_date, hour+':'+ minute, lecturer, 'Pending', ''))
 
                 except Exception as ep:
                     messagebox.showerror('Error',ep)
@@ -3387,6 +3404,8 @@ class Appointments(tk.Frame):
         self.apptstat_tree.heading('Lecturer', text='Lecturer', anchor=CENTER)
         self.apptstat_tree.heading('Status', text='Status', anchor=CENTER)
         self.apptstat_tree.heading('Reason', text='Reason', anchor=CENTER)
+
+        
 
 
         #view lecturer response from post a question in homepage
@@ -3487,6 +3506,8 @@ class Games(tk.Frame):
         self.direction = "Right"
         self.snake = [(HEIGHT // 2, WIDTH // 2)]
         self.food = ()
+        self.game_running = False
+        self.move_snake_id = None
 
         # Function to generate new food
         def generate_food():
@@ -3499,8 +3520,10 @@ class Games(tk.Frame):
 
         # Function to update the snake's position
         def move_snake():
+
             self.canvas.focus_set()
             self.start_btn.config(state=DISABLED)
+            self.stop_btn.config(state=NORMAL)
             self.canvas.bind("<Key>", handle_keypress)
             head_x, head_y = self.snake[0]
             dx, dy = DIRECTIONS[self.direction]
@@ -3522,7 +3545,7 @@ class Games(tk.Frame):
             draw_food()
             draw_score()
 
-            self.after(DELAY, move_snake)
+            self.move_snake_id= self.after(DELAY, move_snake)
 
         # Function to handle keypress events
         def handle_keypress(event):
@@ -3573,6 +3596,24 @@ class Games(tk.Frame):
 
             self.start_btn.config(state=NORMAL)
         
+        def stop_game():
+
+            self.game_running = False
+
+            self.start_btn.config(state=NORMAL)
+            self.stop_btn.config(state=DISABLED)
+
+            self.after_cancel(self.move_snake_id)
+
+            # Clear canvas
+            self.canvas.delete("all")
+
+            # Reset game variables
+            self.score = 0
+            self.direction = "Right"
+            self.snake = [(HEIGHT // 2, WIDTH // 2)]
+            generate_food()
+        
         # Create and pack the canvas
         self.canvas = tk.Canvas(self, width=WIDTH, height=HEIGHT, bg="white")
         self.canvas.place(x=685, y=200)
@@ -3588,8 +3629,10 @@ class Games(tk.Frame):
         # button to start game or stop game
         generate_food()
         self.start_btn=Button(self, text='Start Game', font=f3, bg='white', command=move_snake)
-        self.start_btn.place(x=929, y=635)
-
+        self.start_btn.place(x=875, y=635)
+        
+        self.stop_btn = Button(self, text='Stop Game', font=f3, bg='white', command=stop_game, state=DISABLED)
+        self.stop_btn.place(x=1010, y=635)
 
 
 
@@ -3618,7 +3661,7 @@ class Profile(tk.Frame):
         self.profile_frame.place(x=400, y=200)
 
         #user details: name, id, email
-        self.userdetails_lbl = Label(self.profile_frame, text ='User Details', font = ('Arial', 25), bg=bgc)
+        self.userdetails_lbl = Label(self.profile_frame, text ='Student Details', font = ('Arial', 25), bg=bgc)
         self.userdetails_lbl.grid(row=0, column=1, padx=10, pady=10, sticky=W, columnspan=3)
 
         self.profile_name_lbl=Label(self.profile_frame, text='Name: ', font=f4, bg=bgc)
@@ -3639,28 +3682,28 @@ class Profile(tk.Frame):
         self.subjects_lbl=Label(self.subjects_frame, text='Subjects', font=('Arial', 25), bg=bgc)
         self.subjects_lbl.grid(row=0, column=0, padx=10, pady=10,columnspan=2)
 
-        self.year_lbl=Label(self.subjects_frame, text='Year: Diploma Year 1', font=f4, bg=bgc)
+        self.year_lbl=Label(self.subjects_frame, text='Year: ', font=f4, bg=bgc)
         self.year_lbl.grid(row=1, column=0, padx=10, pady=10, sticky=W)
 
-        self.sem_lbl=Label(self.subjects_frame, text='Semester: 1', font=f4, bg=bgc)
+        self.sem_lbl=Label(self.subjects_frame, text='Semester: ', font=f4, bg=bgc)
         self.sem_lbl.grid(row=1, column=1, padx=10, pady=10, sticky=W)
 
-        self.sch_lbl = Label(self.subjects_frame, text='School: School of Computing', font=f4, bg=bgc)
+        self.sch_lbl = Label(self.subjects_frame, text='School: ', font=f4, bg=bgc)
         self.sch_lbl.grid(row=2, column=0, padx=10, pady=10, sticky=W)
 
-        self.programme_lbl = Label(self.subjects_frame, text='Programme: BCSCUN', font=f4, bg=bgc)
+        self.programme_lbl = Label(self.subjects_frame, text='Programme: ', font=f4, bg=bgc)
         self.programme_lbl.grid(row=2, column=1, padx=10, pady=10, sticky=W)
 
-        self.subj1_lbl = Label(self.subjects_frame, text='Subject 1: Computer Architecture & Networks', font=f4, bg=bgc)
+        self.subj1_lbl = Label(self.subjects_frame, text='Subject 1: ', font=f4, bg=bgc)
         self.subj1_lbl.grid(row=3, column=0, padx=10, pady=10, sticky=W)
 
-        self.subj2_lbl = Label(self.subjects_frame, text='Subject 2: Programming Fundamentals', font=f4, bg=bgc)
+        self.subj2_lbl = Label(self.subjects_frame, text='Subject 2: ', font=f4, bg=bgc)
         self.subj2_lbl.grid(row=3, column=1, padx=10, pady=10, sticky=W)
 
-        self.subj3_lbl = Label(self.subjects_frame, text='Subject 3: Web Programming', font=f4, bg=bgc)
+        self.subj3_lbl = Label(self.subjects_frame, text='Subject 3: ', font=f4, bg=bgc)
         self.subj3_lbl.grid(row=4, column=0, padx=10, pady=10, sticky=W)
 
-        self.subj4_lbl = Label(self.subjects_frame, text='Subject 4: Discrete Mathematics', font=f4, bg=bgc)
+        self.subj4_lbl = Label(self.subjects_frame, text='Subject 4: ', font=f4, bg=bgc)
         self.subj4_lbl.grid(row=4, column=1, padx=10, pady=10, sticky=W)
 
 
