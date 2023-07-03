@@ -46,8 +46,8 @@ def toggle_password(pwd_tf, pwd_btn):
 #admin buttons
 def admin_btns(self, frame1, frame2, frame3, frame4, frame5, frame6, controller):
     #admin page title
-    self.admin_title=tk.Label(self, text='Admin Page', font=('Helvetica', 18, 'bold'), bg=bgc)
-    self.admin_title.place(x=450, y=10)
+    self.admin_title=tk.Label(self, text='Lecturer Page', font=('Helvetica', 18, 'bold'), bg=bgc)
+    self.admin_title.place(x=410, y=13)
 
     #show list of students from db
     #show list of students btn
