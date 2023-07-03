@@ -2472,7 +2472,6 @@ class Homepage(tk.Frame):
         self.cal = Calendar(self.calendar_frame, selectmode="day", year=today.year, month=today.month, day=today.day, date_pattern='dd/mm/yyyy', font=('Arial', 10))
         self.cal.pack(pady=20, padx=20)
 
-
         #post a question label
         self.post_lbl = Label(self, text ='Post a Question', font = ('Arial', 28), bg=bgc)
         self.post_lbl.pack()
@@ -2515,11 +2514,9 @@ class Homepage(tk.Frame):
             if self.img_path != '':
                 self.upload_btn.config(text='Image Attached')
 
-
         #upload image btn
         self.upload_btn = Button(self.post_frame, width=13, text='Attach Image', font=f, relief=SOLID,cursor='hand2', command=attach_img)
         self.upload_btn.grid(row=2, column=0, padx=10, pady=10)
-
 
         def post_ques():
             try:
@@ -2551,7 +2548,6 @@ class Homepage(tk.Frame):
                 messagebox.showerror('Error', f'Error due to {str(e)}')
 
 
-    
         #post question btn
         self.post_btn = Button(self.post_frame, width=13, text='Post', font=f, relief=SOLID,cursor='hand2', command=post_ques)
         self.post_btn.grid(row=2, column=1, padx=10, pady=10)
@@ -2925,18 +2921,21 @@ class Quiz(tk.Frame):
         self.quiz_option2=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white', cursor='hand2', variable=selected_option, value='B', tristatevalue=0)
         self.quiz_option2.grid(row=3, column=1, pady=10, padx=10, sticky=W, columnspan=3)
 
-
         self.quiz_option3=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white',  cursor='hand2', variable=selected_option, value='C', tristatevalue=0)
         self.quiz_option3.grid(row=4, column=1, pady=10, padx=10, sticky=W, columnspan=3)
 
         self.quiz_option4=Radiobutton(self.quizques_frame, text=empty_text, font=f, bg='white', cursor='hand2', variable=selected_option, value='D', tristatevalue=0)
         self.quiz_option4.grid(row=5, column=1, pady=10, padx=10, sticky=W, columnspan=3)
 
-
+        self.quiz_score= 0
         #next question
         def next_ques():
             #count score first
             self.user_ans= selected_option.get()
+            if self.user_ans == self.q_set[self.ques_num][5]:
+                self.quiz_score+=1
+            print(self.quiz_score)
+            
             selected_option.set(None)
 
             if self.ques_num < (len(self.q_set)-1):
@@ -2949,7 +2948,6 @@ class Quiz(tk.Frame):
                 self.quiz_next_btn.config(state=NORMAL)
                 self.quiz_prev_btn.config(state=NORMAL)
             
-
             self.quiz_chapter_title.config(text=self.values)
             self.quiz_question.config(text='Question '+ str(self.ques_num+1) +': '+self.q_set[self.ques_num][0])
             self.quiz_option1.config(text=self.q_set[self.ques_num][1])
@@ -2958,8 +2956,8 @@ class Quiz(tk.Frame):
             self.quiz_option4.config(text=self.q_set[self.ques_num][4])
             self.quiz_ques_num.config(text='Question '+str(self.ques_num+1)+'/'+str(len(self.q_set)))
 
-
         def prev_ques():
+            self.quiz_score-=1
             selected_option.set(None)
             if self.ques_num > 0:
                     self.ques_num -= 1
@@ -3046,10 +3044,13 @@ class Quiz(tk.Frame):
         self.quiz_tv.bind('<ButtonRelease-1>', show_quizques)
        
 
-        self.quiz_score= 0
-        ##show quiz results to user, show score, true false and percentage in messagebox
+        
+        ##show quiz results to user, show score in messagebox
         def quiz_result():
             self.user_ans= selected_option.get()
+            if self.user_ans==self.q_set[self.ques_num][5]:
+                self.quiz_score+=1
+            print(self.quiz_score)
 
             score = str(self.quiz_score)+'/'+str(len(self.q_set))
 
