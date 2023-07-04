@@ -1589,7 +1589,6 @@ class QuizAdmin(tk.Frame):
             self.correctop_entry=ttk.Combobox(self.addquiz_frame, font=f3, values=options, width=8, state='readonly')
             self.correctop_entry.grid(row=9, column=1, pady=10, padx=10, sticky=W, columnspan=2)
 
-
             self.ques_titles=[]
             self.opA=[]
             self.opB=[]
@@ -1694,13 +1693,6 @@ class QuizAdmin(tk.Frame):
                 self.opC.append(self.opC_entry.get())
                 self.opD.append(self.opD_entry.get())
                 self.correctop.append(self.correctop_entry.get())
-                print(self.ques_titles)
-                print(self.opA)
-                print(self.opB)
-                print(self.opC)
-                print(self.opD)
-                print(self.correctop)
-
 
 
                 if len(self.ques_titles) == len(self.opA) == len(self.opB) == len(self.opC) == len(self.opD) == len(self.correctop):
@@ -1709,18 +1701,49 @@ class QuizAdmin(tk.Frame):
                         ques_data=(None, 'Computer Architecture & Networks', self.chapter_entry.get(),self.ques_titles[i], self.opA[i], self.opB[i], self.opC[i], self.opD[i], self.correctop[i])
                         cur.execute(insert_ques, ques_data)
                         con.commit()
+                
                 # #clear list after database add
-                    self.ques_titles.clear()
-                    self.opA.clear()
-                    self.opB.clear()
-                    self.opC.clear()
-                    self.opD.clear()
-                    self.correctop.clear()
+                self.ques_titles.clear()
+                self.opA.clear()
+                self.opB.clear()    
+                self.opC.clear()
+                self.opD.clear()
+                self.correctop.clear()
+
+                #insert quiz title into treeview
+                self.quiz_tv.insert('',tk.END, text='Chapter ' +(self.chapter_entry.get()))
+
+                #clear entries in the add quiz frame
+                self.chapter_entry.delete(0, END)
+                self.noq_cb.set('')
+                self.questitle_entry.delete('1.0', END)
+                self.opA_entry.delete(0, END)
+                self.opB_entry.delete(0, END)
+                self.opC_entry.delete(0, END)
+                self.opD_entry.delete(0, END)
+                self.correctop_entry.set('')
+
+                #messagebox
+                messagebox.showinfo('Success', 'Quiz added successfully')
 
             self.addquiz_btn=Button(self.addquiz_frame, text='Add', font=f3, relief=SOLID, width=10,cursor='hand2', command=add_quiz)
             self.addquiz_btn.grid(row=10, column=1, pady=10, padx=10, sticky=W)
 
-        #delete quiz popup
+        #delete quiz 
+        def delete_quiz():
+            x=self.quiz_tv.focus()
+            quiz_name = self.quiz_tv.item(x).get('text').replace('Chapter ', '')
+            self.quiz_tv.delete(x)
+            con = mysql.connector.connect(host="localhost",
+                                          user="root",
+                                          password="rootpass",
+                                          database="all2")
+            cur = con.cursor()
+            cur.execute("DELETE FROM quiz WHERE chap_name=%s", (quiz_name,))
+            con.commit()
+            con.close()
+            messagebox.showinfo('Success', 'Quiz deleted successfully')
+            
 
         #quiz add, delete btns
         self.quiz_btn_frame=Frame(self, bg=bgc, width=800, height=400)
@@ -1729,7 +1752,7 @@ class QuizAdmin(tk.Frame):
         self.addquiz_btn=Button(self.quiz_btn_frame, text='Add Quiz', font=f3, relief=SOLID, cursor='hand2', command=add_quiz_frame)
         self.addquiz_btn.grid(row=0, column=0, sticky=W, pady=10, padx=65)
 
-        self.deletequiz_btn=Button(self.quiz_btn_frame, text='Delete Quiz', font=f3, relief=SOLID, cursor='hand2')
+        self.deletequiz_btn=Button(self.quiz_btn_frame, text='Delete Quiz', font=f3, relief=SOLID, cursor='hand2', command=delete_quiz)
         self.deletequiz_btn.grid(row=0, column=1, sticky=W, pady=10, padx=10)
 
 
