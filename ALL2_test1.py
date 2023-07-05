@@ -210,9 +210,9 @@ class App(tk.Tk):
             frame.subj4_lbl.config(text='Subject 4: '+subj_set[8])
 
 
-    # def updateChatAdmin(self, login_details):
-    #     frame = self.frames[ChatAdmin]
-    #     frame.name.config(text=login_details[1])
+    def updateChatAdmin(self, login_details):
+        frame = self.frames[ChatAdmin]
+        frame.name.config(text=login_details[1])
 
     def updateAppointments(self, login_details):
         frame = self.frames[Appointments]
@@ -984,7 +984,6 @@ class StudentsView(tk.Frame):
 #add/delete /view books
 class BooksView(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
-        global show_students_frame, show_books_frame
         tk.Frame.__init__(self,parent)
         self.controller=controller
         self.name=name
@@ -1084,8 +1083,6 @@ class BooksView(tk.Frame):
             self.bookcat_entry.delete(0, END)
             self.bookfile_entry.config(text='Upload File')
             self.bookcover_entry.config(text='Upload Cover')
-            # self.pdf_viewer_label.place(x=1035, y=175)
-            # self.clickpdf_lbl.destroy()
             
 
 
@@ -1185,10 +1182,6 @@ class BooksView(tk.Frame):
                     self.bookid_entry.delete(0, END)
                     self.bookname_entry.delete(0, END)
                     self.bookcat_entry.delete(0, END)
-        
-        
-
-
 
                 except Exception as ep:
                     messagebox.showerror('', ep)
@@ -1217,7 +1210,6 @@ class BooksView(tk.Frame):
         self.bookcat_lbl.grid(row=2, column=0, sticky=W, pady=10, padx=10)
         self.bookcat_entry= ttk.Combobox(self.booksrec_frame, font=f3, values=bookcat, width=18)
         self.bookcat_entry.grid(row=2, column=1, pady=10, padx=10)
-
 
         self.bookfile_lbl= Label(self.booksrec_frame, text='Book File', font=f3, bg=bgc)
         self.bookfile_lbl.grid(row=0, column=2, sticky=W, pady=10, padx=10)
@@ -1261,11 +1253,9 @@ class BooksView(tk.Frame):
         self.deletebook_btn= Button(self.booksrec_frame, text='Delete Book', font=f3, relief=SOLID ,cursor='hand2',command=del_book_record, state=DISABLED)
         self.deletebook_btn.grid(row=4, column=2, sticky=W, pady=10, padx=10)
 
-        
 
 class QuizAdmin(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
-        global show_students_frame, show_books_frame
         tk.Frame.__init__(self,parent)
         self.controller=controller
         self.name=name
@@ -1759,7 +1749,6 @@ class QuizAdmin(tk.Frame):
 
 class ChatAdmin(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
-        global show_students_frame, show_books_frame
         tk.Frame.__init__(self,parent)
         self.controller=controller
         self.name=name
@@ -1776,92 +1765,94 @@ class ChatAdmin(tk.Frame):
         chat_admin_label=Label(self, text='Discussions', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
         chat_admin_label.place(x=585, y=155)
 
+        self.client_socket = socket(AF_INET, SOCK_STREAM)
+        self.client_socket.connect(address)
 
-        # self.client_socket = socket(AF_INET, SOCK_STREAM)
-        # self.client_socket.connect(address)
+        # self.interface_done = False
+        self.running=True
 
-        # # self.interface_done = False
-        # self.running=True
+        #get client name for discussions chat
+        self.name = Label(text='')
+        print(self.name.cget("text"))
+        self.client_socket.send(self.name.cget("text").encode('utf-8'))
 
-        # #get client name for discussions chat
-        # self.name = Label(text='')
-        # self.client_socket.send(self.name.cget("text").encode('utf-8'))
+        # interface_thread= Thread(target=self.interface)
+        def receive_msg():
+            self.chat_scrolledtxt = scrolledtext.ScrolledText(self, width=58, height=21, bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
+            self.chat_scrolledtxt.place(x=650, y=115)
+            while self.running:
+                try:
+                    # Display the received message in the chat message area
+                    message = self.client_socket.recv(1024).decode('utf-8')
+                    self.chat_scrolledtxt.config(state='normal')
+                    self.chat_scrolledtxt.insert(tk.END, message + '\n')
+                    self.chat_scrolledtxt.config(state='disabled')
+                    self.chat_scrolledtxt.see(tk.END)  # Scroll to the end of the text area
+                except OSError:
+                    break
 
-        # # interface_thread= Thread(target=self.interface)
-        # def receive_msg():
-        #     self.chat_scrolledtxt = scrolledtext.ScrolledText(self, width=58, height=21, bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
-        #     self.chat_scrolledtxt.place(x=650, y=115)
-        #     while self.running:
-        #         try:
-        #             # Display the received message in the chat message area
-        #             message = self.client_socket.recv(1024).decode('utf-8')
-        #             self.chat_scrolledtxt.config(state='normal')
-        #             self.chat_scrolledtxt.insert(tk.END, message + '\n')
-        #             self.chat_scrolledtxt.config(state='disabled')
-        #             self.chat_scrolledtxt.see(tk.END)  # Scroll to the end of the text area
-        #         except OSError:
-        #             break
-
-        # receive_thread = Thread(target=receive_msg)
+        receive_thread = Thread(target=receive_msg)
         
-        # # interface_thread.start()
-        # receive_thread.start()
+        # interface_thread.start()
+        receive_thread.start()
 
-        # #discussions server treeview scroll
-        # self.discussions_frame=Frame(self, width=300, height=500, bg=bgc)
-        # self.discussions_frame.place(x=125, y=225)
+        #discussions server treeview scroll
+        self.discussions_frame=Frame(self, width=300, height=500, bg=bgc)
+        self.discussions_frame.place(x=125, y=225)
 
-        # self.discussions_tv_frame=Frame(self.discussions_frame, bg=bgc)
-        # self.discussions_tv_frame.grid(row=1, column=0)
+        self.discussions_tv_frame=Frame(self.discussions_frame, bg=bgc)
+        self.discussions_tv_frame.grid(row=1, column=0)
 
-        # self.discussions_tv_scroll=Scrollbar(self.discussions_tv_frame)
-        # self.discussions_tv_scroll.pack(side=RIGHT, fill=Y)
+        self.discussions_tv_scroll=Scrollbar(self.discussions_tv_frame)
+        self.discussions_tv_scroll.pack(side=RIGHT, fill=Y)
 
-        # self.discussions_tv=ttk.Treeview(self.discussions_tv_frame, yscrollcommand=self.discussions_tv_scroll.set, height=13)
-        # self.discussions_tv.pack()
+        self.discussions_tv=ttk.Treeview(self.discussions_tv_frame, yscrollcommand=self.discussions_tv_scroll.set, height=13)
+        self.discussions_tv.pack()
 
-        # self.discussions_tv_scroll.config(command=self.discussions_tv.yview)
+        self.discussions_tv_scroll.config(command=self.discussions_tv.yview)
 
-        # self.discussions_tv.column('#0', width=435, minwidth=435)
-        # self.discussions_tv.heading('#0', text='Discussion Servers', anchor=W)
+        self.discussions_tv.column('#0', width=435, minwidth=435)
+        self.discussions_tv.heading('#0', text='Discussion Servers', anchor=W)
 
-        # #insert server name
-        # self.discussions_tv.insert(parent='', index='end', iid=0, text='Computer Architecture & Networks')
+        #insert server name
+        self.discussions_tv.insert(parent='', index='end', iid=0, text='Computer Architecture & Networks')
 
-        # #chat msg screen
-        # self.chat_scrolledtxt=scrolledtext.ScrolledText(self,width=58,height=15,bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
-        # self.chat_scrolledtxt.place(x=650, y=225)
+        #chat msg screen
+        self.chat_scrolledtxt=scrolledtext.ScrolledText(self,width=58,height=15,bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
+        self.chat_scrolledtxt.place(x=650, y=225)
 
-        # #chat msg input entry
-        # #frame
-        # self.chat_entry_frame=Frame(self, width=675, height=50, bg=bgc)
-        # self.chat_entry_frame.place(x=641, y=600)
+        #add default msg
+        self.chat_scrolledtxt.insert(tk.INSERT, 'Enter name and press send to join the discussion.\n')
 
-        # self.chat_entry=Text(self.chat_entry_frame, height=5,width=52, font=f, wrap=WORD,relief=SOLID, bd=2)
-        # self.chat_entry.grid(row=0, column=0, padx=10, pady=5)
+        #chat msg input entry
+        #frame
+        self.chat_entry_frame=Frame(self, width=675, height=50, bg=bgc)
+        self.chat_entry_frame.place(x=641, y=600)
 
-        # #send btn
-        # self.send_btn=Button(self.chat_entry_frame, text='Send', font=f, relief=SOLID, bd=2, cursor='hand2')
-        # self.send_btn.grid(row=0, column=1, padx=10, pady=5)
+        self.chat_entry=Text(self.chat_entry_frame, height=5,width=52, font=f, wrap=WORD,relief=SOLID, bd=2)
+        self.chat_entry.grid(row=0, column=0, padx=10, pady=5)
 
-        # # self.interface_done=True
+        def send_msg():
+            message = f"{self.name}: {self.chat_entry.get('1.0', 'end-1c')}"
+            self.chat_entry.delete('1.0', 'end')
+            self.client_socket.send(bytes(message,('utf-8')))
 
-        # def send_msg():
-        #     message = f"{self.name}: {self.chat_entry.get('1.0', 'end-1c')}"
-        #     self.chat_entry.delete('1.0', 'end')
-        #     self.client_socket.send(bytes(message,('utf-8')))
+        #send btn
+        self.send_btn=Button(self.chat_entry_frame, text='Send', font=f, relief=SOLID, bd=2, cursor='hand2', command=send_msg)
+        self.send_btn.grid(row=0, column=1, padx=10, pady=5)
 
-        #     # Get the message from the entry field
-        #     # Implement the logic to send the message to the server or other clients
-        #     # You can use a WebSocket connection or any other communication mechanism
-
-        
+        # self.interface_done=True
 
         
+
+            # Get the message from the entry field
+            # Implement the logic to send the message to the server or other clients
+            # You can use a WebSocket connection or any other communication mechanism
+
+  
 
 class CourseMaterials(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
-        global show_students_frame, show_books_frame
         tk.Frame.__init__(self,parent)
         self.controller=controller
         self.name=name
@@ -2131,7 +2122,6 @@ class CourseMaterials(tk.Frame):
 
 class AdminAppointments(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
-        global show_students_frame, show_books_frame
         tk.Frame.__init__(self,parent)
         self.controller=controller
         self.name=name
