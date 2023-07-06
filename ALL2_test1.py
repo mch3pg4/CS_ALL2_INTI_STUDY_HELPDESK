@@ -342,7 +342,7 @@ class Loginpage(tk.Frame):
                     controller.updateProfile(login_details)
                     controller.updateAppointments(login_details)
                     controller.updateAdminAppt(login_details)
-                    # controller.updateChatAdmin(login_details)
+                    controller.updateChatAdmin(login_details)
                     if bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Student'):
                         controller.show_frame(Homepage)
                     elif bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Lecturer'):
@@ -1773,13 +1773,10 @@ class ChatAdmin(tk.Frame):
 
         #get client name for discussions chat
         self.name = Label(text='')
-        print(self.name.cget("text"))
         self.client_socket.send(self.name.cget("text").encode('utf-8'))
 
         # interface_thread= Thread(target=self.interface)
         def receive_msg():
-            self.chat_scrolledtxt = scrolledtext.ScrolledText(self, width=58, height=21, bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
-            self.chat_scrolledtxt.place(x=650, y=115)
             while self.running:
                 try:
                     # Display the received message in the chat message area
@@ -1818,11 +1815,11 @@ class ChatAdmin(tk.Frame):
         self.discussions_tv.insert(parent='', index='end', iid=0, text='Computer Architecture & Networks')
 
         #chat msg screen
-        self.chat_scrolledtxt=scrolledtext.ScrolledText(self,width=58,height=15,bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
+        self.chat_scrolledtxt=scrolledtext.ScrolledText(self,width=60,height=15,bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
         self.chat_scrolledtxt.place(x=650, y=225)
 
         #add default msg
-        self.chat_scrolledtxt.insert(tk.INSERT, 'Enter name and press send to join the discussion.\n')
+        self.chat_scrolledtxt.insert(tk.INSERT, 'Press the START button to join the discussion.\n')
 
         #chat msg input entry
         #frame
@@ -1833,21 +1830,17 @@ class ChatAdmin(tk.Frame):
         self.chat_entry.grid(row=0, column=0, padx=10, pady=5)
 
         def send_msg():
-            message = f"{self.name}: {self.chat_entry.get('1.0', 'end-1c')}"
+            self.send_btn.config(text='Send')
+            clientname = self.name.cget("text")
+            message = f"{clientname}: {self.chat_entry.get('1.0', 'end-1c')}"
             self.chat_entry.delete('1.0', 'end')
             self.client_socket.send(bytes(message,('utf-8')))
 
         #send btn
-        self.send_btn=Button(self.chat_entry_frame, text='Send', font=f, relief=SOLID, bd=2, cursor='hand2', command=send_msg)
+        self.send_btn=Button(self.chat_entry_frame, text='Start', font=f, relief=SOLID, bd=2, cursor='hand2', command=send_msg)
         self.send_btn.grid(row=0, column=1, padx=10, pady=5)
 
         # self.interface_done=True
-
-        
-
-            # Get the message from the entry field
-            # Implement the logic to send the message to the server or other clients
-            # You can use a WebSocket connection or any other communication mechanism
 
   
 
