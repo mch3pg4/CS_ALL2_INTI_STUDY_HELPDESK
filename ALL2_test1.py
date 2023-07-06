@@ -49,6 +49,9 @@ host = gethostbyname(hostname)
 port=5000
 address=(host, port)
 
+client_socket = socket(AF_INET, SOCK_STREAM)
+client_socket.connect(address)
+
 
 
 #top buttons
@@ -214,6 +217,10 @@ class App(tk.Tk):
         frame = self.frames[ChatAdmin]
         frame.name.config(text=login_details[1])
 
+    def updateChat(self, login_details):
+        frame = self.frames[Chat]
+        frame.name.config(text=login_details[1])
+
     def updateAppointments(self, login_details):
         frame = self.frames[Appointments]
 
@@ -342,7 +349,8 @@ class Loginpage(tk.Frame):
                     controller.updateProfile(login_details)
                     controller.updateAppointments(login_details)
                     controller.updateAdminAppt(login_details)
-                    controller.updateChatAdmin(login_details)
+                    # controller.updateChatAdmin(login_details)
+                    controller.updateChat(login_details)
                     if bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Student'):
                         controller.show_frame(Homepage)
                     elif bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Lecturer'):
@@ -1746,7 +1754,6 @@ class QuizAdmin(tk.Frame):
         self.deletequiz_btn.grid(row=0, column=1, sticky=W, pady=10, padx=10)
 
 
-
 class ChatAdmin(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
         tk.Frame.__init__(self,parent)
@@ -1759,88 +1766,83 @@ class ChatAdmin(tk.Frame):
         clockdate(self)
         view_user(self,Homepage, controller)
         log_out_btn(self, Loginpage, controller)
-        admin_btns(self, StudentsView, BooksView, QuizAdmin, ChatAdmin, CourseMaterials, AdminAppointments,controller)
+        admin_btns(self, StudentsView, BooksView, QuizAdmin, Chat, CourseMaterials, AdminAppointments,controller)
 
         #chat admin label
         chat_admin_label=Label(self, text='Discussions', font=('Arial', 20, 'bold'), bg=bgc, fg='black')
         chat_admin_label.place(x=585, y=155)
 
-        self.client_socket = socket(AF_INET, SOCK_STREAM)
-        self.client_socket.connect(address)
-
-        # self.interface_done = False
-        self.running=True
-
-        #get client name for discussions chat
-        self.name = Label(text='')
-        self.client_socket.send(self.name.cget("text").encode('utf-8'))
-
-        # interface_thread= Thread(target=self.interface)
-        def receive_msg():
-            while self.running:
-                try:
-                    # Display the received message in the chat message area
-                    message = self.client_socket.recv(1024).decode('utf-8')
-                    self.chat_scrolledtxt.config(state='normal')
-                    self.chat_scrolledtxt.insert(tk.END, message + '\n')
-                    self.chat_scrolledtxt.config(state='disabled')
-                    self.chat_scrolledtxt.see(tk.END)  # Scroll to the end of the text area
-                except OSError:
-                    break
-
-        receive_thread = Thread(target=receive_msg)
         
-        # interface_thread.start()
-        receive_thread.start()
 
-        #discussions server treeview scroll
-        self.discussions_frame=Frame(self, width=300, height=500, bg=bgc)
-        self.discussions_frame.place(x=125, y=225)
+        # self.running=True
 
-        self.discussions_tv_frame=Frame(self.discussions_frame, bg=bgc)
-        self.discussions_tv_frame.grid(row=1, column=0)
+        # #get client name for discussions chat
+        # self.name = Label(text='')
+        # client_socket.send(self.name.cget("text").encode('utf-8'))
 
-        self.discussions_tv_scroll=Scrollbar(self.discussions_tv_frame)
-        self.discussions_tv_scroll.pack(side=RIGHT, fill=Y)
+        # def receive_msg():
+        #     while self.running:
+        #         try:
+        #             # Display the received message in the chat message area
+        #             message = client_socket.recv(1024).decode('utf-8')
+        #             self.chat_scrolledtxt.config(state='normal')
+        #             self.chat_scrolledtxt.insert(tk.END, message + '\n')
+        #             self.chat_scrolledtxt.config(state='disabled')
+        #             self.chat_scrolledtxt.see(tk.END)  # Scroll to the end of the text area
+        #         except OSError:
+        #             break
 
-        self.discussions_tv=ttk.Treeview(self.discussions_tv_frame, yscrollcommand=self.discussions_tv_scroll.set, height=13)
-        self.discussions_tv.pack()
+        # receive_thread = Thread(target=receive_msg)
+        
+        # # interface_thread.start()
+        # receive_thread.start()
 
-        self.discussions_tv_scroll.config(command=self.discussions_tv.yview)
+        # #discussions server treeview scroll
+        # self.discussions_frame=Frame(self, width=300, height=500, bg=bgc)
+        # self.discussions_frame.place(x=125, y=225)
 
-        self.discussions_tv.column('#0', width=435, minwidth=435)
-        self.discussions_tv.heading('#0', text='Discussion Servers', anchor=W)
+        # self.discussions_tv_frame=Frame(self.discussions_frame, bg=bgc)
+        # self.discussions_tv_frame.grid(row=1, column=0)
 
-        #insert server name
-        self.discussions_tv.insert(parent='', index='end', iid=0, text='Computer Architecture & Networks')
+        # self.discussions_tv_scroll=Scrollbar(self.discussions_tv_frame)
+        # self.discussions_tv_scroll.pack(side=RIGHT, fill=Y)
 
-        #chat msg screen
-        self.chat_scrolledtxt=scrolledtext.ScrolledText(self,width=60,height=15,bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
-        self.chat_scrolledtxt.place(x=650, y=225)
+        # self.discussions_tv=ttk.Treeview(self.discussions_tv_frame, yscrollcommand=self.discussions_tv_scroll.set, height=13)
+        # self.discussions_tv.pack()
 
-        #add default msg
-        self.chat_scrolledtxt.insert(tk.INSERT, 'Press the START button to join the discussion.\n')
+        # self.discussions_tv_scroll.config(command=self.discussions_tv.yview)
 
-        #chat msg input entry
-        #frame
-        self.chat_entry_frame=Frame(self, width=675, height=50, bg=bgc)
-        self.chat_entry_frame.place(x=641, y=600)
+        # self.discussions_tv.column('#0', width=435, minwidth=435)
+        # self.discussions_tv.heading('#0', text='Discussion Servers', anchor=W)
 
-        self.chat_entry=Text(self.chat_entry_frame, height=5,width=52, font=f, wrap=WORD,relief=SOLID, bd=2)
-        self.chat_entry.grid(row=0, column=0, padx=10, pady=5)
+        # #insert server name
+        # self.discussions_tv.insert(parent='', index='end', iid=0, text='Computer Architecture & Networks')
 
-        def send_msg():
-            self.send_btn.config(text='Send')
-            clientname = self.name.cget("text")
-            message = f"{clientname}: {self.chat_entry.get('1.0', 'end-1c')}"
-            self.chat_entry.delete('1.0', 'end')
-            self.client_socket.send(bytes(message,('utf-8')))
+        # #chat msg screen
+        # self.chat_scrolledtxt=scrolledtext.ScrolledText(self,width=60,height=15,bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
+        # self.chat_scrolledtxt.place(x=650, y=225)
 
-        #send btn
-        self.send_btn=Button(self.chat_entry_frame, text='Start', font=f, relief=SOLID, bd=2, cursor='hand2', command=send_msg)
-        self.send_btn.grid(row=0, column=1, padx=10, pady=5)
+        # #add default msg
+        # self.chat_scrolledtxt.insert(tk.INSERT, 'Press the START button to join the discussion.\n')
 
-        # self.interface_done=True
+        # #chat msg input entry
+        # #frame
+        # self.chat_entry_frame=Frame(self, width=675, height=50, bg=bgc)
+        # self.chat_entry_frame.place(x=641, y=600)
+
+        # self.chat_entry=Text(self.chat_entry_frame, height=5,width=52, font=f, wrap=WORD,relief=SOLID, bd=2)
+        # self.chat_entry.grid(row=0, column=0, padx=10, pady=5)
+
+        # def send_msg():
+        #     self.send_btn.config(text='Send')
+        #     clientname = self.name.cget("text")
+        #     message = f"{clientname}: {self.chat_entry.get('1.0', 'end-1c')}"
+        #     self.chat_entry.delete('1.0', 'end')
+        #     client_socket.send(bytes(message,('utf-8')))
+
+        # #send btn
+        # self.send_btn=Button(self.chat_entry_frame, text='Start', font=f, relief=SOLID, bd=2, cursor='hand2', command=send_msg)
+        # self.send_btn.grid(row=0, column=1, padx=10, pady=5)
 
   
 
@@ -3130,6 +3132,29 @@ class Chat(tk.Frame):
         #logout btn
         log_out_btn(self, Loginpage, controller)
 
+
+        self.running=True
+
+        #get client name for discussions chat
+        self.name = Label(text='')
+        client_socket.send(self.name.cget("text").encode('utf-8'))
+
+        def receive_msg():
+            while self.running:
+                try:
+                    # Display the received message in the chat message area
+                    message = client_socket.recv(1024).decode('utf-8')
+                    self.chat_scrolledtxt.config(state='normal')
+                    self.chat_scrolledtxt.insert(tk.END, message + '\n')
+                    self.chat_scrolledtxt.config(state='disabled')
+                    self.chat_scrolledtxt.see(tk.END)  # Scroll to the end of the text area
+                except OSError:
+                    break
+
+        receive_thread = Thread(target=receive_msg)
+        
+        receive_thread.start()
+
         #discussions server treeview scroll
         self.discussions_frame=Frame(self, width=300, height=500, bg=bgc)
         self.discussions_frame.place(x=125, y=100)
@@ -3158,17 +3183,28 @@ class Chat(tk.Frame):
         self.chat_scrolledtxt=scrolledtext.ScrolledText(self,width=58,height=21,bg='white', relief=SOLID, bd=2, font=f, wrap=WORD)
         self.chat_scrolledtxt.place(x=650, y=115)
 
+        #add default msg
+        self.chat_scrolledtxt.insert(tk.INSERT, 'Wait for lecturer to start the discussion.\n')
+
         #chat msg input entry
         #frame
-        self.chat_entry_frame=Frame(self, width=675, height=50, bg=bgc)
-        self.chat_entry_frame.place(x=641, y=600)
+        self.chatstud_entry_frame=Frame(self, width=675, height=50, bg=bgc)
+        self.chatstud_entry_frame.place(x=641, y=600)
 
-        self.chat_entry=Text(self.chat_entry_frame, height=5,width=52, font=f, wrap=WORD,relief=SOLID, bd=2)
-        self.chat_entry.grid(row=0, column=0, padx=10, pady=5)
+        self.chatstud_entry=Text(self.chatstud_entry_frame, height=5,width=52, font=f, wrap=WORD,relief=SOLID, bd=2)
+        self.chatstud_entry.grid(row=0, column=0, padx=10, pady=5)
+
+        
+        def sendstud_msg():
+            self.sendstud_btn.config(text='Send')
+            studname = self.name.cget("text")
+            message = f"{studname}: {self.chatstud_entry.get('1.0', 'end-1c')}"
+            self.chatstud_entry.delete('1.0', 'end')
+            client_socket.send(bytes(message,('utf-8')))
 
         #send btn
-        self.send_btn=Button(self.chat_entry_frame, text='Send', font=f, relief=SOLID, bd=2, cursor='hand2')
-        self.send_btn.grid(row=0, column=1, padx=10, pady=5)
+        self.sendstud_btn=Button(self.chatstud_entry_frame, text='Start', font=f, relief=SOLID, bd=2, cursor='hand2', command=sendstud_msg)
+        self.sendstud_btn.grid(row=0, column=1, padx=10, pady=5)
 
 
 class Chatbot(tk.Frame):
