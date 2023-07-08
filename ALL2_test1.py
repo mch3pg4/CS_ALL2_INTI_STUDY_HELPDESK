@@ -4,7 +4,7 @@ from tkinter import simpledialog
 import bcrypt, re, random, textwrap, datetime, string
 import nltk
 import string
-from nltk.chat.util import Chat
+import nltk.chat.util as util
 from tkcalendar import Calendar, DateEntry
 from tkinter import *
 from PIL import Image,ImageTk
@@ -3275,7 +3275,7 @@ class Chatbot(tk.Frame):
             ],
             [
                 r"How to change password\?",
-                ["You stil can't change your password in this version of the INTI Study Helpdesk yet, stay tuned for future updates."],
+                ["You still can't change your password in this version of the INTI Study Helpdesk yet, stay tuned for future updates."],
             ],
             [
                 r"How to use discussion forum\?",
@@ -3314,7 +3314,7 @@ class Chatbot(tk.Frame):
             "me": "you"
         }
                 
-        self.chat = Chat(self, pairs, reflections)
+        self.chat = util.Chat(pairs, reflections)
 
         #chatbot title
         self.chtbot_lbl = Label(self, text ='Chatbot', font = ('Arial', 28), bg=bgc)
@@ -3329,7 +3329,7 @@ class Chatbot(tk.Frame):
         self.scrollbar.pack(side=RIGHT, fill=Y)
 
         #create a text widget to display chat 
-        self.text_widget = Text(self.chatbot_frame, yscrollcommand=self.scrollbar.set, state=DISABLED, font=("Arial", 16))
+        self.text_widget = Text(self.chatbot_frame, yscrollcommand=self.scrollbar.set,  font=("Arial", 16))
         self.text_widget.pack(expand=True, fill=BOTH)
 
         #configure the scrollbar
@@ -3337,21 +3337,25 @@ class Chatbot(tk.Frame):
 
         #create a bottom frame
         self.bottom_frame = Frame(self, bg=bgc)
-        self.bottom_frame.place(x=210, y=700, width=400, height=50)
+        self.bottom_frame.place(x=215, y=670)
 
         #create a message entry box
-        self.msg_entry = Entry(self.bottom_frame, font=("Arial", 16))
+        self.msg_entry = Entry(self.bottom_frame, font=("Arial", 16), width=60)
         self.msg_entry.grid(row=0, column=0, padx=10, pady=10, sticky=W)
 
         #create a send button
-        self.send_btn = Button(self.bottom_frame, text="Send", font=("Arial", 16), command=self.send_msg)
+        self.send_btn = Button(self.bottom_frame, text="Send", font=f3, command=self.send_msg)
         self.send_btn.grid(row=0, column=1, padx=10, pady=10)
 
         #create a restart chatbot button
-        self.chatbot_btn = Button(self, text="Start Chatbot", font=f, command=self.msg)
-        self.chatbot_btn.place(x=1000, y=700)
+        self.chatbot_btn = Button(self, text="Restart Chatbot", font=f3, command=self.msg)
+        self.chatbot_btn.place(x=1075, y=680)
 
+        self.text_widget.insert(END, "Bot: " + "Hi, I'm the INTI Study Helpdesk chatbot. How can I help you today?\n")
         self.text_widget.configure(state=DISABLED)
+
+        self.msg_entry.bind("<Return>", lambda event: self.send_msg())
+
 
     def chatbot_response(self,message):
         if re.search(r"\bchange password\b", message, re.IGNORECASE):
@@ -3398,10 +3402,9 @@ class Chatbot(tk.Frame):
         self.text_widget.config(state=DISABLED)
 
     def msg(self):
-        self.chatbot_btn.config(text="Restart Chatbot")
         self.text_widget.config(state=NORMAL)
         self.text_widget.delete(1.0, END)
-        self.text_widget.insert(END, "Bot: " + "Hi, I'm the INTI Study Helpdesk chatbot. How can I help you today?" + "\n\n")
+        self.text_widget.insert(END, "Bot: " + "Hi, I'm the INTI Study Helpdesk chatbot. How can I help you today?\n")
         self.text_widget.config(state=DISABLED)
     
 
