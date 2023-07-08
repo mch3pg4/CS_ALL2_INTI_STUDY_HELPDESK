@@ -1,8 +1,10 @@
 from socket import socket, AF_INET, SOCK_STREAM, gethostbyname, gethostname
-import string
 from threading import *
 from tkinter import simpledialog
-import bcrypt, re, random, textwrap, datetime
+import bcrypt, re, random, textwrap, datetime, string
+import nltk
+import string
+from nltk.chat.util import Chat
 from tkcalendar import Calendar, DateEntry
 from tkinter import *
 from PIL import Image,ImageTk
@@ -3176,8 +3178,11 @@ class Calculator(tk.Frame):
 
 
 class Chatbot(tk.Frame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent=None, controller=None, name=None):
         tk.Frame.__init__(self, parent)
+        self.controller = controller
+        self.name = name
+        self.parent=parent
 
         # ui_bg
         ui_bg(self, img_file)
@@ -3190,10 +3195,217 @@ class Chatbot(tk.Frame):
         #logout btn
         log_out_btn(self, Loginpage, controller)
 
+
+        pairs = [
+            [
+                r"my name is (.*)",
+                ["Hello %1, How are you today?"],
+            ],
+            [
+                r"hi|hey|hello",
+                ["Hello", "Hey there"],
+            ],
+            [
+                r"what is your name ?",
+                ["I am a bot created by Analytics Vidhya. You can call me Michael!"],
+            ],
+            [
+                r"how are you ?",
+                ["I'm doing good. How about you?"],
+            ],
+            [
+                r"sorry (.*)",
+                ["It's alright", "It's OK, never mind"],
+            ],
+            [
+                r"I am fine",
+                ["Great to hear that! How can I help you?"],
+            ],
+            [
+                r"i'm (.*) doing good",
+                ["Nice to hear that. How can I help you?"],
+            ],
+            [
+                r"(.*) age\?",
+                ["I'm a computer program, so I don't have an age."],
+            ],
+            [
+                r"what (.*) want ?",
+                ["Make me an offer I can't refuse"],
+            ],
+            [
+                r"(.*) created ?",
+                ["I was created by using Python's NLTK library.", "It's top secret ;)"],
+            ],
+            [
+                r"(.*) (location|city) ?",
+                ["I'm everywhere and nowhere at the same time."],
+            ],
+            [
+                r"how is weather in (.*)\?",
+                ["Weather in %1 is awesome like always", "Too hot man here in %1", "Too cold man here in %1", "Never even heard about %1"],
+            ],
+            [
+                r"i work in (.*)\?",
+                ["%1 is an amazing company, I have heard about it. But they are in huge loss these days."],
+            ],
+            [
+                r"(.)raining in (.)",
+                ["No rain since last week here in %2", "Damn, it's raining too much here in %2"],
+            ],
+            [
+                r"how (.) health(.)",
+                ["I'm a computer program, so I'm always healthy."],
+            ],
+            [
+                r"(.*) (sports|game) ?",
+                ["I'm a very big fan of Football."],
+            ],
+            [
+                r"who (.*) sportsperson ?",
+                ["Messi", "Ronaldo", "Rooney"],
+            ],
+            [
+                r"who (.*) (moviestar|actor)?",
+                ["Brad Pitt"],
+            ],
+            [
+                r"quit",
+                ["Bye! Take care. See you soon :)", "It was nice talking to you. See you soon :)"],
+            ],
+            [
+                r"How to change password\?",
+                ["You stil can't change your password in this version of the INTI Study Helpdesk yet, stay tuned for future updates."],
+            ],
+            [
+                r"How to use discussion forum\?",
+                ["To use the discussion forum, go to the discussions page and wait for the lecturer to start a new discussion."],
+            ],
+            [
+                r"Where and how to do and submit quizzes\?",
+                ["To do and submit quizzes, go to the quiz page and select a quiz."],
+            ],
+            [
+                r"Where to view course materials\?",
+                ["To view course materials, click on your preferred subject in the homepage."],
+            ],
+            [
+                r"Where to view my details\?",
+                ["To view your details, go to the 'profile' page."],
+            ],
+        ]
+
+        reflections = {
+            "i am": "you are",
+            "i was": "you were",
+            "i": "you",
+            "i'm": "you are",
+            "i'd": "you would",
+            "i've": "you have",
+            "i'll": "you will",
+            "my": "your",
+            "you are": "I am",
+            "you were": "I was",
+            "you've": "I have",
+            "you'll": "I will",
+            "your": "my",
+            "yours": "mine",
+            "you": "me",
+            "me": "you"
+        }
+                
+        self.chat = Chat(self, pairs, reflections)
+
         #chatbot title
         self.chtbot_lbl = Label(self, text ='Chatbot', font = ('Arial', 28), bg=bgc)
         self.chtbot_lbl.place(x=600, y=90)
 
+        #chatbot frame
+        self.chatbot_frame = Frame(self, bg=bgc)
+        self.chatbot_frame.place(x=135, y=150, width=1150, height=510)
+
+        #scrollbar
+        self.scrollbar = Scrollbar(self.chatbot_frame)
+        self.scrollbar.pack(side=RIGHT, fill=Y)
+
+        #create a text widget to display chat 
+        self.text_widget = Text(self.chatbot_frame, yscrollcommand=self.scrollbar.set, state=DISABLED, font=("Arial", 16))
+        self.text_widget.pack(expand=True, fill=BOTH)
+
+        #configure the scrollbar
+        self.scrollbar.config(command=self.text_widget.yview)
+
+        #create a bottom frame
+        self.bottom_frame = Frame(self, bg=bgc)
+        self.bottom_frame.place(x=210, y=700, width=400, height=50)
+
+        #create a message entry box
+        self.msg_entry = Entry(self.bottom_frame, font=("Arial", 16))
+        self.msg_entry.grid(row=0, column=0, padx=10, pady=10, sticky=W)
+
+        #create a send button
+        self.send_btn = Button(self.bottom_frame, text="Send", font=("Arial", 16), command=self.send_msg)
+        self.send_btn.grid(row=0, column=1, padx=10, pady=10)
+
+        #create a restart chatbot button
+        self.chatbot_btn = Button(self, text="Start Chatbot", font=f, command=self.msg)
+        self.chatbot_btn.place(x=1000, y=700)
+
+        self.text_widget.configure(state=DISABLED)
+
+    def chatbot_response(self,message):
+        if re.search(r"\bchange password\b", message, re.IGNORECASE):
+            return "You stil can't change your password in this version of the INTI Study Helpdesk yet, stay tuned for future updates."
+        elif re.search(r"\bhow to use discussion forum|discussion forum|discussions|chat|chat discussions|use forum\b", message, re.IGNORECASE):
+            return "To use the discussion forum, go to the discussions page and wait for the lecturer to start a new discussion."
+        elif re.search(r"\bwhere and how to do and submit quizzes|quiz|complete quizzes|submit quizzes\b", message, re.IGNORECASE):
+            return "To do and submit quizzes, go to the quiz page and select a quiz."
+        elif re.search(r"\bwhere to view course materials|course materials|subjects|subject\b", message, re.IGNORECASE):
+            return "To view course materials, click on your preferred subject in the homepage."
+        elif re.search(r"\bwhere to view user details|view profile|profile information\b", message, re.IGNORECASE):
+            return "To view your details, go to the 'profile' page."
+        elif re.search(r"\bhow to contact support|help|seek help|support contact\b", message, re.IGNORECASE):
+            return "To contact support, contact your lecturer."
+        elif re.search(r"\bhow to make appointment|appointment|contact lecturer|consult lecturer|schedule appointment\b", message, re.IGNORECASE):
+            return "To make an appointment with your lecturer, go to the 'notifications' page to schedule an appointment."
+        elif re.search(r"\bhow to view notifications|notifications|view notifications\b", message, re.IGNORECASE):
+            return "To view notifications, go to the 'notifications' page."
+        elif re.search(r"\bhow to ask questions|ask questions|questions|ask|ask lecturer\b", message, re.IGNORECASE):
+            return "To ask questions, go to the homepage and post a question to your lecturer."
+        elif re.search(r"\bhow to view questions|responses|view responses|lecturter response|response\b", message, re.IGNORECASE):
+            return "To view responses from lecturer, go to the 'notifications' page."
+        elif re.search(r"\bhow to view books|books|view books|library|reference books\b", message, re.IGNORECASE):
+            return "To view books, go to the 'books' page."
+        elif re.search(r"\bhow to play games|games|play games|play\b", message, re.IGNORECASE):
+            return "To play games, go to the 'games' page."
+        elif re.search(r"\bhow to enroll in courses|course enrollment|add courses|enroll|register for courses\b", message, re.IGNORECASE):
+            return "To enroll in courses, contact your lecturer or follow the instructions provided at the register courses page."
+        else:
+            return None
+
+
+    def send_msg(self):
+        user_input = self.msg_entry.get()
+        self.msg_entry.delete(0, END)
+        response = self.chat.respond(user_input)
+        if response is None:
+            response = self.chatbot_response(user_input)
+            if response is None:
+                response = "Sorry, I didn't understand that."
+        self.text_widget.config(state=NORMAL)
+        self.text_widget.insert(END, "You: " + user_input + "\n")
+        self.text_widget.insert(END, "Bot: " + response + "\n")
+        self.text_widget.config(state=DISABLED)
+
+    def msg(self):
+        self.chatbot_btn.config(text="Restart Chatbot")
+        self.text_widget.config(state=NORMAL)
+        self.text_widget.delete(1.0, END)
+        self.text_widget.insert(END, "Bot: " + "Hi, I'm the INTI Study Helpdesk chatbot. How can I help you today?" + "\n\n")
+        self.text_widget.config(state=DISABLED)
+    
+
+    
 
 
 class Appointments(tk.Frame):
