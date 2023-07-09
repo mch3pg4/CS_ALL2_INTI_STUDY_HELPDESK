@@ -3200,13 +3200,13 @@ class Calculator(tk.Frame):
         self.calc_lbl.place(x=585, y=90)
 
         #Calculator frame
-        self.calc_frame=Frame(self, width=500, height=500, bg='white')
+        self.calc_frame=Frame(self, bg='white')
         self.calc_frame.place(x=400, y=150)
     
     def calculator_ui(self):
-        
-        frame2=WebView2(self,100,100)
-        frame2.pack(side='left',padx=20,fill='both',expand=True)
+
+        frame2=WebView2(self,1100,600)
+        frame2.place(x=165, y=150)
         frame2.load_url('https://mathway.com')
 
         # while True:
