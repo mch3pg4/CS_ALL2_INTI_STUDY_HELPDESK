@@ -1,7 +1,10 @@
 from socket import socket, AF_INET, SOCK_STREAM, gethostbyname, gethostname
 from threading import *
+import threading as th
+import time
 from tkinter import simpledialog
 import bcrypt, re, random, textwrap, datetime, string
+from tkwebview2.tkwebview2 import WebView2
 import nltk
 import string
 import nltk.chat.util as util
@@ -19,6 +22,12 @@ from mysql.connector import Error
 from captcha.image import ImageCaptcha
 from tktooltip import ToolTip
 from tkPDFViewer import tkPDFViewer as pdf
+from tkinterweb import HtmlFrame, HtmlLabel
+from tkwebview2.tkwebview2 import WebView2, clr, have_runtime, install_runtime
+clr.AddReference('System.Windows.Forms')
+clr.AddReference('System.Threading')
+from System.Windows.Forms import Control
+from System.Threading import Thread,ApartmentState,ThreadStart  
 from buttons import clockdate, ui_bg, log_out_btn, toggle_password, admin_btns, view_user, back_btn, expand_tv, collapse_tv, view_appt
 
 
@@ -303,6 +312,17 @@ class App(tk.Tk):
             wraptxt2= textwrap.fill(row[4], width=30)
             frame.stud_ques_tv.insert('', tk.END, values=(row[0], row[1], wraptxt, wraptxt2))
 
+    def updateCalculator(self):
+        frame=self.frames[Calculator]
+        # t = Thread(ThreadStart(frame.calculator_ui))
+        # t.ApartmentState = ApartmentState.STA
+        # t.Start()
+        # t.Join()
+        # t=th.Thread(target=frame.calculator_ui)
+        # t.start()
+        # t.join()
+        frame.calculator_ui()
+
 class Loginpage(tk.Frame):
     def __init__(self, parent, controller):
         
@@ -354,6 +374,7 @@ class Loginpage(tk.Frame):
                     controller.updateAppointments(login_details)
                     controller.updateAdminAppt(login_details)
                     controller.updateChat(login_details, controller)
+                    controller.updateCalculator()
                     if bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Student'):
                         controller.show_frame(Homepage)
 
@@ -1766,10 +1787,17 @@ class Chat(tk.Frame):
         self.parent=parent
 
         self.running=True
-        receive_thread = Thread(target=self.receive_msg)
+        # receive_thread = th.Thread(target=self.receive_msg)
+        receive_thread = Thread(ThreadStart(self.receive_msg))
+        receive_thread.ApartmentState = ApartmentState.STA
+        receive_thread.Start()
+        # receive_thread.Join()
+
+
+
         
         # interface_thread.start()
-        receive_thread.start()
+        # receive_thread.start()
 
         #get client name for discussions chat
         self.name = Label(text='')
@@ -1904,7 +1932,6 @@ class Chat(tk.Frame):
         self.chat_entry.delete('1.0', 'end')
         client_socket.send(bytes(message,('utf-8')))
 
-  
 
 class CourseMaterials(tk.Frame):
     def __init__(self,parent=None, controller=None, name=None):
@@ -2403,7 +2430,6 @@ class AdminAppointments(tk.Frame):
 
         self.reply_btn=Button(self.reply_frame, text='Send', font=f3, relief=SOLID, cursor='hand2', width=10, state=DISABLED, command=reply_student)
         self.reply_btn.grid(row=2, column=0, padx=10, pady=10)
-
 
 
 class Homepage(tk.Frame):
@@ -3169,11 +3195,30 @@ class Calculator(tk.Frame):
         log_out_btn(self, Loginpage, controller)
 
         #Calculator title
-        w = Label(self, text ='Calculator', font = ('Arial', 28) , bg=bgc)
-        w.pack()
-        w.place(x=585, y=90)
+        self.calc_lbl= Label(self, text ='Calculator', font = ('Arial', 28) , bg=bgc)
+        self.calc_lbl.pack()
+        self.calc_lbl.place(x=585, y=90)
 
-        #calculator webview
+        #Calculator frame
+        self.calc_frame=Frame(self, width=500, height=500, bg='white')
+        self.calc_frame.place(x=400, y=150)
+    
+    def calculator_ui(self):
+        
+        frame2=WebView2(self,100,100)
+        frame2.pack(side='left',padx=20,fill='both',expand=True)
+        frame2.load_url('https://mathway.com')
+
+        # while True:
+        #     # Thread.Sleep(100)
+        #     time.sleep(0.1)
+
+    # def calculator_ui(self):
+    #     frame2 = WebView2(self, 1100, 600)
+    #     frame2.place(x=165, y=150)
+    #     frame2.load_url('https://smart-space.com.cn/')
+
+
 
 
 
@@ -3407,9 +3452,6 @@ class Chatbot(tk.Frame):
         self.text_widget.insert(END, "Bot: " + "Hi, I'm the INTI Study Helpdesk chatbot. How can I help you today?\n")
         self.text_widget.config(state=DISABLED)
     
-
-    
-
 
 class Appointments(tk.Frame):
     def __init__(self, parent, controller):
@@ -3668,7 +3710,6 @@ class Appointments(tk.Frame):
         self.lec_res_tree.heading('Response from Lecturer', text='Response from Lecturer', anchor=CENTER)
 
 
-
 class Games(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -3860,7 +3901,6 @@ class Games(tk.Frame):
         self.stop_btn.place(x=1010, y=635)
 
 
-
 class Profile(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -3934,8 +3974,25 @@ class Profile(tk.Frame):
 
 
 #window
-ws=App()
-ws.title("INTI Study Helpdesk")
-ws.geometry('1380x773+80+5')
-ws.resizable(False,False)
-ws.mainloop()
+
+
+
+def main():
+    ws=App()
+    ws.title("INTI Study Helpdesk")
+    ws.geometry('1380x773+80+5')
+    ws.resizable(False,False)
+    ws.mainloop()
+
+if __name__ == "__main__":
+    # t = Thread(ThreadStart(main))
+    # t.ApartmentState = ApartmentState.STA
+    # t.Start()
+    # t.Join()
+
+    t = th.Thread(target=main)
+    # t.ApartmentState = ApartmentState.STA
+    t.start()
+    t.join()
+
+
