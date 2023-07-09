@@ -3344,11 +3344,11 @@ class Chatbot(tk.Frame):
         self.msg_entry.grid(row=0, column=0, padx=10, pady=10, sticky=W)
 
         #create a send button
-        self.send_btn = Button(self.bottom_frame, text="Send", font=f3, command=self.send_msg)
+        self.send_btn = Button(self.bottom_frame, text="Send", font=f3, command=self.send_msg, cursor="hand2")
         self.send_btn.grid(row=0, column=1, padx=10, pady=10)
 
         #create a restart chatbot button
-        self.chatbot_btn = Button(self, text="Restart Chatbot", font=f3, command=self.msg)
+        self.chatbot_btn = Button(self, text="Restart Chatbot", font=f3, command=self.msg, cursor="hand2")
         self.chatbot_btn.place(x=1075, y=680)
 
         self.text_widget.insert(END, "Bot: " + "Hi, I'm the INTI Study Helpdesk chatbot. How can I help you today?\n")
@@ -3359,7 +3359,7 @@ class Chatbot(tk.Frame):
 
     def chatbot_response(self,message):
         if re.search(r"\bchange password\b", message, re.IGNORECASE):
-            return "You stil can't change your password in this version of the INTI Study Helpdesk yet, stay tuned for future updates."
+            return "You still can't change your password in this version of the INTI Study Helpdesk yet, stay tuned for future updates."
         elif re.search(r"\bhow to use discussion forum|discussion forum|discussions|chat|chat discussions|use forum\b", message, re.IGNORECASE):
             return "To use the discussion forum, go to the discussions page and wait for the lecturer to start a new discussion."
         elif re.search(r"\bwhere and how to do and submit quizzes|quiz|complete quizzes|submit quizzes\b", message, re.IGNORECASE):
