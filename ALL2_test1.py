@@ -3399,7 +3399,7 @@ class Chatbot(tk.Frame):
         self.text_widget.insert(END, "Bot: " + "Hi, I'm the INTI Study Helpdesk chatbot. How can I help you today?\n")
         self.text_widget.configure(state=DISABLED)
 
-        self.msg_entry.bind("<Return>", lambda event: self.send_msg())
+        # self.msg_entry.bind("<Return>", lambda event: self.send_msg())
 
 
     def chatbot_response(self,message):
