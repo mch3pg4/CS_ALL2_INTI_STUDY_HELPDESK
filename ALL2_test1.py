@@ -322,6 +322,8 @@ class App(tk.Tk):
         # t.start()
         # t.join()
         frame.calculator_ui()
+        frame.bind("<Button-1>", frame.handle_click)
+
 
 class Loginpage(tk.Frame):
     def __init__(self, parent, controller):
@@ -3199,15 +3201,37 @@ class Calculator(tk.Frame):
         self.calc_lbl.pack()
         self.calc_lbl.place(x=585, y=90)
 
-        #Calculator frame
-        self.calc_frame=Frame(self, bg='white')
-        self.calc_frame.place(x=400, y=150)
+        
+
+
     
+
+    #show calculator webview
     def calculator_ui(self):
 
-        frame2=WebView2(self,1100,600)
-        frame2.place(x=165, y=150)
-        frame2.load_url('https://mathway.com')
+        self.calc_frame=WebView2(self,1100,600)
+        self.calc_frame.place(x=165, y=150)
+        self.calc_frame.load_url('https://mathway.com')
+
+
+    def handle_click(event, self):
+# Check if the click event occurred outside of the frame
+        if event.widget == self.calc_frame:
+            # Do something when clicked outside the frame
+            print("Clicked outside of the frame")
+
+        # root =  self.winfo_toplevel()
+        # root.calc_frame.bind("<Button-1>", handle_click)
+
+        
+    
+    
+
+
+    
+
+    
+        
 
         # while True:
         #     # Thread.Sleep(100)
@@ -3399,7 +3423,7 @@ class Chatbot(tk.Frame):
         self.text_widget.insert(END, "Bot: " + "Hi, I'm the INTI Study Helpdesk chatbot. How can I help you today?\n")
         self.text_widget.configure(state=DISABLED)
 
-        # self.msg_entry.bind("<Return>", lambda event: self.send_msg())
+        self.msg_entry.bind("<Return>", lambda event: self.send_msg())
 
 
     def chatbot_response(self,message):
