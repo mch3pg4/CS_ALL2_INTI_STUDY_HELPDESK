@@ -311,25 +311,25 @@ class App(tk.Tk):
             wraptxt2= textwrap.fill(row[4], width=30)
             frame.stud_ques_tv.insert('', tk.END, values=(row[0], row[1], wraptxt, wraptxt2))
 
-    def updateCalculator(self):
-        frame=self.frames[Calculator]
-        # t = Thread(ThreadStart(frame.calculator_ui))
-        # t.ApartmentState = ApartmentState.STA
-        # t.Start()
-        # t.Join()
-        # t=th.Thread(target=frame.calculator_ui)
-        # t.start()
-        # t.join()
-        frame.calculator_ui()
+    # def updateCalculator(self):
+    #     frame=self.frames[Calculator]
+    #     # t = Thread(ThreadStart(frame.calculator_ui))
+    #     # t.ApartmentState = ApartmentState.STA
+    #     # t.Start()
+    #     # t.Join()
+    #     # t=th.Thread(target=frame.calculator_ui)
+    #     # t.start()
+    #     # t.join()
+    #     # frame.calculator_ui()
 
-    # def handle_focus_out(self, event, frame):
-    #     if event.widget.focus_get() is None:
-    #         print('do not focus')
-    #         frame.focus_set()
-    #         frame.config(state='disabled')
-    #     else:
-    #         print('other focus')
-    #         # frame.config(takefocus=True)
+    # # def handle_focus_out(self, event, frame):
+    # #     if event.widget.focus_get() is None:
+    # #         print('do not focus')
+    # #         frame.focus_set()
+    # #         frame.config(state='disabled')
+    # #     else:
+    # #         print('other focus')
+    # #         # frame.config(takefocus=True)
 
 
 
@@ -384,7 +384,7 @@ class Loginpage(tk.Frame):
                     controller.updateAppointments(login_details)
                     controller.updateAdminAppt(login_details)
                     controller.updateChat(login_details, controller)
-                    controller.updateCalculator()
+                    # controller.updateCalculator()
                     if bcrypt.checkpw(upwd.encode('utf-8'),login_details[5].encode('utf-8')) & (login_details[4]== 'Student'):
                         controller.show_frame(Homepage)
 
@@ -3209,14 +3209,26 @@ class Calculator(tk.Frame):
         self.calc_lbl.pack()
         self.calc_lbl.place(x=585, y=90)
 
+        #pause button to temporarily stop calculator
+        self.pause_btn=Button(self, text='Start', font=f3, relief=SOLID, cursor='hand2', width=10, command=self.calculator_ui)
+        self.pause_btn.place(x=915, y=90)
+
         # self.bind('<Leave>', lambda event: controller.handle_focus_out(event, self.calc_frame))
 
     #show calculator webview
     def calculator_ui(self):
 
-        self.calc_frame=WebView2(self,1100,600)
-        self.calc_frame.place(x=165, y=150)
-        self.calc_frame.load_url('https://mathway.com')
+        
+
+    # def pause_calc(self):
+        if self.pause_btn.cget('text')=='Start':
+            self.calc_frame=WebView2(self,1100,600, takefocus=0)
+            self.calc_frame.place(x=165, y=150)
+            self.calc_frame.load_url('https://mathway.com')
+            self.pause_btn.config(text='Stop')
+        else:
+            self.calc_frame.destroy()
+            self.pause_btn.config(text='Start')
 
         
 
