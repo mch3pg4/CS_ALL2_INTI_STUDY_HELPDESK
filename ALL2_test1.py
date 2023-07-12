@@ -22,7 +22,6 @@ from mysql.connector import Error
 from captcha.image import ImageCaptcha
 from tktooltip import ToolTip
 from tkPDFViewer import tkPDFViewer as pdf
-from tkinterweb import HtmlFrame, HtmlLabel
 from tkwebview2.tkwebview2 import WebView2, clr, have_runtime, install_runtime
 clr.AddReference('System.Windows.Forms')
 clr.AddReference('System.Threading')
@@ -322,7 +321,16 @@ class App(tk.Tk):
         # t.start()
         # t.join()
         frame.calculator_ui()
-        frame.bind("<Button-1>", frame.handle_click)
+
+    # def handle_focus_out(self, event, frame):
+    #     if event.widget.focus_get() is None:
+    #         print('do not focus')
+    #         frame.focus_set()
+    #         frame.config(state='disabled')
+    #     else:
+    #         print('other focus')
+    #         # frame.config(takefocus=True)
+
 
 
 class Loginpage(tk.Frame):
@@ -3201,10 +3209,7 @@ class Calculator(tk.Frame):
         self.calc_lbl.pack()
         self.calc_lbl.place(x=585, y=90)
 
-        
-
-
-    
+        # self.bind('<Leave>', lambda event: controller.handle_focus_out(event, self.calc_frame))
 
     #show calculator webview
     def calculator_ui(self):
@@ -3213,34 +3218,16 @@ class Calculator(tk.Frame):
         self.calc_frame.place(x=165, y=150)
         self.calc_frame.load_url('https://mathway.com')
 
-
-    def handle_click(event, self):
-# Check if the click event occurred outside of the frame
-        if event.widget == self.calc_frame:
-            # Do something when clicked outside the frame
-            print("Clicked outside of the frame")
-
-        # root =  self.winfo_toplevel()
-        # root.calc_frame.bind("<Button-1>", handle_click)
-
         
-    
-    
 
+    # def handle_focus_out(event):
+    #         event.frame.focus_set()
+    #         print(event.frame.focus_get())
 
-    
-
-    
-        
 
         # while True:
         #     # Thread.Sleep(100)
         #     time.sleep(0.1)
-
-    # def calculator_ui(self):
-    #     frame2 = WebView2(self, 1100, 600)
-    #     frame2.place(x=165, y=150)
-    #     frame2.load_url('https://smart-space.com.cn/')
 
 
 
@@ -3998,10 +3985,8 @@ class Profile(tk.Frame):
 
 
 #window
-
-
-
 def main():
+
     ws=App()
     ws.title("INTI Study Helpdesk")
     ws.geometry('1380x773+80+5')
@@ -4013,10 +3998,13 @@ if __name__ == "__main__":
     # t.ApartmentState = ApartmentState.STA
     # t.Start()
     # t.Join()
-
+    
     t = th.Thread(target=main)
     # t.ApartmentState = ApartmentState.STA
     t.start()
     t.join()
+    
+
+    
 
 
