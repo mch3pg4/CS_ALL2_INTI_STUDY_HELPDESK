@@ -311,25 +311,7 @@ class App(tk.Tk):
             wraptxt2= textwrap.fill(row[4], width=30)
             frame.stud_ques_tv.insert('', tk.END, values=(row[0], row[1], wraptxt, wraptxt2))
 
-    # def updateCalculator(self):
-    #     frame=self.frames[Calculator]
-    #     # t = Thread(ThreadStart(frame.calculator_ui))
-    #     # t.ApartmentState = ApartmentState.STA
-    #     # t.Start()
-    #     # t.Join()
-    #     # t=th.Thread(target=frame.calculator_ui)
-    #     # t.start()
-    #     # t.join()
-    #     # frame.calculator_ui()
-
-    # # def handle_focus_out(self, event, frame):
-    # #     if event.widget.focus_get() is None:
-    # #         print('do not focus')
-    # #         frame.focus_set()
-    # #         frame.config(state='disabled')
-    # #     else:
-    # #         print('other focus')
-    # #         # frame.config(takefocus=True)
+   
 
 
 
@@ -403,10 +385,10 @@ class Loginpage(tk.Frame):
         Label(self.left_frame, text="Email", bg='salmon',font=f).grid(row=0, column=0, sticky=W, pady=10)
         Label(self.left_frame, text="Password", bg='salmon',font=f).grid(row=1, column=0, pady=10)
         self.email_tf = Entry(self.left_frame, font=f)
-        self.email_tf.insert(0, 'lect1@gmail.com')   #default value for testing
+        # self.email_tf.insert(0, 'lect1@gmail.com')   #default value for testing
 
-        self.pwd_tf = Entry(self.left_frame, font=f, show='*')    #default value for testing
-        self.pwd_tf.insert(0, 'Lect,1234')
+        self.pwd_tf = Entry(self.left_frame, font=f, show='*')    
+        # self.pwd_tf.insert(0, 'Lect,1234')           #default value for testing
         self.pwd_btn=Button(self, text='Show', width=4, font=('Arial', 9), cursor= "hand2",command=lambda:toggle_password(self.pwd_tf, self.pwd_btn))
         self.pwd_btn.place(x=1123, y=382)
         
@@ -3213,14 +3195,9 @@ class Calculator(tk.Frame):
         self.pause_btn=Button(self, text='Start', font=f3, relief=SOLID, cursor='hand2', width=10, command=self.calculator_ui)
         self.pause_btn.place(x=915, y=90)
 
-        # self.bind('<Leave>', lambda event: controller.handle_focus_out(event, self.calc_frame))
 
     #show calculator webview
     def calculator_ui(self):
-
-        
-
-    # def pause_calc(self):
         if self.pause_btn.cget('text')=='Start':
             self.calc_frame=WebView2(self,1100,600, takefocus=0)
             self.calc_frame.place(x=165, y=150)
@@ -3229,18 +3206,6 @@ class Calculator(tk.Frame):
         else:
             self.calc_frame.destroy()
             self.pause_btn.config(text='Start')
-
-        
-
-    # def handle_focus_out(event):
-    #         event.frame.focus_set()
-    #         print(event.frame.focus_get())
-
-
-        # while True:
-        #     # Thread.Sleep(100)
-        #     time.sleep(0.1)
-
 
 
 
