@@ -1902,7 +1902,7 @@ class Chat(tk.Frame):
         self.chat_scrolledtxt.place(x=650, y=115)
 
         #add default msg
-        self.chat_scrolledtxt.insert(tk.INSERT, 'Wait for lecturer to start the discussion.\n')
+        self.chat_scrolledtxt.insert(tk.INSERT, 'Press the START button to join the discussion.\n')
 
         #chat msg input entry
         #frame
